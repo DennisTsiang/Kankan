@@ -1,22 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html  ng-app="ui" >
 <head>
 
-  <!-- link in the core bootstrap css -->
-  <link href="css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-animate.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
+   <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
+   <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
   <link href="stylesheet.css" rel="stylesheet">
+
+<script>
+
+angular.module('ui', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
+angular.module('ui').controller('myCtrl', function($scope) {
+    $scope.nameChange = function() {
+        return $scope.name + "1";
+    };
+});
+
+angular.module('ui').controller('ButtonsCtrl', function ($scope) {
+  $scope.singleModel = 1;
+
+  $scope.radioModel = 'Middle';
+
+  $scope.checkModel = {
+    left: false,
+    middle: true,
+    right: false
+  };
+
+  $scope.checkResults = [];
+
+  $scope.$watchCollection('checkModel', function () {
+    $scope.checkResults = [];
+    angular.forEach($scope.checkModel, function (value, key) {
+      if (value) {
+        $scope.checkResults.push(key);
+      }
+    });
+  });
+});
+</script>
 
   <title> Pulse - a Free kanban organisational tool </title>
 
 </head>
 <body>
 
-  <div class="jumbotron">
-  <h1> Welcome to Pulse </h1>
-  </div>
+<div class="jumbotron">
+<h1> Welcome to Pulse </h1>
+</div>
 
-  <div class ="container-fluid">
+<div class="container-fluid" ng-controller="myCtrl" >
+
+  <div class="row">
+
+    <div class="col-sm-1">
+    <button type="button" class="btn" ng-click="name = nameChange()">Add</button>
+    </div>
+
+    <div class="col-sm-5 col-md-4">
+    <p> Hello </p>
+
+      <p>Name : <input type="text" ng-model="name" ></p>
+      <h1>Hello {{name}}</h1>
+
+    </div>
+
+    <div class="col-sm-5 col-md-6">
+    <p> Goodbye</p>
+    </div>
+
+    <div class="col-sm-1"></div>
+
+  </div>
 
     <div class="row">
 
@@ -24,55 +82,55 @@
       <button type="button" class="btn">Basic</button>
       </div>
 
-      <div class="col-sm-5 col-md-4">
+      <div class="col-sm-4 col-md-5">
       <p> Hello </p>
-
-      <img src = "cheese.jpg" class="img-responsive"></img>
-
-
-
-      <div class="container-fluid" ng-app="">
-        <p>Name : <input type="text" ng-model="name"></p>
-        <h1>Hello {{name}}</h1>
       </div>
 
-      </div>
-
-      <div class="col-sm-5 col-md-6">
+      <div class="col-sm-6 col-md-5">
       <p> Goodbye</p>
       </div>
 
       <div class="col-sm-1"></div>
 
+
     </div>
 
-      <div class="row">
-
-        <div class="col-sm-1">
-        <button type="button" class="btn">Basic</button>
-        </div>
-
-        <div class="col-sm-4 col-md-5">
-        <p> Hello </p>
-        </div>
-
-        <div class="col-sm-6 col-md-5">
-        <p> Goodbye</p>
-        </div>
-
-        <div class="col-sm-1"></div>
+</div>
 
 
-      </div>
+<div ng-controller="ButtonsCtrl">
+    <h4>Single toggle</h4>
+    <pre>{{singleModel}}</pre>
+    <button type="button" class="btn btn-primary" ng-model="singleModel" uib-btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">
+        Single Toggle
+    </button>
+    <h4>Checkbox</h4>
+    <pre>Model: {{checkModel}}</pre>
+    <pre>Results: {{checkResults}}</pre>
+    <div class="btn-group">
+        <label class="btn btn-primary" ng-model="checkModel.left" uib-btn-checkbox>Left</label>
+        <label class="btn btn-primary" ng-model="checkModel.middle" uib-btn-checkbox>Middle</label>
+        <label class="btn btn-primary" ng-model="checkModel.right" uib-btn-checkbox>Right</label>
+    </div>
+    <h4>Radio &amp; Uncheckable Radio</h4>
+    <pre>{{radioModel || 'null'}}</pre>
+    <div class="btn-group">
+        <label class="btn btn-primary" ng-model="radioModel" uib-btn-radio="'Left'">Left</label>
+        <label class="btn btn-primary" ng-model="radioModel" uib-btn-radio="'Middle'">Middle</label>
+        <label class="btn btn-primary" ng-model="radioModel" uib-btn-radio="'Right'">Right</label>
+    </div>
+    <div class="btn-group">
+        <label class="btn btn-success" ng-model="radioModel" uib-btn-radio="'Left'" uncheckable>Left</label>
+        <label class="btn btn-success" ng-model="radioModel" uib-btn-radio="'Middle'" uncheckable>Middle</label>
+        <label class="btn btn-success" ng-model="radioModel" uib-btn-radio="'Right'" uib-uncheckable="uncheckable">Right</label>
+    </div>
+    <div>
+        <button class="btn btn-default" ng-click="uncheckable = !uncheckable">
+            Toggle uncheckable
+        </button>
+    </div>
+</div>
 
-  </div>
-
-
-
-  <!-- jQuery necessary for Bootstraps JavaScript plugins -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="js/bootstrap.min.js"></script>
 
 </body>
 </html>
