@@ -4,6 +4,8 @@
 
   <!-- link in the core bootstrap css -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  <link href="stylesheet.css" rel="stylesheet">
 
   <title> Pulse - a Free kanban organisational tool </title>
 
@@ -26,6 +28,14 @@
       <p> Hello </p>
 
       <img src = "cheese.jpg" class="img-responsive"></img>
+
+
+
+      <div class="container-fluid" ng-app="">
+        <p>Name : <input type="text" ng-model="name"></p>
+        <h1>Hello {{name}}</h1>
+      </div>
+
       </div>
 
       <div class="col-sm-5 col-md-6">
