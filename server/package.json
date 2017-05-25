@@ -1,0 +1,15 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Backend for Pulse web app project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.doc.ic.ac.uk:lab1617_summer/webapps_13.git"
+  },
+  "author": "group 13",
+  "license": "ISC"
+}
