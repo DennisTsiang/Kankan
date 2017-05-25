@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en-GB" ng-app="Pulse">
+
+<head>
+
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  <link href="stylesheet.css" rel="stylesheet">
+</head>
+
+
+<body ng-controller="MainCtrl">
+
+<div ng-app="">
+ <p>Name : <input type="text" ng-model="name"></p>
+ <h1>Hello {{name}}</h1>
+</div>
+
+<!-- Buttons to increment or decrement columns
+<button class="btn btn-success" ng-click="increment('up')">Add Column</button>
+<button class="btn btn-danger" ng-click="increment('down')">Remove Column</button>
+-->
+
+<table class="table table-bordered">
+  <tr>
+    <th ng-repeat="col in cols | limitTo: colCount">{{col}}</th>
+  </tr>
+  <div class="row">
+    <tr>
+      <td>
+        <div class="ticket">
+          Ticket id#471
+        </div>
+      </td>
+      <td>
+        <div class="ticket">
+          Ticket id#455
+        </div>
+      </td>
+      <td>
+        <div class="ticket">
+          Ticket id#489
+        </div>
+      </td>
+    </tr>
+  </div>
+
+  <!--
+  <tr ng-repeat="row in data">
+    <td ng-repeat="item in row | limitTo: colCount">{{item}}</td>
+  </tr>
+  -->
+
+</table>
+
+<script>
+
+var addEvent = (function () {
+  if (document.addEventListener) {
+    return function (el, type, fn) {
+      if (el && el.nodeName || el === window) {
+        el.addEventListener(type, fn, false);
+      } else if (el && el.length) {
+        for (var i = 0; i < el.length; i++) {
+          addEvent(el[i], type, fn);
+        }
+      }
+    };
+  } else {
+    return function (el, type, fn) {
+      if (el && el.nodeName || el === window) {
+        el.attachEvent('on' + type, function () { return fn.call(el, window.event); });
+      } else if (el && el.length) {
+        for (var i = 0; i < el.length; i++) {
+          addEvent(el[i], type, fn);
+        }
+      }
+    };
+  }
+})();
+
+var app = angular.module('Pulse', []);
+
+app.controller('MainCtrl', function($scope) {
+  var cols =[];
+  var data= [];
+
+  cols.push('To do');
+  cols.push('In Progress');
+  cols.push('Done');
+
+
+  /* populate demo data
+  for (var i=0; i<10;i++){
+    cols.push('Col '+(i+1));
+    var rowData = [];
+    for (var j=0; j<10;j++){
+      rowData.push('Row-'+(i+1) +' - Col '+(j+1))
+    }
+    data.push(rowData)
+  }
+  */
+
+  // app variables
+  $scope.colCount = 3;
+
+  /* Function to add column
+  $scope.increment=function(dir){
+    (dir === 'up')? $scope.colCount ++ : $scope.colCount--;
+  }
+  */
+
+  $scope.cols = cols;
+  $scope.data=data;
+
+
+
+});
+
+var tickets = document.querySelectorAll('.ticket'), el = null;
+for (var i=0; i < tickets.length; i++) {
+  console.log("ticket length: " + tickets.length);
+  el = tickets[i];
+  el.setAttribute('draggable', 'true');
+
+  addEvent(el, 'dragstart', function (e) {
+    e.dataTransfer.setData('Text', "text", 'this is the value of the dragged data');
+  });
+}
+
+
+</script>
+
+</body>
+</html>
