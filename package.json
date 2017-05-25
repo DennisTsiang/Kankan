@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "Backend for Pulse web app project.",
-  "main": "server/index.js",
+  "main": "server/app.js",
   "scripts": {
     "test": "mocha"
   },
