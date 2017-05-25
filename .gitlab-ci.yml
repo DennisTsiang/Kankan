@@ -9,9 +9,8 @@ services:
 
 before_script:
   - npm install
+  - npm install mocha
 
 test_server:
   script:
-    - npm install
-    - npm install mocha
-    - node index.js 
+    - node server/index.js 
