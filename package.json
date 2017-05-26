@@ -13,7 +13,9 @@
   "author": "group 13",
   "license": "ISC",
   "dependencies": {
-    "pg": "^6.2.3",
-    "asyncawait":"^1.0.6"
+    "asyncawait": "^1.0.6",
+    "chai": "^4.0.0",
+    "locks": "^0.2.2",
+    "pg": "^6.2.3"
   }
 }

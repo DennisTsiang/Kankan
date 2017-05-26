@@ -14,6 +14,9 @@ var handleConnection = async(function(request, response) {
     if (url === '/') {
         //send client code
         sendClientCode(response);
+        var d = require('./db_one_table');
+        var d = new d.Database(require('./db'));
+        d.getTickets(0);
     } else if (url === '/app' && method === 'POST') {
         //handle request
         response.end();
