@@ -2,20 +2,25 @@
  * Created by yianni on 25/05/17.
  */
 
-var handleConnection = function(request, response) {
+var await = require('asyncawait/await');
+var async = require('asyncawait/async');
+
+var database = require('./db_one_table');
+var ticket = require('./ticket');
+
+var handleConnection = async(function(request, response) {
     var method = request.method;
     var url = request.url;
     if (url === '/') {
         //send client code
         sendClientCode(response);
-
     } else if (url === '/app' && method === 'POST') {
         //handle request
         response.end();
     } else {
         //error
     }
-};
+});
 
 var clientCodePath = 'Client.html';
 fs = require('fs');
