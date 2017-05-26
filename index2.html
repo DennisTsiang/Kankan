@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-GB" ng-app="Pulse">
+<meta charset="utf-8">
 
 <head>
 
@@ -27,20 +28,21 @@
   </tr>
   <div class="row">
     <tr>
-      <td>
-        <div class="ticket">
-          Ticket id#471
-        </div>
-      </td>
-      <td>
-        <div class="ticket">
-          Ticket id#455
-        </div>
-      </td>
-      <td>
-        <div class="ticket">
-          Ticket id#489
-        </div>
+        <td class="ticket_column">
+          <div class="ticket" id="471">
+            Ticket id#471
+          </div>
+        </td>
+        <td class="ticket_column">
+            <div class="ticket" id="455">
+              Ticket id#455
+            </div>
+          </div>
+        </td>
+      <td class="ticket_column">
+          <div class="ticket" id="489">
+            Ticket id#489
+          </div>
       </td>
     </tr>
   </div>
@@ -53,83 +55,7 @@
 
 </table>
 
-<script>
-
-var addEvent = (function () {
-  if (document.addEventListener) {
-    return function (el, type, fn) {
-      if (el && el.nodeName || el === window) {
-        el.addEventListener(type, fn, false);
-      } else if (el && el.length) {
-        for (var i = 0; i < el.length; i++) {
-          addEvent(el[i], type, fn);
-        }
-      }
-    };
-  } else {
-    return function (el, type, fn) {
-      if (el && el.nodeName || el === window) {
-        el.attachEvent('on' + type, function () { return fn.call(el, window.event); });
-      } else if (el && el.length) {
-        for (var i = 0; i < el.length; i++) {
-          addEvent(el[i], type, fn);
-        }
-      }
-    };
-  }
-})();
-
-var app = angular.module('Pulse', []);
-
-app.controller('MainCtrl', function($scope) {
-  var cols =[];
-  var data= [];
-
-  cols.push('To do');
-  cols.push('In Progress');
-  cols.push('Done');
-
-
-  /* populate demo data
-  for (var i=0; i<10;i++){
-    cols.push('Col '+(i+1));
-    var rowData = [];
-    for (var j=0; j<10;j++){
-      rowData.push('Row-'+(i+1) +' - Col '+(j+1))
-    }
-    data.push(rowData)
-  }
-  */
-
-  // app variables
-  $scope.colCount = 3;
-
-  /* Function to add column
-  $scope.increment=function(dir){
-    (dir === 'up')? $scope.colCount ++ : $scope.colCount--;
-  }
-  */
-
-  $scope.cols = cols;
-  $scope.data=data;
-
-
-
-});
-
-var tickets = document.querySelectorAll('.ticket'), el = null;
-for (var i=0; i < tickets.length; i++) {
-  console.log("ticket length: " + tickets.length);
-  el = tickets[i];
-  el.setAttribute('draggable', 'true');
-
-  addEvent(el, 'dragstart', function (e) {
-    e.dataTransfer.setData('Text', "text", 'this is the value of the dragged data');
-  });
-}
-
-
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
