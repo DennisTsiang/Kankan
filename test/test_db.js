@@ -37,7 +37,7 @@ pool.on('error', function (err, client) {
 //export the query method for passing queries to the pool
 module.exports.query = function (text, values) {
     console.log('query:', text, values);
-    return
+
 };
 
 // the pool also supports checking out a client for
