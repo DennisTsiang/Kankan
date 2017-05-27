@@ -40,46 +40,55 @@ var handleConnection = async(function (request, response) {
 });
 
 function handleRequest(request, callback) {
+  //TODO: Check that request data is good and wont blow up.
   switch (request['type']) {
     case 'kanban':
-      //TODO: Handle request kanban.
+      var kanban = await (db.getKanban(request['pid']));
+      callback(JSON.stringify(kanban));
       break;
 
     case 'tickets':
-      //TODO: Handle request tickets.
+      var tickets = await (db.getKanban(request['pid']));
+      callback(JSON.stringify(kanban));
       break;
 
     default:
       //TODO: Handle unknown request.
       break;
   }
-
-}
-
-function handleUpdate(update, callback) {
-  switch (update['type']) {
-    case 'ticket_moved':
-      //TODO: Handle ticket moved.
-      break;
-
-    case 'ticket_info':
-      //TODO: Handle updte ticket info.
-      break;
-
-    default:
-      //TODO: Handle unknown update.
-      break;
-  }
 }
 
 function handleStore(store, callback) {
+  //TODO: Handle correct store data - not blow up
+  //TODO: catch errors and report to client
   switch (store['type']) {
     case 'ticket_new':
-      //TODO: Handle new ticket.
+      var new_ticket = await (db.newTicket(update['pid'], update['ticket'], update['column_name']));
+      callback(JSON.stringify({'response':'ok'}));
       break;
 
     default:
       //TODO: Handle unknown store.
+      break;
+  }
+}
+
+function handleUpdate(update, callback) {
+  //TODO: Handle correct update data - not blow up
+  //TODO: catch errors and report to client
+  switch (update['type']) {
+    case 'ticket_moved':
+      var move = await (db.moveTicket(update['pid'], update['ticket'], update['to'], update['from']));
+      callback(JSON.stringify({'response':'ok'}));
+      break;
+
+    case 'ticket_info':
+      var info = await (db.updateTicketDesc(update['pid'], update['ticket'], update['new_description']));
+      callback(JSON.stringify({'response':'ok'}));
+      break;
+
+    default:
+      //TODO: Handle unknown update.
       break;
   }
 }
