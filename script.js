@@ -1,4 +1,3 @@
-
 //Adds an event to a HTML element
 var addEvent = (function () {
   if (document.addEventListener) {
@@ -25,7 +24,6 @@ var addEvent = (function () {
 })();
 
 var app = angular.module('Pulse', []);
-
 app.controller('MainCtrl', function($scope) {
   var cols =[];
   var data= [];
@@ -33,7 +31,6 @@ app.controller('MainCtrl', function($scope) {
   cols.push('To do');
   cols.push('In Progress');
   cols.push('Done');
-
 
   /* populate demo data
   for (var i=0; i<10;i++){
@@ -58,52 +55,41 @@ app.controller('MainCtrl', function($scope) {
   $scope.cols = cols;
   $scope.data=data;
 
-
-
 });
 
+$( document ).ready(function(){
+  enableDraggableTickets();
+  enableDnDColumns();
+  addTicket(1, new Ticket(375));
+});
+
+function enableDraggableTickets() {
 //Finds all ticket classes and sets the draggable attribute
 //Also adds the dragstart event.
-var elems = document.querySelectorAll('.ticket'), el = null;
-for (var i=0; i < elems.length; i++) {
-  console.log("ticket length: " + elems.length);
-  el = elems[i];
-  el.setAttribute('draggable', 'true');
-  el.addEventListener('dragstart', handleDragStart, false);
-}
-
-elems = document.querySelectorAll('.ticket_column');
-for (var i=0; i < elems.length; i++) {
-  el = elems[i];
-  el.addEventListener('dragover', handleDragOver, false);
-  el.addEventListener('drop', handleDrop, false);
-  el.addEventListener('dragleave', handleDragLeave, false);
-}
-
-var dragSrcEl = null;
-
-function handleDragStart(e) {
-  e.dataTransfer.setData('Text', e.target.id);
-  e.dataTransfer.effectAllowed = 'move';
-  dragSrcEl = this;
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    this.style.border = "thick solid #0000FF"
-}
-
-function handleDragLeave(e) {
-  this.style.border = "";
-}
-
-function handleDrop(e) {
-  if (dragSrcEl != this ) {
-    console.log("class name:" + e.target.className);
-    e.preventDefault();
-    var data = e.dataTransfer.getData("Text");
-    console.log("ticket id: " + data);
-    this.appendChild(document.getElementById(data));
+  var elems = document.querySelectorAll('.ticket'), el = null;
+  for (var i=0; i < elems.length; i++) {
+    //console.log("ticket length: " + elems.length);
+    el = elems[i];
+    el.setAttribute('draggable', 'true');
+    el.addEventListener('dragstart', handleDragStart, false);
   }
-  this.style.border = "";
+}
+
+function enableDnDColumns() {
+//Each column has drag and drop events listeners
+  elems = document.querySelectorAll('.ticket_column');
+  for (var i=0; i < elems.length; i++) {
+    el = elems[i];
+    el.addEventListener('dragover', handleDragOver, false);
+    el.addEventListener('drop', handleDrop, false);
+    el.addEventListener('dragleave', handleDragLeave, false);
+  }
+}
+
+function addTicket(col, ticket) {
+  var ticket_row = 1;
+  var tid = ticket.ticket_id;
+  var table = document.getElementById("kanban");
+  var ticket_container = table.rows[ticket_row].cells[col];
+  ticket_container.appendChild(ticket.makeDiv());
 }
