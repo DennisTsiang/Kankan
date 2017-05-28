@@ -24,9 +24,18 @@ var addEvent = (function () {
   }
 })();
 
-var app = angular.module('Pulse', []);
+var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
 
 app.controller('MainCtrl', function($scope) {
+
+
+    $scope.addBTN = function() {
+      var newEle = angular.element("<div class='ticket' id='333'>Ticked id #333</div>");
+     var target = document.getElementById('row1');
+     angular.element(target).append(newEle);
+    }
+
+
   var cols =[];
   var data= [];
 
