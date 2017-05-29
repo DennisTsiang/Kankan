@@ -12,10 +12,21 @@ h1 {
   border: 2px solid #26292e;
   border-radius: 4px;
   background-color: #e8eaeb;
+  float: left;
 }
 
 .columnHeader {
 
+}
+
+.buttonHeader {
+  width: 100%;
+  height: 40px;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
 }
 
 .ticket_column {
@@ -23,4 +34,3 @@ h1 {
 }
 
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
->>>>>>> 71de62720904f0268cf69c798feb3cab85e06d41
