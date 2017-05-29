@@ -60,6 +60,7 @@ app.controller('MainCtrl', function($scope) {
 
 });
 
+//Fires as soon as the page DOM has finished loading
 $( document ).ready(function(){
   enableDraggableTickets();
   enableDnDColumns();
@@ -79,7 +80,7 @@ function enableDraggableTickets() {
 }
 
 function enableDnDColumns() {
-//Each column has drag and drop events listeners
+//Each column has drag and drop event listeners
   elems = document.querySelectorAll('.ticket_column');
   for (var i=0; i < elems.length; i++) {
     el = elems[i];

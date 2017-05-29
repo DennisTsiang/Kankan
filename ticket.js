@@ -25,3 +25,7 @@ Ticket.prototype.makeDiv = function() {
   node.appendChild(textNode);
   return node;
 }
+
+Ticket.prototype.addText = function(text) {
+  this.desc = text;
+}
