@@ -34,23 +34,23 @@
   </tr>
   <tr>
         <td class="ticket_column" id="ToDo">
-          <button type="button" class="btn btn-primary" ng-click="addBTN('ToDo')">
+          <button type="button" class="btn btn-primary" ng-click="addBTN(($event).target.parentElement.id)">
             Add
           </button>
-          <div class="ticket" id="471">
-            Ticket id#471
-          </div>
+
         </td>
         <td class="ticket_column" id="InProgress">
-            <div class="ticket" id="455">
-              Ticket id#455
-            </div>
+          <button type="button" class="btn btn-primary" ng-click="addBTN(($event).target.parentElement.id)">
+            Add
+          </button>
+
           </div>
         </td>
       <td class="ticket_column" id="Done">
-          <div class="ticket" id="489">
-            Ticket id#489
-          </div>
+        <button type="button" class="btn btn-primary" ng-click="addBTN(($event).target.parentElement.id)">
+          Add
+        </button>
+        
       </td>
   </tr>
   <!--

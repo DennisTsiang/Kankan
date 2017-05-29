@@ -1,7 +1,10 @@
-var nextavailabletid = -1;
+var nextavailabletid = 0;
 
 function findHighestTid() {
   var tickets = document.querySelectorAll('.ticket');
+  if (tickets.length == 0) {
+    return -1;
+  }
   var highestTid = Math.max.apply(Math,
     Array.prototype.map.call(tickets, function(t){
       return t.id;
