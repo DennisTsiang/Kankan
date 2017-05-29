@@ -19,6 +19,7 @@ Ticket.prototype.makeDiv = function() {
   var node = document.createElement("DIV");
   node.id = this.ticket_id;
   node.className = 'ticket';
+  node.setAttribute('ng-click','$ModalCtrl.open()');
   node.setAttribute('draggable', 'true');
   node.addEventListener('dragstart', handleDragStart, false);
   var textNode = document.createTextNode("Ticket id#"+this.ticket_id);

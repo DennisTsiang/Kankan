@@ -96,3 +96,45 @@ function addTicket(col, ticket) {
   var ticket_container = table.rows[ticket_row].cells[col];
   ticket_container.appendChild(ticket.makeDiv());
 }
+
+angular.module('Pulse').controller('ModalCtrl', function($uibModal, $log, $document) {
+  var ctrl = this;
+
+  ctrl.animationsEnabled = true;
+
+  ctrl.open = function(size, parentSelector) {
+    var parentElem = parentSelector ?
+      angular.element($document[0].querySelector('.ticket-menu ' + parentSelector)) : undefined;
+    var modalInstance = $uibModal.open({
+      animation: ctrl.animationsEnabled,
+      ariaLabelledBy: 'modal-title',
+      ariaDescribedBy: 'modal-body',
+      templateUrl: 'ticket-popup.html',
+      controller: 'ModalInstanceCtrl',
+      controllerAs: 'ModalCtrl',
+      size: size,
+      appendTo: parentElem,
+      resolve: {
+        items: function() {
+          return ctrl.items;
+        }
+      }
+    });
+  };
+});
+
+// Please note that $uibModalInstance represents a modal window (instance) dependency.
+// It is not the same as the $uibModal service used above.
+
+var popupInstance = this;
+angular.module('Pulse').controller('ModalInstanceCtrl', function($uibModalInstance, items) {
+
+
+  popupInstance.ok = function() {
+    $uibModalInstance.close(ModalCtrl.selected.item);
+  };
+
+  popupInstance.cancel = function() {
+    $uibModalInstance.dismiss('cancel');
+  };
+});

@@ -1,136 +1,149 @@
 <!DOCTYPE html>
-<html  ng-app="ui" >
+<html ng-app="ui">
+
 <head>
 
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.js"></script>
-   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-animate.js"></script>
-   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
-   <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
-   <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-animate.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
+  <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
+  <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
   <link href="stylesheet.css" rel="stylesheet">
 
-<script>
-
-angular.module('ui', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
-angular.module('ui').controller('myCtrl', function($scope) {
-    $scope.nameChange = function() {
+  <script>
+    angular.module('ui', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
+    angular.module('ui').controller('myCtrl', function($scope) {
+      $scope.nameChange = function() {
         return $scope.name + "1";
-    };
-});
-
-angular.module('ui').controller('ButtonsCtrl', function ($scope) {
-  $scope.singleModel = 1;
-
-  $scope.radioModel = 'Middle';
-
-  $scope.checkModel = {
-    left: false,
-    middle: true,
-    right: false
-  };
-
-  $scope.checkResults = [];
-
-  $scope.$watchCollection('checkModel', function () {
-    $scope.checkResults = [];
-    angular.forEach($scope.checkModel, function (value, key) {
-      if (value) {
-        $scope.checkResults.push(key);
-      }
+      };
     });
-  });
-});
-</script>
+
+
+    angular.module('ui').controller('ModalCtrl', function($uibModal, $log, $document) {
+      var ctrl = this;
+
+
+      ctrl.animationsEnabled = true;
+
+      ctrl.open = function(size, parentSelector) {
+        var parentElem = parentSelector ?
+          angular.element($document[0].querySelector('.ticket-menu ' + parentSelector)) : undefined;
+        var modalInstance = $uibModal.open({
+          animation: ctrl.animationsEnabled,
+          ariaLabelledBy: 'modal-title',
+          ariaDescribedBy: 'modal-body',
+          templateUrl: 'ticket-popup.html',
+          controller: 'ModalInstanceCtrl',
+          controllerAs: 'ModalCtrl',
+          size: size,
+          appendTo: parentElem,
+          resolve: {
+            items: function() {
+              return ctrl.items;
+            }
+          }
+        });
+      };
+    });
+
+    // Please note that $uibModalInstance represents a modal window (instance) dependency.
+    // It is not the same as the $uibModal service used above.
+
+    var popupInstance = this;
+    angular.module('ui').controller('ModalInstanceCtrl', function($uibModalInstance, items) {
+
+
+      popupInstance.ok = function() {
+        $uibModalInstance.close(ModalCtrl.selected.item);
+      };
+
+      popupInstance.cancel = function() {
+        $uibModalInstance.dismiss('cancel');
+      };
+    });
+
+    // Please note that the close and dismiss bindings are from $uibModalInstance.
+  </script>
 
   <title> Pulse - a Free kanban organisational tool </title>
 
 </head>
+
 <body>
 
-<div class="jumbotron">
-<h1> Welcome to Pulse </h1>
-</div>
 
-<div class="container-fluid" ng-controller="myCtrl" >
 
-  <div class="row">
 
-    <div class="col-sm-1">
-    <button type="button" class="btn" ng-click="name = nameChange()">Add</button>
-    </div>
-
-    <div class="col-sm-5 col-md-4">
-    <p> Hello </p>
-
-      <p>Name : <input type="text" ng-model="name" ></p>
-      <h1>Hello {{name}}</h1>
-
-    </div>
-
-    <div class="col-sm-5 col-md-6">
-    <p> Goodbye</p>
-    </div>
-
-    <div class="col-sm-1"></div>
-
+  <div class="jumbotron">
+    <h1> Welcome to Pulse </h1>
   </div>
 
-    <div class="row">
+  <div class="container-fluid" ng-controller="myCtrl">
 
-      <div class="col-sm-1">
-      <button type="button" class="btn">Basic</button>
+    <div ng-controller="ModalCtrl as $ModalCtrl" class="ticket-menu">
+      <script type="text/ng-template" id="ticket-popup.html">
+
+
+        <div class="modal-header">
+          <h3 class="modal-title" id="modal-title">Edit Ticket</h3>
+        </div>
+
+
+        <div class="modal-body" id="modal-body">
+
+        </div>
+
+
+      </script>
+
+      <button type="button" class="btn btn-default" ng-click="$ModalCtrl.open()">Open me!</button>
+
+
+
+      <div class="row">
+
+        <div class="col-sm-1">
+          <button type="button" class="btn" ng-click="name = nameChange()">Add</button>
+        </div>
+
+        <div class="col-sm-5 col-md-4">
+          <div id="0" class="ticket" draggable="true" ng-click="$ModalCtrl.open()">Ticket id#0</div>
+        </div>
+
+        <div class="col-sm-5 col-md-6">
+          <p> Goodbye</p>
+        </div>
+
+        <div class="col-sm-1"></div>
+
       </div>
 
-      <div class="col-sm-4 col-md-5">
-      <p> Hello </p>
+      <div class="row">
+
+        <div class="col-sm-1">
+          <button type="button" class="btn">Basic</button>
+        </div>
+
+        <div class="col-sm-4 col-md-5">
+          <p> Hello </p>
+        </div>
+
+        <div class="col-sm-6 col-md-5">
+          <p> Goodbye</p>
+        </div>
+
+        <div class="col-sm-1"></div>
+
+
       </div>
-
-      <div class="col-sm-6 col-md-5">
-      <p> Goodbye</p>
-      </div>
-
-      <div class="col-sm-1"></div>
-
-
     </div>
+  </div>
 
-</div>
 
 
-<div ng-controller="ButtonsCtrl">
-    <h4>Single toggle</h4>
-    <pre>{{singleModel}}</pre>
-    <button type="button" class="btn btn-primary" ng-model="singleModel" uib-btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">
-        Single Toggle
-    </button>
-    <h4>Checkbox</h4>
-    <pre>Model: {{checkModel}}</pre>
-    <pre>Results: {{checkResults}}</pre>
-    <div class="btn-group">
-        <label class="btn btn-primary" ng-model="checkModel.left" uib-btn-checkbox>Left</label>
-        <label class="btn btn-primary" ng-model="checkModel.middle" uib-btn-checkbox>Middle</label>
-        <label class="btn btn-primary" ng-model="checkModel.right" uib-btn-checkbox>Right</label>
-    </div>
-    <h4>Radio &amp; Uncheckable Radio</h4>
-    <pre>{{radioModel || 'null'}}</pre>
-    <div class="btn-group">
-        <label class="btn btn-primary" ng-model="radioModel" uib-btn-radio="'Left'">Left</label>
-        <label class="btn btn-primary" ng-model="radioModel" uib-btn-radio="'Middle'">Middle</label>
-        <label class="btn btn-primary" ng-model="radioModel" uib-btn-radio="'Right'">Right</label>
-    </div>
-    <div class="btn-group">
-        <label class="btn btn-success" ng-model="radioModel" uib-btn-radio="'Left'" uncheckable>Left</label>
-        <label class="btn btn-success" ng-model="radioModel" uib-btn-radio="'Middle'" uncheckable>Middle</label>
-        <label class="btn btn-success" ng-model="radioModel" uib-btn-radio="'Right'" uib-uncheckable="uncheckable">Right</label>
-    </div>
-    <div>
-        <button class="btn btn-default" ng-click="uncheckable = !uncheckable">
-            Toggle uncheckable
-        </button>
-    </div>
-</div>
 
 
 </body>
+
 </html>
