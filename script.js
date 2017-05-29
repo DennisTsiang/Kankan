@@ -1,5 +1,6 @@
 var nextavailabletid = 0;
 
+//Finds the highest ticket id on the kanban board
 function findHighestTid() {
   var tickets = document.querySelectorAll('.ticket');
   if (tickets.length == 0) {
@@ -12,6 +13,7 @@ function findHighestTid() {
   return parseInt(highestTid);
 }
 
+//Returns the next available ticket id and increments the nextavailabletid
 function getNextLabel() {
   var label = nextavailabletid;
   nextavailabletid++;
@@ -20,13 +22,6 @@ function getNextLabel() {
 
 var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
 app.controller('MainCtrl', function($scope) {
-
-  $scope.addBTN = function(id) {
-   var ticket = new Ticket(getNextLabel());
-   var newEle = angular.element(ticket.makeDiv());
-   var target = document.getElementById(id);
-   angular.element(target).append(newEle);
-  }
 
   var cols =[];
   var data= [];
@@ -58,6 +53,27 @@ app.controller('MainCtrl', function($scope) {
   $scope.cols = cols;
   $scope.data=data;
 
+});
+
+//Angular directive for the add ticket buttons
+app.directive('addBtn', function($compile) {
+  return {
+    replace: true,
+    template: "<button type='button' class='btn btn-primary'"+
+              "ng-click='addBTN(($event).target.parentElement"+
+                                      ".parentElement.id)'>"+
+                 "Add"+
+              "</button>",
+    controller: function($scope, $element, $attrs) {
+      $scope.addBTN = function(id) {
+       var ticket = new Ticket(getNextLabel());
+       var newEle = angular.element(ticket.makeDiv());
+       $compile(newEle)($scope); //Must compile angular again to get ng-click to work
+       var target = document.getElementById(id);
+       angular.element(target).append(newEle);
+     }
+    }
+  }
 });
 
 //Fires as soon as the page DOM has finished loading
