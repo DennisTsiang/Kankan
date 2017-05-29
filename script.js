@@ -1,30 +1,30 @@
-//Adds an event to a HTML element
-var addEvent = (function () {
-  if (document.addEventListener) {
-    return function (el, type, fn) {
-      if (el && el.nodeName || el === window) {
-        el.addEventListener(type, fn, false);
-      } else if (el && el.length) {
-        for (var i = 0; i < el.length; i++) {
-          addEvent(el[i], type, fn);
-        }
-      }
-    };
-  } else {
-    return function (el, type, fn) {
-      if (el && el.nodeName || el === window) {
-        el.attachEvent('on' + type, function () { return fn.call(el, window.event); });
-      } else if (el && el.length) {
-        for (var i = 0; i < el.length; i++) {
-          addEvent(el[i], type, fn);
-        }
-      }
-    };
-  }
-})();
+var nextavailabletid = -1;
 
-var app = angular.module('Pulse', []);
+function findHighestTid() {
+  var tickets = document.querySelectorAll('.ticket');
+  var highestTid = Math.max.apply(Math,
+    Array.prototype.map.call(tickets, function(t){
+      return t.id;
+  }));
+  return parseInt(highestTid);
+}
+
+function getNextLabel() {
+  var label = nextavailabletid;
+  nextavailabletid++;
+  return label;
+}
+
+var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
 app.controller('MainCtrl', function($scope) {
+
+  $scope.addBTN = function(id) {
+   var ticket = new Ticket(getNextLabel());
+   var newEle = angular.element(ticket.makeDiv());
+   var target = document.getElementById(id);
+   angular.element(target).append(newEle);
+  }
+
   var cols =[];
   var data= [];
 
@@ -60,7 +60,7 @@ app.controller('MainCtrl', function($scope) {
 $( document ).ready(function(){
   enableDraggableTickets();
   enableDnDColumns();
-  addTicket(1, new Ticket(375));
+  nextavailabletid = findHighestTid() + 1;
 });
 
 function enableDraggableTickets() {
