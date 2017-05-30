@@ -1,7 +1,3 @@
-/**
- * Created by yianni on 25/05/17.
- */
-
 var expect = require('chai').expect;
 var assert = require('assert');
 var async = require('asyncawait/async');
@@ -31,11 +27,11 @@ describe('Request', function() {
 
   });
 
-  describe('#handleStore()'), function () {
+  describe('#handleStore()', function () {
 
-  };
+  });
 
-  describe('#handleUpdate()'), function () {
+  describe('#handleUpdate()', function () {
 
-  };
+  });
 });

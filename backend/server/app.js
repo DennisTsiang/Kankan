@@ -5,19 +5,19 @@
 var await = require('asyncawait/await');
 var async = require('asyncawait/async');
 
-var database = require('./db_one_table');
+var database_implementation = require('./db_one_table');
 var ticket = require('./ticket');
-var db = new database.Database(require('./db'));
+var db = new database_implementation.Database(require('./db'));
 
 var handleConnection = async(function (request, response) {
   var method = request.method;
   var url = request.url;
 
-  if (url === '/') {
+  /*if (url === '/') {
     //send client code
     sendClientCode(response);
 
-  } else if (url === '/app' && method === 'POST') {
+  } else */if (url === '/app' && method === 'POST') {
     //handle request
 
     var body = [];
@@ -108,6 +108,7 @@ function handleCommunication(jsonInput, callback) {
   }
 }
 
+/*
 var clientCodePath = 'Client.html';
 fs = require('fs');
 function sendClientCode(response) {
@@ -121,9 +122,9 @@ function sendClientCode(response) {
     response.end();
   });
 }
+*/
 
-
-var httpPort = 8000; //test port
+var httpPort = process.env.SERVER_PORT;
 var http = require('http');
 var httpServer = http.createServer(handleConnection);
 
