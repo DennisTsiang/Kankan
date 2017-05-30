@@ -108,7 +108,6 @@ function enableDnDColumns() {
 
 function addTicket(col, ticket) {
   var ticket_row = 1;
-  var tid = ticket.ticket_id;
   var table = document.getElementById("kanban");
   var ticket_container = table.rows[ticket_row].cells[col];
   ticket_container.appendChild(ticket.makeDiv());
