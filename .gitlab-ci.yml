@@ -6,8 +6,9 @@ services:
 
 before_script:
   - sudo apt-get -y install npm
+  - sudo apt-get -y install nodejs
+  - alias node=nodejs
   - cd backend
-  - pwd
   - npm install
   - npm install mocha
 
