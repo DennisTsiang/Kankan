@@ -13,11 +13,11 @@ var handleConnection = async(function (request, response) {
   var method = request.method;
   var url = request.url;
 
-  /*if (url === '/') {
+  if (url === '/') {
     //send client code
     sendClientCode(response);
 
-  } else */if (url === '/app' && method === 'POST') {
+  } else if (url === '/app' && method === 'POST') {
     //handle request
 
     var body = [];
@@ -108,7 +108,6 @@ function handleCommunication(jsonInput, callback) {
   }
 }
 
-/*
 var clientCodePath = 'Client.html';
 fs = require('fs');
 function sendClientCode(response) {
@@ -122,7 +121,7 @@ function sendClientCode(response) {
     response.end();
   });
 }
-*/
+
 
 var httpPort = process.env.SERVER_PORT;
 var http = require('http');
