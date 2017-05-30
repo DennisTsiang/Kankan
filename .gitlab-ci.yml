@@ -5,6 +5,7 @@ services:
    - postgres:latest
 
 before_script:
+  - sudo apt-get install npm
   - npm install
   - npm install mocha
 
