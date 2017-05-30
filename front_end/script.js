@@ -20,7 +20,7 @@ function getNextLabel() {
   return label;
 }
 
-var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
+var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable']);
 app.controller('MainCtrl', function($scope) {
 
   var cols =[];
@@ -113,7 +113,7 @@ function addTicket(col, ticket) {
   ticket_container.appendChild(ticket.makeDiv());
 }
 
-angular.module('Pulse').controller('ModalCtrl', function($uibModal, $log, $document) {
+angular.module('Pulse').controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {
   var ctrl = this;
 
   ctrl.animationsEnabled = true;
@@ -153,4 +153,17 @@ angular.module('Pulse').controller('ModalInstanceCtrl', function($uibModalInstan
   popupInstance.cancel = function() {
     $uibModalInstance.dismiss('cancel');
   };
+});
+
+
+function addKeyPressEventListenerToTicketsPopups() {
+
+}
+
+function saveEdit(el) {
+  var content = el.innerHTML;
+}
+
+angular.module('Pulse').controller('textCtrl', function($scope) {
+    $scope.desc = "Enter ticket description here";
 });

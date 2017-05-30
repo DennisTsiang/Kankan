@@ -10,6 +10,8 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-animate.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
   <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
+  <link href="angular-xeditable/css/xeditable.css" rel="stylesheet">
+  <script src="angular-xeditable/js/xeditable.js"></script>
   <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
   <link href="stylesheet.css" rel="stylesheet">
 </head>
@@ -17,23 +19,24 @@
 
 <body ng-controller="MainCtrl">
 
+  <!-- ModalCtrl handles the popup. Div element surrounds whole body -->
   <div ng-controller="ModalCtrl as $ModalCtrl" class="ticket-menu">
     <script type="text/ng-template" id="ticket-popup.html">
-
 
       <div class="modal-header">
         <h3 class="modal-title" id="modal-title">Edit Ticket</h3>
       </div>
 
-
       <div class="modal-body" id="modal-body">
-
+        <div ng-controller="textCtrl">
+          <p editable-textarea="desc">{{desc}}</p>
+        </div>
       </div>
 
-
     </script>
+    <!--
     <button type="button" class="btn btn-default" ng-click="$ModalCtrl.open()">Open me!</button>
-
+    -->
 
 
   <!--
