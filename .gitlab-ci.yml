@@ -6,7 +6,7 @@ services:
 
 before_script:
   - sudo apt-get -y install npm
-  - sudo apt-get -y install nodejs
+  - sudo apt-get -y install nodejs-legacy
   - cd backend
   - npm install
   - npm install mocha
