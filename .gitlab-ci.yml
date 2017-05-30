@@ -7,11 +7,10 @@ services:
 before_script:
   - sudo apt-get -y install npm
   - sudo apt-get -y install nodejs
-  - alias node=nodejs
   - cd backend
   - npm install
   - npm install mocha
 
 test_server:
   script:
-    - SERVER_PORT=8080 node backend/server/app.js
+    - SERVER_PORT=8080 nodejs backend/server/app.js
