@@ -13,4 +13,4 @@ before_script:
 
 test_server:
   script:
-    - SERVER_PORT=8080 nodejs backend/server/app.js
+    - SERVER_PORT=8080 nodejs server/app.js
