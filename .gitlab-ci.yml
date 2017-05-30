@@ -3,6 +3,7 @@ variables:
   CI_REGISTRY: "146.169.45.156"
   CI_PROJECT_NAME: "WebApps"
   CI_PROJECT_PATH: "webapp"
+
 # Pick zero or more services to be used on all builds.
 # Only needed when using a docker container to run your tests in.
 # Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-a-service
@@ -40,10 +41,11 @@ deploy_server:
     SERVICE_NAME: $CI_PROJECT_NAME-$PUBLISHED_PORT
 
   script:
-    - 'eval docker build --build-arg published_port=$PUBLISHED_PORT -t $IMAGE_NAME .'
-    - 'eval docker push $IMAGE_NAME'
-    - 'eval docker service rm $SERVICE_NAME || true'
-    - 'eval  docker service create --name $SERVICE_NAME -p $PUBLISHED_PORT:$PUBLISHED_PORT $IMAGE_NAME'
+    - cd ../
+    - docker build --build-arg published_port=$PUBLISHED_PORT -t $IMAGE_NAME .
+    - docker push $IMAGE_NAME
+    - docker service rm $SERVICE_NAME || true
+    - docker service create --name $SERVICE_NAME -p $PUBLISHED_PORT:$PUBLISHED_PORT $IMAGE_NAME
   only:
     - master
   environment: staging
