@@ -13,4 +13,5 @@ before_script:
 
 test_server:
   script:
+    - alias node=nodejs
     - npm test
