@@ -40,10 +40,10 @@ deploy_server:
     SERVICE_NAME: $CI_PROJECT_NAME-$PUBLISHED_PORT
 
   script:
-    - 'docker build --build-arg published_port=$PUBLISHED_PORT -t $IMAGE_NAME .'
-    - 'docker push $IMAGE_NAME'
-    - 'docker service rm $SERVICE_NAME || true'
-    - 'docker service create --name $SERVICE_NAME -p $PUBLISHED_PORT:$PUBLISHED_PORT $IMAGE_NAME'
+    - 'eval docker build --build-arg published_port=$PUBLISHED_PORT -t $IMAGE_NAME .'
+    - 'eval docker push $IMAGE_NAME'
+    - 'eval docker service rm $SERVICE_NAME || true'
+    - 'eval  docker service create --name $SERVICE_NAME -p $PUBLISHED_PORT:$PUBLISHED_PORT $IMAGE_NAME'
   only:
     - master
   environment: staging
