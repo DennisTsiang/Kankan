@@ -16,4 +16,4 @@ ARG published_port=8080
 EXPOSE 8080
 
 #CMD SERVER_PORT=$published_port node server/app.js
-CMD ["SERVER_PORT=8080", "node", "server/app.js"]
+CMD ["SERVER_PORT=8080", "sudo", "node", "server/app.js"]
