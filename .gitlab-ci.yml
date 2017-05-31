@@ -1,6 +1,6 @@
 variables:
   PUBLISHED_PORT: "8080"
-  CI_REGISTRY: "http://146.169.45.156:443"
+  CI_REGISTRY: "tcp://146.169.45.156:443"
   CI_PROJECT_NAME: "webapps"
   CI_PROJECT_PATH: "webapp"
 
