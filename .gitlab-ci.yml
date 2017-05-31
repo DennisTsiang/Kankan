@@ -1,8 +1,8 @@
 variables:
   PUBLISHED_PORT: "8080"
   CI_REGISTRY: "localhost:5000"
-  CI_PROJECT_NAME: "webapps"
-  CI_PROJECT_PATH: ""
+  CI_PROJECT_NAME: "webapp"
+  CI_PROJECT_PATH: "webapp"
 
 # Pick zero or more services to be used on all builds.
 # Only needed when using a docker container to run your tests in.
