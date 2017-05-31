@@ -1,6 +1,6 @@
 variables:
   PUBLISHED_PORT: "8080"
-  CI_REGISTRY: "localhost:5000"
+  CI_REGISTRY: "registry"
   CI_PROJECT_NAME: "webapp"
   CI_PROJECT_PATH: "webapp"
 
@@ -46,9 +46,6 @@ deploy_server:
     - sudo docker push $IMAGE_NAME
     - sudo docker service rm $SERVICE_NAME || true
     - sudo docker service create --name $SERVICE_NAME -p $PUBLISHED_PORT:$PUBLISHED_PORT $IMAGE_NAME
-#   - sudo docker stop $IMAGE_NAME
-#   - sudo docker rm $IMAGE_NAME
-#   - sudo docker run -p 8080:8080 $IMAGE_NAME
   only:
     - master
   environment: staging
