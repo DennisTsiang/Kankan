@@ -13,8 +13,7 @@ RUN npm install
 ARG published_port
 
 EXPOSE $published_port
-#EXPOSE 8080
 
+#TODO: Try and inject published port as argument
 #CMD node server/app.js --SERVER_PORT $published_port
-
-CMD node server/app.js --SERVER_PORT $published_port
+CMD node server/app.js --SERVER_PORT 8080
