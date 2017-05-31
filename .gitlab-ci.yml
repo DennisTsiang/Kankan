@@ -1,6 +1,6 @@
 variables:
   PUBLISHED_PORT: "8080"
-  CI_REGISTRY: "registry"
+  CI_REGISTRY: "localhost:5000"
   CI_PROJECT_NAME: "webapp"
   CI_PROJECT_PATH: "webapp"
 

@@ -1,5 +1,3 @@
-/*Ava test framework?*/
-
 var expect = require('chai').expect;
 var assert = require('assert');
 var async = require('asyncawait/async');

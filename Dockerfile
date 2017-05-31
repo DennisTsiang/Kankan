@@ -10,10 +10,10 @@ WORKDIR /usr/src/app/backend/
 
 RUN npm install
 
-ARG published_port=8080
+#ARG published_port="8080"
 
-#EXPOSE $published_port
-EXPOSE 8080
+EXPOSE $published_port
+#EXPOSE 8080
 
-#CMD SERVER_PORT=$published_port node server/app.js
-CMD ["node", "server/app.js", "--SERVER_PORT", "8080"]
+#CMD node server/app.js --SERVER_PORT $published_port
+CMD ["node", "server/app.js", "--SERVER_PORT", $published_port]
