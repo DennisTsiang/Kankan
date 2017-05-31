@@ -2,7 +2,7 @@ variables:
   PUBLISHED_PORT: "8080"
   CI_REGISTRY: "localhost:5000"
   CI_PROJECT_NAME: "webapps"
-  CI_PROJECT_PATH: "webapp"
+  CI_PROJECT_PATH: "/"
 
 # Pick zero or more services to be used on all builds.
 # Only needed when using a docker container to run your tests in.
@@ -45,7 +45,8 @@ deploy_server:
     - sudo docker build --build-arg published_port=$PUBLISHED_PORT -t $IMAGE_NAME .
     - sudo docker push $IMAGE_NAME
     - sudo docker service rm $SERVICE_NAME || true
-    - sudo docker service create --name $SERVICE_NAME -p $PUBLISHED_PORT:$PUBLISHED_PORT $IMAGE_NAME
+#    - sudo docker service create --name $SERVICE_NAME -p $PUBLISHED_PORT:$PUBLISHED_PORT $IMAGE_NAME
+    - sudo docker run -p 8080:8080 $IMAGE_NAME
   only:
     - master
   environment: staging
