@@ -10,7 +10,7 @@ WORKDIR /usr/src/app/backend/
 
 RUN npm install
 
-ARG published_port
+ARG $published_port
 
 #EXPOSE published_port
 #EXPOSE 8080
