@@ -2,14 +2,11 @@
  * Created by yianni on 25/05/17.
  */
 
-var await = require('asyncawait/await');
-var async = require('asyncawait/async');
-
 var database_implementation = require('./db_one_table');
 var ticket = require('./ticket');
 var db = new database_implementation.Database(require('./db'));
 
-var handleConnection = async(function (request, response) {
+var handleConnection = function (request, response) {
   var method = request.method;
   var url = request.url;
 
@@ -37,19 +34,21 @@ var handleConnection = async(function (request, response) {
   } else {
     //error
   }
-});
+};
 
 function handleRequest(request, callback) {
   //TODO: Check that request data is good and wont blow up.
   switch (request['type']) {
     case 'kanban':
-      var kanban = await (db.getKanban(request['pid']));
-      callback(JSON.stringify(kanban));
+      db.getKanban(request['pid'], function(kanban) {
+        callback(JSON.stringify(kanban));
+      });
       break;
 
     case 'tickets':
-      var tickets = await (db.getKanban(request['pid']));
-      callback(JSON.stringify(kanban));
+      db.getKanban(request['pid'], function (ticket) {
+        callback(JSON.stringify(ticket));
+      });
       break;
 
     default:
@@ -63,8 +62,9 @@ function handleStore(store, callback) {
   //TODO: catch errors and report to client
   switch (store['type']) {
     case 'ticket_new':
-      var new_ticket = await (db.newTicket(update['pid'], update['ticket'], update['column_name']));
-      callback(JSON.stringify({'response':'ok'}));
+      db.newTicket(update['pid'], update['ticket'], update['column_name'], function(new_ticket) {
+        callback(JSON.stringify({'response':'ok'}));
+      });
       break;
 
     default:
@@ -78,13 +78,15 @@ function handleUpdate(update, callback) {
   //TODO: catch errors and report to client
   switch (update['type']) {
     case 'ticket_moved':
-      var move = await (db.moveTicket(update['pid'], update['ticket'], update['to'], update['from']));
-      callback(JSON.stringify({'response':'ok'}));
+      db.moveTicket(update['pid'], update['ticket'], update['to'], update['from'], function (move) {
+        callback(JSON.stringify({'response':'ok'}));
+      });
       break;
 
     case 'ticket_info':
-      var info = await (db.updateTicketDesc(update['pid'], update['ticket'], update['new_description']));
-      callback(JSON.stringify({'response':'ok'}));
+      db.updateTicketDesc(update['pid'], update['ticket'], update['new_description'], function (info) {
+        callback(JSON.stringify({'response':'ok'}));
+      });
       break;
 
     default:
