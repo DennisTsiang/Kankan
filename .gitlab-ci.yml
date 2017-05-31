@@ -43,7 +43,7 @@ deploy_server:
   script:
     - cd ../
     - sudo docker build --build-arg published_port=$PUBLISHED_PORT -t $IMAGE_NAME .
-#    - sudo docker push $IMAGE_NAME
+    - sudo docker push $IMAGE_NAME
     - sudo docker service rm $SERVICE_NAME || true
     - sudo docker service create --name $SERVICE_NAME -p $PUBLISHED_PORT:$PUBLISHED_PORT $IMAGE_NAME
 #   - sudo docker stop $IMAGE_NAME
