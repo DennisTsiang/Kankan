@@ -124,8 +124,7 @@ function sendClientCode(response) {
   });
 }
 
-
-var httpPort = process.env.SERVER_PORT;
+var httpPort = process.argv[3];
 var http = require('http');
 var httpServer = http.createServer(handleConnection);
 
