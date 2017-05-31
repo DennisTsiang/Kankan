@@ -113,14 +113,14 @@ function addTicket(col, ticket) {
   ticket_container.appendChild(ticket.makeDiv());
 }
 
-angular.module('Pulse').controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {
+app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {
   var ctrl = this;
 
   ctrl.animationsEnabled = true;
-
-  ctrl.open = function(size, parentSelector) {
-    var parentElem = parentSelector ?
-      angular.element($document[0].querySelector('.ticket-menu ' + parentSelector)) : undefined;
+  $scope.tid = -1;
+  ctrl.open = function(tid) {
+    $scope.tid = tid;
+    var parentElem = angular.element($document[0].querySelector('.ticket-menu'));
     var modalInstance = $uibModal.open({
       animation: ctrl.animationsEnabled,
       ariaLabelledBy: 'modal-title',
@@ -128,12 +128,9 @@ angular.module('Pulse').controller('ModalCtrl', function($compile, $scope, $uibM
       templateUrl: 'ticket-popup.html',
       controller: 'ModalInstanceCtrl',
       controllerAs: 'ModalCtrl',
-      size: size,
       appendTo: parentElem,
       resolve: {
-        items: function() {
-          return ctrl.items;
-        }
+
       }
     });
   };
@@ -143,7 +140,7 @@ angular.module('Pulse').controller('ModalCtrl', function($compile, $scope, $uibM
 // It is not the same as the $uibModal service used above.
 
 var popupInstance = this;
-angular.module('Pulse').controller('ModalInstanceCtrl', function($uibModalInstance, items) {
+angular.module('Pulse').controller('ModalInstanceCtrl', function($uibModalInstance) {
 
 
   popupInstance.ok = function() {
@@ -160,10 +157,35 @@ function addKeyPressEventListenerToTicketsPopups() {
 
 }
 
+function updateTicketTextHTML(ticket) {
+    var target = document.getElementById(ticket.ticket_id);
+    target.innerHTML = "Ticked id#" + ticket.ticket_id + "</br>" + ticket.desc;
+}
+
 function saveEdit(el) {
   var content = el.innerHTML;
 }
 
-angular.module('Pulse').controller('textCtrl', function($scope) {
-    $scope.desc = "Enter ticket description here";
+app.controller('textCtrl', function($scope) {
+    function getTicket(id) {
+        //var tickets = document.querySelectorAll(".ticket");
+        for (let ticket of ticketList) {
+            if (ticket.ticket_id == id) {
+                console.log("Found");
+                return ticket;
+            }
+        }
+    }
+    function getTid() {
+        var sel = 'div[ng-controller="ModalCtrl as $ModalCtrl"]';
+        return angular.element(sel).scope().tid;
+
+    }
+    $scope.desc = getTicket(getTid()).desc;
+    $scope.saveEdit = function(text) {
+      var tid = getTid();
+      var ticket = getTicket(tid);
+      ticket.desc = text;
+      updateTicketTextHTML(ticket);
+      };
 });

@@ -1,8 +1,11 @@
+var ticketList = []
+
 //Constructor
 function Ticket(ticket_id) {
   this.ticket_id = ticket_id;
   this.members = new Array();
-  this.desc = null;
+  this.desc = "";
+  ticketList.push(this);
 }
 
 Ticket.prototype.addMembersToTicket = function(array) {
@@ -21,8 +24,8 @@ Ticket.prototype.makeDiv = function() {
   node.className = 'ticket';
   node.setAttribute('draggable', 'true');
   node.addEventListener('dragstart', handleDragStart, false);
-  node.setAttribute('ng-click', "$ModalCtrl.open($(event).target.innerHTML)");
-  node.innerHTML = "Ticked id#" + this.ticket_id + "</br> Empty";
+  node.setAttribute('ng-click', "$ModalCtrl.open("+this.ticket_id+")");
+  node.innerHTML = "Ticked id#" + this.ticket_id + "</br>" + this.desc;
   // var textNode = document.createTextNode("Ticket id#" + this.ticket_id + Empty");
   //node.appendChild(textNode);
   return node;
