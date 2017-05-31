@@ -124,9 +124,13 @@ function sendClientCode(response) {
   });
 }
 
+
+
 var httpPort = process.argv[3];
 var http = require('http');
 var httpServer = http.createServer(handleConnection);
 
-httpServer.listen(httpPort);
+if(!module.parent) {
+  httpServer.listen(httpPort);
+}
 console.log("HTTP server listening on port " + httpPort + " at localhost.");
