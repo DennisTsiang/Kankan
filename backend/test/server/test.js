@@ -1,4 +1,6 @@
 var expect = require('chai').expect;
+var mocha = require('mocha');
+var sinon = require('sinon');
 var assert = require('assert');
 var async = require('asyncawait/async');
 var db = require('../../server/db_one_table');
@@ -12,12 +14,12 @@ describe('Array', function () {
 });
 
 describe('Database', function () {
-  var mock_db = new db.Database(require('../test_db'));
-  describe('Concurrency', function () {
-    it("Works with multiple async calls", function () {
-      mock_db.getTickets();
-    });
-  });
+  var callback = sinon.spy();
+  var mock_db = db.Database(callback);
+  mock_db.getKanban(1, function(something) {});
+
+  //assert(callback.calledOnce);
+
 });
 
 
