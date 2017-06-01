@@ -26,16 +26,28 @@ function App (db) {
 
   this.handleConnection = function (socket) {
     socket.on('request', function (data) {
+      console.log('Received request');
       this.handleRequest(JSON.parse(data), function (response) {
         socket.emit('requestreply', response);
+        console.log('Replied to request');
       });
-    })
+    });
 
-    /*var jsonInput = JSON.parse(bodyString);
-    this.handleCommunication(jsonInput, function (result) {
-      response.write(result);
-      response.end();
-    });*/
+    socket.on('store', function (data) {
+      console.log('Received Store');
+      this.handleStore(JSON.parse(data), function (response) {
+        socket.emit('storereply', response);
+        console.log('Replied to store');
+      });
+    });
+
+    socket.on('update', function(data) {
+      console.log('Received Update');
+      this.handleUpdate(JSON.parse(data), function (response) {
+        socket.emit('updatereply', response);
+        console.log('Replied to update');
+      });
+    });
 
   };
 
