@@ -2,25 +2,21 @@ var URL = "http://kankan.uk";
 var socket = null;
 
 function initiateSocket() {
-    socket = io(URL);
+    socket = io();
 
     //Set listener events
     socket.on('connect', function(){
-        console.log("Successfully connected");
+        console.log("Connect event started");
     });
     socket.on('event', function(data){});
 
     socket.on('disconnect', function(){
         alert("Disconnected from " + URL);
     });
-    
+
     socket.on('requestreply', function(obj) {
         alert(obj);
     });
-}
-
-function socketConnect() {
-    socket.connect(URL, 80);
 }
 
 //check socket status
