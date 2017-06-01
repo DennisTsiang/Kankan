@@ -16,8 +16,8 @@ function setOnEvents() {
         alert("Disconnected from " + URL);
     });
 
-    socket.on('requestreply', function(obj) {
-        alert(obj);
+    socket.on('requestreply', function(reply) {
+        generateTickets(reply);
     });
 
     printSocketStatus();

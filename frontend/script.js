@@ -191,3 +191,7 @@ app.controller('textCtrl', function($scope) {
       updateTicketTextHTML(ticket);
       };
 });
+
+function generateTickets(jsonTickets) {
+    
+}
