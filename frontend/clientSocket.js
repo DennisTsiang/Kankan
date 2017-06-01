@@ -24,6 +24,10 @@ function setOnEvents() {
     updateHandler(JSON.parse(reply));
   });
 
+  socket.on('storereply', function(reply){
+    storeHandler(reply);
+  });
+
   printSocketStatus();
   if (isSocketConnected()) {
     sendTicketsRequest(0);
@@ -50,14 +54,19 @@ function sendTicketsRequest(pid) {
 }
 
 function sendTicketUpdateMoved(ticket, pid, to, from) {
-  var jsonString = {ticket: ticket, pid : pid,
+  var jsonString = {type: 'ticket_moved', ticket: ticket, pid : pid,
     to : to, from : from};
   socket.emit("update", JSON.stringify(jsonString));
 }
 
 function sendTicketUpdateInfo(ticket, pid, desc) {
-  var jsonString = {ticket: ticket, pid : pid, new_description : desc};
+  var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
   socket.emit("update", JSON.stringify(jsonString));
+}
+
+function sendStoreTicket(type, pid, ticket, col) {
+  var jsonString = {type:type, pid : pid, ticket : ticket, column_name : col};
+  socket.emit("store", JSON.stringify(jsonString));
 }
 
 function requestHandler(reply) {
@@ -83,6 +92,15 @@ function requestHandler(reply) {
       case "ticket_info" : {
         break;
       }
+    }
+  }
+}
+
+function storeHandler(reply) {
+  let type = reply.type;
+  switch (type) {
+    case "newticket" : {
+      break;
     }
   }
 }

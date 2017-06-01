@@ -82,7 +82,7 @@ function App (db) {
     //TODO: catch errors and report to client
     switch (store['type']) {
       case 'ticket_new':
-        db.newTicket(update['pid'], update['ticket'], update['column_name'], function (new_ticket) {
+        db.newTicket(store['pid'], store['ticket'], store['column_name'], function (new_ticket) {
           callback({type:'newticket' ,response: 'ok'});
         });
         break;

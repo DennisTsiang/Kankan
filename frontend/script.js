@@ -70,7 +70,9 @@ app.directive('addBtn', function($compile) {
         var newEle = angular.element(ticket.makeDiv());
         $compile(newEle)($scope); //Must compile angular again to get ng-click to work
         var target = document.getElementById(id);
+        var columnNumber = target.cellIndex;
         angular.element(target).append(newEle);
+        sendStoreTicket('ticket_new', 0, ticket, columnNumber);
       }
     }
   }
@@ -181,6 +183,7 @@ app.controller('textCtrl', function($scope) {
       }
     }
   }
+
   function getTid() {
     var sel = 'div[ng-controller="ModalCtrl as $ModalCtrl"]';
     return angular.element(sel).scope().tid;
@@ -188,14 +191,14 @@ app.controller('textCtrl', function($scope) {
   }
 
   $scope.desc = getTicket(getTid()).desc;
-  $scope.saveEdit = function(text) {
+  $scope.saveEdit = function (text) {
     var tid = getTid();
     var ticket = getTicket(tid);
     ticket.desc = text;
     updateTicketTextHTML(ticket);
     sendTicketUpdateInfo(ticket, 0, text);
   };
-
+});
 
 function generateTickets(ticket_list) {
   for (let ticket of ticket_list) {

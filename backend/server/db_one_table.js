@@ -45,7 +45,7 @@ function Database(pool) {
     });
   };
 
-  this.newTicket = function (pid, ticket, columnName, callback) {
+  this.newTicket = function (pid, ticket, columnPos, callback) {
     rwlock.writeLock(function () {
 
       //Check if ticket already exists
@@ -57,25 +57,25 @@ function Database(pool) {
       });
 
       //Collect information for column being moved into
-      pool.query('SELECT column_id, column_position, project_name, column_title ' +
-          'FROM project WHERE project_id = $1::int AND column_title = $2::text', [pid, columnName],
+      pool.query('SELECT column_id, column_title, project_name, column_title ' +
+          'FROM project WHERE project_id = $1::int AND column_position = $2::int', [pid, columnPos],
           function (columnInfoResponse) {
 
             var columnInfo = columnInfoResponse.rows;
-            if (columnInfo.length === 0) throw new Error("New ticket can't be placed in a column that doesn't exist.");
+            //if (columnInfo.length === 0) throw new Error("New ticket can't be placed in a column that doesn't exist.");
             //Check all columns are the same
 
-            for (var i = 1; i < columnInfo.length; i++) {
+            /*for (var i = 1; i < columnInfo.length; i++) {
               if (columnInfo[i-1].column_id !== columnInfo[i].column_id)
                 throw new Error("Column title has inconsistent associated values.");
-            }
+            }*/
 
             columnInfo = columnInfo[0];
 
             try {
               pool.query('INSERT INTO project VALUES ($1::int, $2::text, $3::int, $4::text, ' +
-                  '$5::int, $6::int, $7::text)', [pid, columnInfo['project_name'], ticket.column_id,
-                'sup', columnInfo['column_position'], ticket.ticket_id, ticket.desc],
+                  '$5::int, $6::int, $7::text)', [pid, 0, columnPos,
+                'sup', columnPos, ticket.ticket_id, ticket.desc],
                   function (insertion) {
                 //handle dealing with insertion
 
