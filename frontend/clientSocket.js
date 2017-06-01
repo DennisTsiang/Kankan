@@ -1,4 +1,4 @@
-var URL = "http:/kankan.uk";
+var URL = "http://kankan.uk";
 var socket = null;
 
 function initiateSocket() {
@@ -6,7 +6,7 @@ function initiateSocket() {
 
     //Set listener events
     socket.on('connect', function(){
-        alert("Successfully connected");
+        console.log("Successfully connected");
     });
     socket.on('event', function(data){});
 

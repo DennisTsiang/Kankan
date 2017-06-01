@@ -82,10 +82,9 @@ $( document ).ready(function(){
   enableDnDColumns();
   nextavailabletid = findHighestTid() + 1;
   initiateSocket();
+  socketConnect();
   if (isSocketConnected()) {
       sendTestMessage();
-  } else {
-      socketConnect();
   }
 });
 
