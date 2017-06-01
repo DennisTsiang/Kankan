@@ -1,37 +1,34 @@
-var URL = "http://kankan.uk";
 var socket = null;
 
-function initiateSocket() {
-  socket = io();
-
+function initiateSocket($scope, s_socket) {
   //Set listener events
-  socket.on('connect', setOnEvents);
+  socket = s_socket;
+  setOnEvents($scope)
 }
 
-function setOnEvents() {
+function setOnEvents($scope) {
   console.log("Connected");
-  socket.on('event', function(data){});
 
   socket.on('disconnect', function(){
-    alert("Disconnected from " + URL);
+    alert("Disconnected");
   });
 
   socket.on('requestreply', function(reply) {
-    requestHandler(JSON.parse(reply));
+    requestHandler($scope, JSON.parse(reply));
   });
 
   socket.on('updatereply', function(reply){
-    updateHandler(JSON.parse(reply));
+    updateHandler($scope, JSON.parse(reply));
   });
 
-  printSocketStatus();
-  if (isSocketConnected()) {
-    sendTicketsRequest(0);
-  }
+  printSocketStatus($scope);
+  if (isSocketConnected($scope)) {
 
+  }
+  sendTicketsRequest($scope, 0);
 }
 
-function printSocketStatus(){
+function printSocketStatus($scope){
   if (!socket.connected) {
     console.log("Not connected");
   } else {
@@ -40,41 +37,41 @@ function printSocketStatus(){
 }
 
 //check socket status
-function isSocketConnected() {
+function isSocketConnected($scope) {
   return socket.connected;
 }
 
-function sendTicketsRequest(pid) {
+function sendTicketsRequest($scope, pid) {
   var ticketObj = {type : "tickets", pid : pid};
   socket.emit("request", JSON.stringify(ticketObj));
 }
 
-function sendTicketUpdateMoved(ticket, pid, to, from) {
+function sendTicketUpdateMoved($scope, ticket, pid, to, from) {
   var jsonString = {ticket: ticket, pid : pid,
     to : to, from : from};
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-function sendTicketUpdateInfo(ticket, pid, desc) {
+function sendTicketUpdateInfo($scope, ticket, pid, desc) {
   var jsonString = {ticket: ticket, pid : pid, new_description : desc};
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-function requestHandler(reply) {
+function requestHandler($scope, reply) {
   var type = reply.type;
   var request_data = reply.object;
   switch (type) {
     case "tickets" : {
-      generateTickets(request_data);
+      generateTickets($scope, request_data);
       break;
     }
     case "kanban" : {
-      generate_kanban(request_data);
+      generate_kanban($scope, request_data);
       break;
     }
   }
 
-  function updateHandler(reply) {
+  function updateHandler($scope, reply) {
     let type = reply.type;
     switch (type) {
       case "ticket_moved" : {

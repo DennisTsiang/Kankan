@@ -2,6 +2,6 @@
 //Constructor
 function Project(project_id){
 
-  this.column_id = project_id;
-
+  this.project_id = project_id;
+  this.columns = [];
 }

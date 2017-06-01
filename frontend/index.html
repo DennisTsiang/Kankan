@@ -20,24 +20,24 @@
 
 <body ng-controller="MainCtrl">
 
-  <!-- ModalCtrl handles the popup. Div element surrounds whole body -->
-  <div ng-controller="ModalCtrl as $ModalCtrl" class="ticket-menu">
-    <script type="text/ng-template" id="ticket-popup.html">
+<!-- ModalCtrl handles the popup. Div element surrounds whole body -->
+<div ng-controller="ModalCtrl as $ModalCtrl" class="ticket-menu">
+  <script type="text/ng-template" id="ticket-popup.html">
 
-      <div class="modal-header">
-        <h3 class="modal-title" id="modal-title">Edit Ticket</h3>
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-title">Edit Ticket</h3>
+    </div>
+
+    <div class="modal-body" id="modal-body">
+      <div ng-controller="textCtrl">
+        <p editable-textarea="desc" onaftersave="saveEdit(desc)">{{desc || 'empty'}}</p>
       </div>
+    </div>
 
-      <div class="modal-body" id="modal-body">
-        <div ng-controller="textCtrl">
-          <p editable-textarea="desc" onaftersave="saveEdit(desc)">{{desc || 'empty'}}</p>
-        </div>
-      </div>
-
-    </script>
-    <!--
-    <button type="button" class="btn btn-default" ng-click="$ModalCtrl.open()">Open me!</button>
-    -->
+  </script>
+  <!--
+  <button type="button" class="btn btn-default" ng-click="$ModalCtrl.open()">Open me!</button>
+  -->
 
 
   <!--
@@ -46,43 +46,42 @@
  <h1>Hello {{name}}</h1>
 </div>
 -->
-<!-- Buttons to increment or decrement columns
-<button class="btn btn-success" ng-click="increment('up')">Add Column</button>
-<button class="btn btn-danger" ng-click="increment('down')">Remove Column</button>
--->
-
-<table id="kanban" class="table table-bordered">
-  <tr>
-    <th ng-repeat="col in cols | limitTo: colCount">{{col}}</th>
-  </tr>
-  <tr>
-        <td class="ticket_column" id="ToDo">
-          <div class="buttonHeader">
-            <add-btn></add-btn>
-          </div>
-        </td>
-        <td class="ticket_column" id="InProgress">
-          <div class="buttonHeader">
-            <add-btn></add-btn>
-          </div>
-        </td>
-      <td class="ticket_column" id="Done">
-        <div class="buttonHeader">
-          <add-btn></add-btn>
-        </div>
-      </td>
-  </tr>
-  <!--
-  <tr ng-repeat="row in data">
-    <td ng-repeat="item in row | limitTo: colCount">{{item}}</td>
-  </tr>
+  <!-- Buttons to increment or decrement columns
+  <button class="btn btn-success" ng-click="increment('up')">Add Column</button>
+  <button class="btn btn-danger" ng-click="increment('down')">Remove Column</button>
   -->
+  <div id="kanban_table" ng-controller="kanban_ctrl">
+    <table id="kanban" class="table table-bordered">
+      <tr>
+        <th ng-repeat="col in project.columns">{{col.title}}</th>
+      </tr>
 
-  </table>
+      <tr>
+          <td ng-repeat="col in project.columns" class="ticket_column" id={{col.id}}>
+          <div class="buttonHeader">
+            <add-btn></add-btn>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td ng-repeat="col in project.columns">
+          <div ng-repeat="ticket in col.tickets" >
+               <div ng-click="$ModalCtrl.open(ticket.ticket_id)" ondragstart="handleDragStart" class="ticket">
+                {{ticket.desc}}
+               </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
 </div>
 </body>
-<script src="script.js"></script>
+<script src="Project.js"></script>
+<script src="Column.js"></script>
 <script src="ticket.js"></script>
+<script src="script.js"></script>
 <script src="dnd_handlers.js"></script>
 <script src="clientSocket.js"></script>
 

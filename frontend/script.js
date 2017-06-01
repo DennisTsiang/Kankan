@@ -21,14 +21,24 @@ function getNextLabel() {
 }
 
 var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable']);
-app.controller('MainCtrl', function($scope) {
+app.controller('MainCtrl', function($scope, socket) {
+  initiateSocket($scope, socket);
+});
 
-  var cols =[];
-  var data= [];
+app.controller('kanban_ctrl', function($scope) {
 
-  cols.push('To do');
-  cols.push('In Progress');
-  cols.push('Done');
+  var todo_column = new Column(0);
+  todo_column.title = 'To do';
+  var progress_column = new Column(1);
+  progress_column.title = 'In Progreess';
+  var done_column = new Column(2);
+  done_column.title = 'Done';
+
+  $scope.project = new Project(0);
+  $scope.project.columns.push(todo_column);
+  $scope.project.columns.push(progress_column);
+  $scope.project.columns.push(done_column);
+
 
   /* populate demo data
    for (var i=0; i<10;i++){
@@ -41,22 +51,17 @@ app.controller('MainCtrl', function($scope) {
    }
    */
 
-  // app variables
-  $scope.colCount = 3;
-
   /* Function to add column
    $scope.increment=function(dir){
    (dir === 'up')? $scope.colCount ++ : $scope.colCount--;
    }
    */
 
-  $scope.cols = cols;
-  $scope.data=data;
-
 });
 
 //Angular directive for the add ticket buttons
 app.directive('addBtn', function($compile) {
+  $c = $compile;
   return {
     replace: true,
     template: "<button type='button' class='btn btn-primary'"+
@@ -76,12 +81,47 @@ app.directive('addBtn', function($compile) {
   }
 });
 
+app.factory('socket', function ($rootScope) {
+  var socket = io.connect();
+  return {
+    on: function (eventName, callback) {
+      socket.on(eventName, function () {
+        var args = arguments;
+        $rootScope.$apply(function () {
+          callback.apply(socket, args);
+        });
+      });
+    },
+    emit: function (eventName, data, callback) {
+      socket.emit(eventName, data, function () {
+        var args = arguments;
+        $rootScope.$apply(function () {
+          if (callback) {
+            callback.apply(socket, args);
+          }
+        });
+      })
+    },
+    //TODO: Need to implement connected function
+    /*connected: function (eventName, data, callback) {
+      socket.connected(eventName, data, function () {
+        var args = arguments;
+        $rootScope.$apply(function () {
+          if (callback) {
+            callback.apply(socket, args);
+          }
+        });
+      })
+    }*/
+  };
+});
+
+
 //Fires as soon as the page DOM has finished loading
 $( document ).ready(function(){
   enableDraggableTickets();
   enableDnDColumns();
   nextavailabletid = findHighestTid() + 1;
-  initiateSocket();
   //socketConnect();
 });
 
@@ -108,13 +148,11 @@ function enableDnDColumns() {
   }
 }
 
-function addTicket(col, ticket_id, desc) {
-  let ticket_row = 1;
-  var table = document.getElementById("kanban");
-  var ticket_container = table.rows[ticket_row].cells[col];
+function addTicket($scope, col, ticket_id, desc) {
   var ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
-  ticket_container.appendChild(ticket.makeDiv());
+  var s = angular.element($("#kanban_table")).scope();
+  s.project.columns[col].tickets.push(ticket);
 }
 
 app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {
@@ -194,13 +232,13 @@ app.controller('textCtrl', function($scope) {
   };
 });
 
-function generateTickets(ticket_list) {
-  for (let ticket of ticket_list) {
-    addTicket(ticket.column_id, ticket.id, ticket.desc);
+function generateTickets($scope, ticket_info_list) {
+  for (let ticket_info of ticket_info_list) {
+    addTicket($scope, ticket_info.column_id, ticket_info.id, ticket_info.desc);
   }
 }
 
-function generate_kanban(kanban) {
+function generate_kanban($scope, kanban) {
   var kanban_name = kanban.project_name;
   var columns = kanban.columns;
 
