@@ -38,7 +38,7 @@ describe('App', function () {
     });
   });
 
-  describe('Handle Socket Connection', function () {
+  /*describe('Handle Socket Connection', function () {
     var adapter = require('../test_db_adapter');
     var db = new adapter.Database();
     var mock_app = new app.App(db);
@@ -52,7 +52,7 @@ describe('App', function () {
       });
       app.stop_server();
     });
-  });
+  });*/
 });
 
 
