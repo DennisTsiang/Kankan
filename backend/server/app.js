@@ -10,31 +10,23 @@ var express = require('express')();
 var http = require('http').Server(express);
 var io = require('socket.io')(http);
 
-express.get('/\*', app.handleFileConnection);
-
-io.on('connection', app.handleConnection);
-
-if (!module.parent) {
-  http.listen(httpPort);
-  console.log("HTTP server listening on port " + httpPort + " at localhost.");
-}
-
-
-
+start_server(httpPort);
 
 function App (db) {
 
   this.handleFileConnection = function (request, response) {
-    if (request.pathname === "/") {
-      response.sendFile('../../frontend/index.html');
+    var frontend = __dirname;
+    frontend = frontend.substring(0, frontend.length - 14);
+    if (request.originalUrl === "/") {
+      response.sendFile(frontend + 'frontend/index.html');
     } else {
-      response.sendFile('../../frontend' + request.pathname);
+      response.sendFile(frontend + 'frontend' + request.originalUrl);
     }
   };
 
   this.handleConnection = function (socket) {
     socket.on('request', function (data) {
-      super.handleRequest(JSON.parse(data), function (response) {
+      this.handleRequest(JSON.parse(data), function (response) {
         socket.emit('requestreply', response);
       });
     })
@@ -134,7 +126,28 @@ function App (db) {
       response.end();
     });
   };
-};
+}
+
+module.exports.start_server = start_server;
+module.exports.stop_server = stop_server;
+
+function start_server (port) {
+
+  express.get('/\*', app.handleFileConnection);
+
+  io.on('connection', app.handleConnection);
+
+  if (!module.parent) {
+    http.listen(port);
+    console.log("HTTP server listening on port " + port + " at localhost.");
+  }
+}
+
+function stop_server() {
+  io.close();
+  console.log('Server was closed');
+}
+
 
 
 

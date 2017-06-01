@@ -5,6 +5,7 @@ var assert = require('assert');
 var async = require('asyncawait/async');
 var db = require('../../server/db_one_table');
 var app = require('../../server/app');
+var io = require('socket.io');
 
 describe('Database', function () {
   describe('getKanban', function () {
@@ -23,7 +24,7 @@ describe('Database', function () {
   });
 });
 
-describe('Adapter', function () {
+describe('App', function () {
   describe('Handle Request', function () {
     var adapter = require('../test_db_adapter');
     var db = new adapter.Database();
@@ -36,7 +37,25 @@ describe('Adapter', function () {
       assert(db.getTickets.calledOnce)
     });
   });
+
+  describe('Handle Socket Connection', function () {
+    var adapter = require('../test_db_adapter');
+    var db = new adapter.Database();
+    var mock_app = new app.App(db);
+
+    it('Doesnt crash', function () {
+      app.start_server(8080);
+      var socket = new io('localhost');
+      socket.on('connection', function (socket) {
+        var test_obj = {type:'kanban', pid:1};
+        socket.emit('request', JSON.stringify(test_obj));
+      });
+      app.stop_server();
+    });
+  });
 });
+
+
 
 //TODO: Write server request tests
 describe('Request', function() {
