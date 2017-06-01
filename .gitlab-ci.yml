@@ -16,7 +16,10 @@ stages:
   - deploy
 
 before_script:
-  - sudo apt-get -y install npm
+  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 68576280
+  - sudo apt-add-repository "deb https://deb.nodesource.com/node_6.x $(lsb_release -sc) main"
+  - sudo apt-get update
+  - sudo apt-get install nodejs
   - cd backend
   - npm install
   - npm install mocha
