@@ -16,8 +16,9 @@ stages:
   - deploy
 
 before_script:
-  - sudo apt-get -y install npm
-  - sudo apt-get -y install nodejs-legacy
+  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 68576280
+  - sudo apt-add-repository "deb https://deb.nodesource.com/node_6.x $(lsb_release -sc) main"
+  - sudo apt-get install nodejs
   - cd backend
   - npm install
   - npm install mocha
@@ -46,7 +47,7 @@ deploy_server:
     - sudo docker build --build-arg published_port=$PUBLISHED_PORT -t $IMAGE_NAME .
     - sudo docker push $IMAGE_NAME
     - sudo docker service rm $SERVICE_NAME || true
-    - sudo docker service create --name $SERVICE_NAME -p $PUBLISHED_PORT:$OUTER_PORT $IMAGE_NAME
+    - sudo docker service create --name $SERVICE_NAME -p $OUTER_PORT:$PUBLISHED_PORT $IMAGE_NAME
   only:
     - master
   environment: staging

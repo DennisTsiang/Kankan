@@ -4,7 +4,7 @@
   "description": "Backend for Pulse web app project.",
   "main": "server/app.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha test/server"
   },
   "repository": {
     "type": "git",
