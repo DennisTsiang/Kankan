@@ -4,7 +4,10 @@
 module.exports.App = App;
 
 var httpPort = process.argv[3];
-var app = new App(require('./db_one_table'));
+var db_module = require('./db_one_table');
+var pool = require('./db');
+var db = new db_module.Database(pool);
+var app = new App(db);
 var ticket = require('./ticket');
 var express = require('express')();
 var http = require('http').Server(express);
