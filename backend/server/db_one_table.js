@@ -18,7 +18,7 @@ function Database(pool) {
             var tickets = [];
             res.rows.forEach(function (row) {
               //Create ticket objects
-              tickets.push(new ticket.Ticket(row["ticket_id"], row["ticket_description"], row["column_id"]));
+              tickets.push(new ticket.Ticket(row["ticket_id"], row["column_id"], row["ticket_description"]));
             });
             rwlock.unlock();
             callback(tickets);
