@@ -83,9 +83,6 @@ $( document ).ready(function(){
   nextavailabletid = findHighestTid() + 1;
   initiateSocket();
   //socketConnect();
-  if (isSocketConnected()) {
-      sendTestMessage();
-  }
 });
 
 function enableDraggableTickets() {
