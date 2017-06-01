@@ -3,7 +3,7 @@ var nextavailabletid = 0;
 //Finds the highest ticket id on the kanban board
 function findHighestTid() {
   var tickets = document.querySelectorAll('.ticket');
-  if (tickets.length == 0) {
+  if (tickets.length === 0) {
     return -1;
   }
   var highestTid = Math.max.apply(Math,
@@ -108,8 +108,8 @@ function enableDnDColumns() {
   }
 }
 
-function addTicket(col, ticket_id, desc) {
-  var ticket_row = 1;
+function addTicket(col, ticket) {
+  let ticket_row = 1;
   var table = document.getElementById("kanban");
   var ticket_container = table.rows[ticket_row].cells[col];
   var ticket = new Ticket(ticket_id);
