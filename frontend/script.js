@@ -7,9 +7,9 @@ function findHighestTid() {
     return -1;
   }
   var highestTid = Math.max.apply(Math,
-    Array.prototype.map.call(tickets, function(t){
-      return t.id;
-  }));
+      Array.prototype.map.call(tickets, function(t){
+        return t.id;
+      }));
   return parseInt(highestTid);
 }
 
@@ -31,24 +31,24 @@ app.controller('MainCtrl', function($scope) {
   cols.push('Done');
 
   /* populate demo data
-  for (var i=0; i<10;i++){
-    cols.push('Col '+(i+1));
-    var rowData = [];
-    for (var j=0; j<10;j++){
-      rowData.push('Row-'+(i+1) +' - Col '+(j+1))
-    }
-    data.push(rowData)
-  }
-  */
+   for (var i=0; i<10;i++){
+   cols.push('Col '+(i+1));
+   var rowData = [];
+   for (var j=0; j<10;j++){
+   rowData.push('Row-'+(i+1) +' - Col '+(j+1))
+   }
+   data.push(rowData)
+   }
+   */
 
   // app variables
   $scope.colCount = 3;
 
   /* Function to add column
-  $scope.increment=function(dir){
-    (dir === 'up')? $scope.colCount ++ : $scope.colCount--;
-  }
-  */
+   $scope.increment=function(dir){
+   (dir === 'up')? $scope.colCount ++ : $scope.colCount--;
+   }
+   */
 
   $scope.cols = cols;
   $scope.data=data;
@@ -60,18 +60,18 @@ app.directive('addBtn', function($compile) {
   return {
     replace: true,
     template: "<button type='button' class='btn btn-primary'"+
-              "ng-click='addBTN(($event).target.parentElement"+
-                                      ".parentElement.id)'>"+
-                 "Add"+
-              "</button>",
+    "ng-click='addBTN(($event).target.parentElement"+
+    ".parentElement.id)'>"+
+    "Add"+
+    "</button>",
     controller: function($scope, $element, $attrs) {
       $scope.addBTN = function(id) {
-       var ticket = new Ticket(getNextLabel());
-       var newEle = angular.element(ticket.makeDiv());
-       $compile(newEle)($scope); //Must compile angular again to get ng-click to work
-       var target = document.getElementById(id);
-       angular.element(target).append(newEle);
-     }
+        var ticket = new Ticket(getNextLabel());
+        var newEle = angular.element(ticket.makeDiv());
+        $compile(newEle)($scope); //Must compile angular again to get ng-click to work
+        var target = document.getElementById(id);
+        angular.element(target).append(newEle);
+      }
     }
   }
 });
@@ -112,8 +112,8 @@ function addTicket(col, ticket) {
   let ticket_row = 1;
   var table = document.getElementById("kanban");
   var ticket_container = table.rows[ticket_row].cells[col];
-  var ticket = new Ticket(ticket_id);
-  ticket.setDesc(desc);
+  var ticket = new Ticket(ticket.id);
+  ticket.setDesc(ticket.desc);
   ticket_container.appendChild(ticket.makeDiv());
 }
 
@@ -162,8 +162,8 @@ function addKeyPressEventListenerToTicketsPopups() {
 }
 
 function updateTicketTextHTML(ticket) {
-    var target = document.getElementById(ticket.ticket_id);
-    target.innerHTML = "Ticked id#" + ticket.ticket_id + "</br>" + ticket.desc;
+  var target = document.getElementById(ticket.ticket_id);
+  target.innerHTML = "Ticked id#" + ticket.ticket_id + "</br>" + ticket.desc;
 }
 
 function saveEdit(el) {
@@ -171,31 +171,38 @@ function saveEdit(el) {
 }
 
 app.controller('textCtrl', function($scope) {
-    function getTicket(id) {
-        //var tickets = document.querySelectorAll(".ticket");
-        for (let ticket of ticketList) {
-            if (ticket.ticket_id == id) {
-                console.log("Found");
-                return ticket;
-            }
-        }
+  function getTicket(id) {
+    //var tickets = document.querySelectorAll(".ticket");
+    for (let ticket of ticketList) {
+      if (ticket.ticket_id === id) {
+        console.log("Found");
+        return ticket;
+      }
     }
-    function getTid() {
-        var sel = 'div[ng-controller="ModalCtrl as $ModalCtrl"]';
-        return angular.element(sel).scope().tid;
+  }
+  function getTid() {
+    var sel = 'div[ng-controller="ModalCtrl as $ModalCtrl"]';
+    return angular.element(sel).scope().tid;
 
-    }
-    $scope.desc = getTicket(getTid()).desc;
-    $scope.saveEdit = function(text) {
-      var tid = getTid();
-      var ticket = getTicket(tid);
-      ticket.desc = text;
-      updateTicketTextHTML(ticket);
-      };
+  }
+  $scope.desc = getTicket(getTid()).desc;
+  $scope.saveEdit = function(text) {
+    var tid = getTid();
+    var ticket = getTicket(tid);
+    ticket.desc = text;
+    updateTicketTextHTML(ticket);
+  };
 });
 
-function generateTickets(jsonTickets) {
-    for (let ticket of jsonTickets) {
-        addTicket(ticket.column_id, ticket.id, ticket.desc);
-    }
+function generateTickets(ticket_list) {
+  for (let ticket of ticket_list) {
+    addTicket(ticket.column_id, ticket.id, ticket.desc);
+  }
+}
+
+function generate_kanban(kanban) {
+  var kanban_name = kanban.project_name;
+  var columns = kanban.columns;
+
+  //TODO: Generate table columns corresponding to columns and update project name on ui.
 }
