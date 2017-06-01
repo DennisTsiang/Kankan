@@ -1,10 +1,11 @@
-var ticketList = []
+var ticketList = [];
 
 //Constructor
 function Ticket(ticket_id) {
   this.ticket_id = ticket_id;
   this.members = new Array();
   this.desc = "";
+  this.col  = -1;
   ticketList.push(this);
 }
 
@@ -29,6 +30,10 @@ Ticket.prototype.makeDiv = function() {
   // var textNode = document.createTextNode("Ticket id#" + this.ticket_id + Empty");
   //node.appendChild(textNode);
   return node;
+}
+
+Ticket.prototype.setColumn = function(n) {
+  this.col = n;
 }
 
 // Ticket.prototype.addText = function(text) {
