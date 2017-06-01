@@ -1,0 +1,53 @@
+variables:
+  PUBLISHED_PORT: "8080"
+  OUTER_PORT: "80"
+  CI_REGISTRY: "localhost:5000"
+  CI_PROJECT_NAME: "webapp"
+  CI_PROJECT_PATH: "webapp"
+
+# Pick zero or more services to be used on all builds.
+# Only needed when using a docker container to run your tests in.
+# Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-a-service
+services:
+   - postgres:latest
+
+stages:
+  - test
+  - deploy
+
+before_script:
+  - sudo apt-get -y install npm
+  - sudo apt-get -y install nodejs-legacy
+  - cd backend
+  - npm install
+  - npm install mocha
+
+test_server:
+  stage: test
+  script:
+    - npm test
+
+image: $CI_REGISTRY/gdocker
+
+deploy_server:
+  stage: test
+  script:
+    - npm test
+  artifacts:
+    untracked: true
+
+  stage: deploy
+  variables:
+    IMAGE_NAME: $CI_REGISTRY/$CI_PROJECT_PATH
+    SERVICE_NAME: $CI_PROJECT_NAME-$PUBLISHED_PORT
+
+  script:
+    - cd ../
+    - sudo docker build --build-arg published_port=$PUBLISHED_PORT -t $IMAGE_NAME .
+    - sudo docker push $IMAGE_NAME
+    - sudo docker service rm $SERVICE_NAME || true
+    - sudo docker service create --name $SERVICE_NAME -p $PUBLISHED_PORT:$OUTER_PORT $IMAGE_NAME
+  only:
+    - master
+  environment: staging
+
