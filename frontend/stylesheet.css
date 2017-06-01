@@ -3,9 +3,16 @@ h1 {
    color: navy;
 }
 
+div {
+  word-wrap: break-word;
+
+}
+
 .ticket {
   width: 100px;
-  height: 60px;
+  display: flex;
+  flex-direction: column;
+  min-height: 60px;
   margin: 5px;
   font-weight: bold;
   text-align: center;
