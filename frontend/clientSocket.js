@@ -17,7 +17,7 @@ function setOnEvents() {
     });
 
     socket.on('requestreply', function(reply) {
-        generateTickets(JSON.parse(reply));
+        requestHandler(JSON.parse(reply));
     });
 
     printSocketStatus();
@@ -43,4 +43,17 @@ function isSocketConnected() {
 function sendTestMessage() {
     var ticketObj = {type : "tickets", pid : "0"};
     socket.emit("request", JSON.stringify(ticketObj));
+}
+
+function requestHandler(reply) {
+    var type = reply.type;
+    switch (type) {
+        case "tickets" : {
+            generateTickets(reply.object);
+            break;
+        }
+        case "kanban" : {
+
+        }
+    }
 }
