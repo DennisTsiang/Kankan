@@ -14,6 +14,8 @@ start_server(httpPort);
 
 function App (db) {
 
+  var _this = this;
+
   this.handleFileConnection = function (request, response) {
     var frontend = __dirname;
     frontend = frontend.substring(0, frontend.length - 14);
@@ -27,7 +29,7 @@ function App (db) {
   this.handleConnection = function (socket) {
     socket.on('request', function (data) {
       console.log('Received request');
-      this.handleRequest(JSON.parse(data), function (response) {
+      _this.handleRequest(JSON.parse(data), function (response) {
         socket.emit('requestreply', response);
         console.log('Replied to request');
       });
@@ -35,7 +37,7 @@ function App (db) {
 
     socket.on('store', function (data) {
       console.log('Received Store');
-      this.handleStore(JSON.parse(data), function (response) {
+      _this.handleStore(JSON.parse(data), function (response) {
         socket.emit('storereply', response);
         console.log('Replied to store');
       });
@@ -43,7 +45,7 @@ function App (db) {
 
     socket.on('update', function(data) {
       console.log('Received Update');
-      this.handleUpdate(JSON.parse(data), function (response) {
+      _this.handleUpdate(JSON.parse(data), function (response) {
         socket.emit('updatereply', response);
         console.log('Replied to update');
       });
