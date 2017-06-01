@@ -81,6 +81,12 @@ $( document ).ready(function(){
   enableDraggableTickets();
   enableDnDColumns();
   nextavailabletid = findHighestTid() + 1;
+  initiateSocket();
+  if (isSocketConnected()) {
+      sendTestMessage();
+  } else {
+      socketConnect();
+  }
 });
 
 function enableDraggableTickets() {
