@@ -113,6 +113,7 @@ function addTicket(col, ticket_id, desc) {
   var table = document.getElementById("kanban");
   var ticket_container = table.rows[ticket_row].cells[col];
   var ticket = new Ticket(ticket_id);
+  nextavailabletid = Math.max(ticket_id + 1, nextavailabletid);
   ticket.setDesc(desc);
   ticket_container.appendChild(ticket.makeDiv());
 }
@@ -191,6 +192,7 @@ app.controller('textCtrl', function($scope) {
       var ticket = getTicket(tid);
       ticket.desc = text;
       updateTicketTextHTML(ticket);
+      sendTicketUpdateInfo(ticket, 0, text);
       };
 });
 

@@ -24,10 +24,13 @@ function handleDrop(e) {
     this.appendChild(document.getElementById(data));
     var cell = $(this).closest('td');
     var columnNumber = cell[0].cellIndex;
-    for (let ticket of ticketList) {
-      if (ticket.ticket_id === data) {
-          ticket.setColumn(columnNumber);
-          sendTicketUpdateMoved(ticket, 0, columnNumber, ticket.col)
+    console.log(ticketList.length);
+    for (let i = 0; i < ticketList.length; i++) {
+      if (ticketList[i].ticket_id == data) {
+          console.log("Found ticket");
+          sendTicketUpdateMoved(ticketList[i], 0, columnNumber, ticketList[i].col);
+          ticketList[i].setColumn(columnNumber);
+          break;
       }
     }
   }

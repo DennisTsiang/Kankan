@@ -50,7 +50,7 @@ function Database(pool) {
 
       //Check if ticket already exists
       pool.query('SELECT project_name FROM project ' +
-          'WHERE ticket_id = $1::int AND project_id = $2::int', [ticket.id, pid], function (check_ticket) {
+          'WHERE ticket_id = $1::int AND project_id = $2::int', [ticket.ticket_id, pid], function (check_ticket) {
         if (check_ticket.rows.length > 0) {
           throw new Error("Ticket already exists");
         }
@@ -75,7 +75,7 @@ function Database(pool) {
             try {
               pool.query('INSERT INTO project VALUES ($1::int, $2::text, $3::int, $4::text, ' +
                   '$5::int, $6::int, $7::text)', [pid, columnInfo['project_name'], ticket.column_id,
-                columnInfo['column_title'], columnInfo['column_position'], ticket.id, ticket.desc],
+                'sup', columnInfo['column_position'], ticket.ticket_id, ticket.desc],
                   function (insertion) {
                 //handle dealing with insertion
 
@@ -92,32 +92,27 @@ function Database(pool) {
     });
   };
 
-  this.moveTicket = function (pid, ticket, toColumnName, fromColumnName, callback) {
+  this.moveTicket = function (pid, ticket, toPosition, fromPos, callback) {
     rwlock.writeLock(function () {
-      //Check valid current location
-      pool.query('SELECT column_id FROM project WHERE' +
-          ' column_name = $1::text AND ticket_id = $2::int AND project_id = $3::int', [fromColumnName, ticket.id, pid],
-          function (checkCurrentColumn) {
-            if (checkCurrentColumn.rows.length !== 1) throw new Error("Ticket is currently in multiple columns.");
-          });
-
       //Get column information for toColumn
-      pool.query('SELECT column_id, column_position FROM project ' +
-          'WHERE project_id = $1::int AND column_title = $2::text', [pid, toColumnName],
+      pool.query('SELECT column_title, column_id FROM project ' +
+          'WHERE project_id = $1::int AND column_position = $2::int', [pid, toPosition],
           function (toColumnInfoResponse) {
+           console.log("made is here");
             var toColumnInfo = toColumnInfoResponse.rows;
-            if (toColumnInfo.length === 0) throw new Error("Can't move ticket to a column that doesn't exist.");
+            //if (toColumnInfo.length === 0) throw new Error("Can't move ticket to a column that doesn't exist.");
 
-            if (!toColumnInfo.reduce(function (total, next) {
+            /*if (!toColumnInfo.reduce(function (total, next) {
                   return total === next
                 })) throw new Error("Column title has inconsistent associated values.");
-
+            */
             toColumnInfo = toColumnInfo[0];
 
             pool.query('UPDATE project SET column_id = $1::int, column_position = $2::int, column_title = $3::text ' +
-                ' WHERE project_id = $4::int AND ticket_id = $5::int', [toColumnInfo["column_id"],
-              toColumnInfo["column_position"], toColumnName, pid, ticket.id], function (res) {
+                ' WHERE project_id = $4::int AND ticket_id = $5::int', [toColumnInfo.column_id,
+              toPosition, 'sup', pid, ticket.ticket_id], function (res) {
               rwlock.unlock();
+              console.log("Finished updating");
               callback(true);
             });
       });
@@ -127,7 +122,7 @@ function Database(pool) {
   this.updateTicketDesc = function (pid, ticket, newDescription, callback) {
     rwlock.writeLock(function () {
       pool.query('UPDATE project SET ticket_description = $1::text ' +
-          ' WHERE project_id = $2::int AND ticket_id = $3::int', [newDescription, pid, ticket.id], function (res) {
+          ' WHERE project_id = $2::int AND ticket_id = $3::int', [newDescription, pid, ticket.ticket_id], function (res) {
 
         rwlock.unlock();
         callback(true);

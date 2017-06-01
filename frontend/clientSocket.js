@@ -24,6 +24,8 @@ function setOnEvents() {
         updateHandler(JSON.parse(reply));
     });
 
+    
+
     printSocketStatus();
     if (isSocketConnected()) {
         sendTicketsRequest(0);
@@ -50,13 +52,13 @@ function sendTicketsRequest(pid) {
 }
 
 function sendTicketUpdateMoved(ticket, pid, to, from) {
-    var jsonString = {ticket: ticket, pid : pid,
+    var jsonString = {type: "ticket_moved", ticket: ticket, pid : pid,
                         to : to, from : from};
     socket.emit("update", JSON.stringify(jsonString));
 }
 
 function sendTicketUpdateInfo(ticket, pid, desc) {
-    var jsonString = {ticket: ticket, pid : pid, new_description : desc};
+    var jsonString = {type : "ticket_info", ticket: ticket, pid : pid, new_description : desc};
     socket.emit("update", JSON.stringify(jsonString));
 }
 
