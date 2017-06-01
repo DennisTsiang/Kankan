@@ -31,6 +31,6 @@ Ticket.prototype.makeDiv = function() {
   return node;
 }
 
-Ticket.prototype.addText = function(text) {
-  this.desc = text;
-}
+// Ticket.prototype.addText = function(text) {
+//   this.desc = text;
+// }

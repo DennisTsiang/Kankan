@@ -108,10 +108,12 @@ function enableDnDColumns() {
   }
 }
 
-function addTicket(col, ticket) {
+function addTicket(col, ticket_id, desc) {
   var ticket_row = 1;
   var table = document.getElementById("kanban");
   var ticket_container = table.rows[ticket_row].cells[col];
+  var ticket = new Ticket(ticket_id);
+  ticket.setDesc(desc);
   ticket_container.appendChild(ticket.makeDiv());
 }
 
@@ -193,5 +195,7 @@ app.controller('textCtrl', function($scope) {
 });
 
 function generateTickets(jsonTickets) {
-    
+    for (let ticket of jsonTickets) {
+        addTicket(ticket.column_id, ticket.id, ticket.desc);
+    }
 }

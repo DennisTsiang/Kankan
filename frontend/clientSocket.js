@@ -17,7 +17,7 @@ function setOnEvents() {
     });
 
     socket.on('requestreply', function(reply) {
-        generateTickets(reply);
+        generateTickets(JSON.parse(reply));
     });
 
     printSocketStatus();
