@@ -33,7 +33,7 @@ function App (db) {
     socket.on('request', function (data) {
       console.log('Received request');
       _this.handleRequest(JSON.parse(data), function (response) {
-        socket.emit('requestreply', response);
+        socket.emit('requestreply', JSON.stringify(response));
         console.log('Replied to request');
       });
     });
@@ -41,7 +41,7 @@ function App (db) {
     socket.on('store', function (data) {
       console.log('Received Store');
       _this.handleStore(JSON.parse(data), function (response) {
-        socket.emit('storereply', response);
+        socket.emit('storereply', JSON.stringify(response));
         console.log('Replied to store');
       });
     });
@@ -49,7 +49,7 @@ function App (db) {
     socket.on('update', function(data) {
       console.log('Received Update');
       _this.handleUpdate(JSON.parse(data), function (response) {
-        socket.emit('updatereply', response);
+        socket.emit('updatereply', JSON.stringify(response));
         console.log('Replied to update');
       });
     });
@@ -61,13 +61,13 @@ function App (db) {
     switch (request['type']) {
       case 'kanban':
         db.getKanban(request['pid'], function (kanban) {
-          callback(JSON.stringify(kanban));
+          callback({type:'kanban', object:kanban});
         });
         break;
 
       case 'tickets':
-        db.getTickets(request['pid'], function (ticket) {
-          callback(JSON.stringify(ticket));
+        db.getTickets(request['pid'], function (tickets) {
+          callback({type:'tickets', object:tickets});
         });
         break;
 
@@ -83,7 +83,7 @@ function App (db) {
     switch (store['type']) {
       case 'ticket_new':
         db.newTicket(update['pid'], update['ticket'], update['column_name'], function (new_ticket) {
-          callback(JSON.stringify({'response': 'ok'}));
+          callback({type:'newticket' ,response: 'ok'});
         });
         break;
 
@@ -99,13 +99,13 @@ function App (db) {
     switch (update['type']) {
       case 'ticket_moved':
         db.moveTicket(update['pid'], update['ticket'], update['to'], update['from'], function (move) {
-          callback(JSON.stringify({'response': 'ok'}));
+          callback({type:'moveticket', response: 'ok'});
         });
         break;
 
       case 'ticket_info':
         db.updateTicketDesc(update['pid'], update['ticket'], update['new_description'], function (info) {
-          callback(JSON.stringify({'response': 'ok'}));
+          callback({type:'ticketdesc', response: 'ok'});
         });
         break;
 
