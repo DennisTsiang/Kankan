@@ -28,7 +28,7 @@ function getTicketNewJSON(project, ticket, column){
 
 }
 
-//Create a JSON for tickettCreated or ticketNew (pass this in as a string)
+//Create a JSON for ticketCreated or ticketNew (pass this in as a string)
 function ticketUpdateStatic(type, ticket, project){
 
   return {"type":type, "tid":ticket.ticket_id,
