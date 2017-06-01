@@ -108,7 +108,7 @@ function enableDnDColumns() {
   }
 }
 
-function addTicket(col, ticket) {
+function addTicket(col, ticket_id, desc) {
   let ticket_row = 1;
   var table = document.getElementById("kanban");
   var ticket_container = table.rows[ticket_row].cells[col];

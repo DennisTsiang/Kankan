@@ -22,6 +22,14 @@ function handleDrop(e) {
     var data = e.dataTransfer.getData("Text");
     console.log("ticket id: " + data);
     this.appendChild(document.getElementById(data));
+    var cell = $(this).closest('td');
+    var columnNumber = cell[0].cellIndex;
+    for (let ticket of ticketList) {
+      if (ticket.ticket_id === data) {
+          ticket.setColumn(columnNumber);
+          sendTicketUpdateMoved(ticket, 0, columnNumber, ticket.col)
+      }
+    }
   }
   this.style.border = "";
 }
