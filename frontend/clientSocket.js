@@ -86,22 +86,27 @@ function updateHandler($scope, reply) {
     let type = reply.type;
     switch (type) {
       case "ticket_moved" : {
+        var scope = angular.element($("#kanban_table")).scope();
+        delete scope.project.columns[reply.from_col].tickets[reply.ticket_id];
+        scope.project.columns[reply.to_col].tickets[reply.ticket_id] = scope.project.tickets[reply.ticket_id];
         break;
       }
       case "ticket_info" : {
+        var scope = angular.element($("#kanban_table")).scope();
+        var ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
+        ticket.setDesc(reply.desc);
         break;
       }
     }
 }
 
 function storeHandler($scope, reply) {
-  console.log("Entered store handler");
   let type = reply.type;
   console.log(type);
   switch (type) {
     case "newticket" : {
-      console.log("new ticket");
       addTicket(reply.position, reply.ticket_id, reply.desc);
+      break;
     }
   }
 }
