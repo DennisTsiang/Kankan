@@ -92,13 +92,16 @@ function updateHandler(reply) {
       case "ticket_moved" : {
         var scope = angular.element($("#kanban_table")).scope();
         delete scope.project.columns[reply.from_col].tickets[reply.ticket_id];
-        scope.project.columns[reply.to_col].tickets[reply.ticket_id] = scope.project.tickets[reply.ticket_id];
+        scope.project.columns[reply.to_col].tickets[reply.ticket_id]
+          = scope.project.tickets[reply.ticket_id];
+        scope.$apply();
         break;
       }
       case "ticket_info" : {
         var scope = angular.element($("#kanban_table")).scope();
         var ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
         ticket.setDesc(reply.desc);
+        scope.$apply();
         break;
       }
     }
