@@ -1,25 +1,3 @@
-var nextavailabletid = 0;
-
-//Finds the highest ticket id on the kanban board
-function findHighestTid() {
-  var tickets = document.querySelectorAll('.ticket');
-  if (tickets.length === 0) {
-    return -1;
-  }
-  var highestTid = Math.max.apply(Math,
-      Array.prototype.map.call(tickets, function(t){
-        return t.id;
-      }));
-  return parseInt(highestTid);
-}
-
-//Returns the next available ticket id and increments the nextavailabletid
-function getNextLabel() {
-  var label = nextavailabletid;
-  nextavailabletid++;
-  return label;
-}
-
 var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable']);
 app.controller('MainCtrl', function($scope, socket) {
   initiateSocket($scope, socket);
@@ -39,24 +17,6 @@ app.controller('kanban_ctrl', function($scope) {
   $scope.project.columns.push(progress_column);
   $scope.project.columns.push(done_column);
 
-
-  /* populate demo data
-   for (var i=0; i<10;i++){
-   cols.push('Col '+(i+1));
-   var rowData = [];
-   for (var j=0; j<10;j++){
-   rowData.push('Row-'+(i+1) +' - Col '+(j+1))
-   }
-   data.push(rowData)
-   }
-   */
-
-  /* Function to add column
-   $scope.increment=function(dir){
-   (dir === 'up')? $scope.colCount ++ : $scope.colCount--;
-   }
-   */
-
 });
 
 function addBTN(event) {
@@ -73,31 +33,6 @@ function addBTN(event) {
 
   sendStoreTicket('ticket_new', 0, ticket, column_id);
 }
-//Angular directive for the add ticket buttons
-/*app.directive('addBtn', function($compile) {
-  return {
-    replace: true,
-    template: "<button type='button' class='btn btn-primary'"+
-    "onclick='addBTN(event)'>"+
-    "Add"+
-    "</button>",
-    controller: function($scope, $element, $attrs) {
-      $scope.addBTN = function(id) {
-        var ticket = new Ticket(getNextLabel());
-        let k_scope = angular.element($('#kanban_table')).scope();
-        k_scope.project.tickets.push(ticket);
-        console.log(id);
-        k_scope.project.columns[id].tickets[ticket.ticket_id] = ticket;
-        /*
-        var newEle = angular.element(ticket.makeDiv());
-        $compile(newEle)($scope); //Must compile angular again to get ng-click to work
-        var target = document.getElementById(id);
-        angular.element(target).append(newEle);
-      }
-    }
-  }
-});
-*/
 
 app.factory('socket', function ($rootScope) {
   var socket = io.connect();
@@ -120,39 +55,19 @@ app.factory('socket', function ($rootScope) {
         });
       })
     },
-    //TODO: Need to implement connected function
-    /*connected: function (eventName, data, callback) {
-      socket.connected(eventName, data, function () {
-        var args = arguments;
-        $rootScope.$apply(function () {
-          if (callback) {
-            callback.apply(socket, args);
-          }
-        });
-      })
-    }*/
   };
 });
 
 
 //Fires as soon as the page DOM has finished loading
 $( document ).ready(function(){
-  enableDraggableTickets();
+  //enableDraggableTickets();
   enableDnDColumns();
-  nextavailabletid = findHighestTid() + 1;
-  //socketConnect();
 });
 
-function enableDraggableTickets() {
-//Finds all ticket classes and sets the draggable attribute
-//Also adds the dragstart event.
-  var elems = document.querySelectorAll('.ticket'), el = null;
-  for (var i=0; i < elems.length; i++) {
-    //console.log("ticket length: " + elems.length);
-    el = elems[i];
-    el.setAttribute('draggable', 'true');
-    el.addEventListener('dragstart', handleDragStart, false);
-  }
+function saveEdit(el) {
+  //TODO: work out how this works
+  var content = el.innerHTML;
 }
 
 function enableDnDColumns() {
@@ -167,9 +82,6 @@ function enableDnDColumns() {
 }
 
 function addTicket($scope, col, ticket_id, desc) {
-  let ticket_row = 1;
-  //var table = document.getElementById("kanban");
-  //var ticket_container = table.rows[ticket_row].cells[col];
   var ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
   ticket.setColumn(col);
@@ -204,11 +116,8 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
 
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
 // It is not the same as the $uibModal service used above.
-
 var popupInstance = this;
 angular.module('Pulse').controller('ModalInstanceCtrl', function($uibModalInstance) {
-
-
   popupInstance.ok = function() {
     $uibModalInstance.close(ModalCtrl.selected.item);
   };
@@ -219,37 +128,18 @@ angular.module('Pulse').controller('ModalInstanceCtrl', function($uibModalInstan
 });
 
 
-function addKeyPressEventListenerToTicketsPopups() {
-
-}
-
-function saveEdit(el) {
-  var content = el.innerHTML;
-}
-
 app.controller('textCtrl', function($scope) {
   function getTicket(id) {
-    //var tickets = document.querySelectorAll(".ticket");
     var k_scope = angular.element($('#kanban_table')).scope();
+    console.log(k_scope.project.tickets);
     return k_scope.project.tickets[id];
-
-    /*
-    for (let ticket of k_scope.project.tickets) {
-      if (ticket.ticket_id === id) {
-        console.log("Found");
-        return ticket;
-      }
-    }
-    */
   }
+
   function getTid() {
     var sel = 'div[ng-controller="ModalCtrl as $ModalCtrl"]';
     return angular.element(sel).scope().tid;
   }
 
-
-  console.log(getTid());
-  console.log(getTicket(getTid()));
   $scope.desc = getTicket(getTid()).desc;
   $scope.saveEdit = function(text) {
     var tid = getTid();
