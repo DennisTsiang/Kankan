@@ -66,7 +66,7 @@
 
           <div>
           <div ng-repeat="ticket in col.tickets" ng-click="$ModalCtrl.open(ticket.ticket_id)" draggable="true"
-               id="{{ticket.ticket_id}}" ng-drag ondragstart="handleDragStart(event)" class="ticket">
+               id="{{ticket.ticket_id}}" ondragstart="handleDragStart(event)" class="ticket">
             Ticket id# {{ticket.ticket_id}} </br>
                 {{ticket.desc}}
           </div>

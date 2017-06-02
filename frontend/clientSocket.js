@@ -22,7 +22,7 @@ function setOnEvents($scope) {
   });
 
   socket.on('storereply', function(reply){
-    storeHandler($scope, reply);
+    storeHandler($scope, JSON.parse(reply));
   });
 
   printSocketStatus($scope);
@@ -95,10 +95,13 @@ function updateHandler($scope, reply) {
 }
 
 function storeHandler($scope, reply) {
+  console.log("Entered store handler");
   let type = reply.type;
+  console.log(type);
   switch (type) {
     case "newticket" : {
-      break;
+      console.log("new ticket");
+      addTicket(reply.position, reply.ticket_id, reply.desc);
     }
   }
 }

@@ -166,7 +166,7 @@ function enableDnDColumns() {
   }
 }
 
-function addTicket($scope, col, ticket_id, desc) {
+function addTicket(col, ticket_id, desc) {
   let ticket_row = 1;
   //var table = document.getElementById("kanban");
   //var ticket_container = table.rows[ticket_row].cells[col];
@@ -262,7 +262,7 @@ app.controller('textCtrl', function($scope) {
 function generateTickets($scope, ticket_info_list) {
   console.log(ticket_info_list);
   for (let ticket_info of ticket_info_list) {
-    addTicket($scope, ticket_info.column_id, ticket_info.id, ticket_info.desc);
+    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc);
   }
 }
 

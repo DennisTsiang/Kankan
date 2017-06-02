@@ -80,7 +80,7 @@ function Database(pool) {
                   function (insertion) {
                 //handle dealing with insertion
 
-                    callback(true);
+                    callback(ticket, columnPos);
                   });
 
             } catch (error) {
