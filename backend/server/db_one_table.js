@@ -49,20 +49,12 @@ function Database(pool) {
     });
   };
 
-  this.newTicket = function (pid, ticket, columnPos, callback) {
+  this.newTicket = function (pid, column_id, callback) {
     rwlock.writeLock(function () {
 
-      //Check if ticket already exists
-      pool.query('SELECT project_name FROM project ' +
-          'WHERE ticket_id = $1::int AND project_id = $2::int', [ticket.ticket_id, pid], function (check_ticket) {
-        if (check_ticket.rows.length > 0) {
-          throw new Error("Ticket already exists");
-        }
-      });
-
       //Collect information for column being moved into
-      pool.query('SELECT column_id, column_title, project_name, column_title ' +
-          'FROM project WHERE project_id = $1::int AND column_position = $2::int', [pid, columnPos],
+      pool.query('SELECT column_position, column_title, project_name, column_title ' +
+          'FROM project WHERE project_id = $1::int AND column_position = $2::int', [pid, column_id],
           function (columnInfoResponse) {
 
             var columnInfo = columnInfoResponse.rows;
@@ -78,14 +70,14 @@ function Database(pool) {
 
             try {
               pool.query('INSERT INTO project VALUES ($1::int, $2::text, $3::int, $4::text, ' +
-                  '$5::int, $6::int, $7::text)', [pid, 0, columnPos,
-                'sup', columnPos, ticket.ticket_id, ticket.desc],
+                  '$5::int, (SELECT MAX(ticket_id)+1 FROM project WHERE project_id = $1::int), $6::text)',
+                  [pid, 0, column_id, 'sup', column_id, "New ticket"],
                   function (insertion) {
-                //handle dealing with insertion
+                    //handle dealing with insertion
 
-                    callback(ticket, columnPos);
+                    console.log(insertion);
+                    callback();
                   });
-
             } catch (error) {
               console.error("Error creating new ticket in db.");
               console.error(error);

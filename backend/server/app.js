@@ -84,8 +84,12 @@ function App (db) {
     //TODO: catch errors and report to client
     switch (store['type']) {
       case 'ticket_new':
-        db.newTicket(store['pid'], store['ticket'], store['column_name'], function (new_ticket, position) {
-          callback({type:'newticket', ticket_id:new_ticket.ticket_id, desc:new_ticket.desc, position:position});
+        console.log(store);
+        db.newTicket(store['pid'], store['column_id'], function () {
+          //TODO: Copied from getTickets - return all tickets
+          db.getTickets(store['pid'], function(tickets) {
+            callback({type:'tickets', object:tickets});
+          });
         });
         break;
 

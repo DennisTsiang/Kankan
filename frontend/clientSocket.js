@@ -66,11 +66,9 @@ function sendTicketUpdateInfo(ticket, pid, desc) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-function sendStoreTicket(type, pid, ticket_id, col_id) {
-  ticket_id;
-  //TODO: request ticket from database
-  //var jsonString = {type:type, pid : pid, ticket_id: ticket_id, column_id: col_id};
-  //socket.emit("store", JSON.stringify(jsonString));
+function sendStoreTicket(type, pid, col_id) {
+  var jsonString = {type:type, pid : pid, column_id: col_id};
+  socket.emit("store", JSON.stringify(jsonString));
 }
 
 function requestHandler(reply) {
@@ -108,10 +106,12 @@ function updateHandler(reply) {
 
 function storeHandler(reply) {
   let type = reply.type;
-  console.log(type);
   switch (type) {
-    case "newticket" : {
-      addTicket(reply.position, reply.ticket_id, reply.desc);
+    case "tickets": {//"newticket" : {
+      //TODO: Right when new ticket is created we request the server makes the ticket, and it sends all the tickets
+      // in the project back, like the getTickets request (hence type="tickets"). We only want the ticket that's been
+      // created to be sent back.
+      requestHandler(reply);
       break;
     }
   }

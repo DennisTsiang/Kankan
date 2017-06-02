@@ -47,6 +47,7 @@ function addTicket(col_id, ticket_id, desc) {
 
   //Update change
   s.$apply();
+  console.log("added ticket");
 }
 
 app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {
