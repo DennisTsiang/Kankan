@@ -30,6 +30,7 @@ function handleDrop(e) {
   scope.project.columns[end_col].tickets[id] = scope.project.tickets[id];
 
   sendTicketUpdateMoved(scope.project.tickets[id], 0, end_col, start_col);
+  scope.$apply();
 
   this.style.border = "";
 }

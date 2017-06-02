@@ -1,21 +1,16 @@
+//Fires as soon as the page DOM has finished loading
+$( document ).ready(function(){
+  //enableDraggableTickets();
+  enableDnDColumns();
+  initiateConnection();
+});
+
 var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable']);
-app.controller('MainCtrl', function($scope, socket) {
-  initiateSocket($scope, socket);
+app.controller('MainCtrl', function($scope) {
+  //Empty
 });
 
 app.controller('kanban_ctrl', function($scope) {
-
-  var todo_column = new Column(0);
-  todo_column.title = 'To do';
-  var progress_column = new Column(1);
-  progress_column.title = 'In Progreess';
-  var done_column = new Column(2);
-  done_column.title = 'Finished';
-
-  $scope.project = new Project(0);
-  $scope.project.columns.push(todo_column);
-  $scope.project.columns.push(progress_column);
-  $scope.project.columns.push(done_column);
 
 });
 
@@ -34,37 +29,6 @@ function addBTN(event) {
   sendStoreTicket('ticket_new', 0, ticket, column_id);
 }
 
-app.factory('socket', function ($rootScope) {
-  var socket = io.connect();
-  return {
-    on: function (eventName, callback) {
-      socket.on(eventName, function () {
-        var args = arguments;
-        $rootScope.$apply(function () {
-          callback.apply(socket, args);
-        });
-      });
-    },
-    emit: function (eventName, data, callback) {
-      socket.emit(eventName, data, function () {
-        var args = arguments;
-        $rootScope.$apply(function () {
-          if (callback) {
-            callback.apply(socket, args);
-          }
-        });
-      })
-    },
-  };
-});
-
-
-//Fires as soon as the page DOM has finished loading
-$( document ).ready(function(){
-  //enableDraggableTickets();
-  enableDnDColumns();
-});
-
 function saveEdit(el) {
   //TODO: work out how this works
   var content = el.innerHTML;
@@ -81,13 +45,17 @@ function enableDnDColumns() {
   }
 }
 
-function addTicket($scope, col, ticket_id, desc) {
+function addTicket(col, ticket_id, desc) {
   var ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
   ticket.setColumn(col);
+
   var s = angular.element($("#kanban_table")).scope();
   s.project.tickets.push(ticket);
   s.project.columns[col].tickets[ticket_id] = ticket;
+
+  //Update change
+  s.$apply();
 }
 
 app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {
@@ -149,16 +117,25 @@ app.controller('textCtrl', function($scope) {
   };
 });
 
-function generateTickets($scope, ticket_info_list) {
-  console.log(ticket_info_list);
+function generateTickets(ticket_info_list) {
   for (let ticket_info of ticket_info_list) {
-    addTicket($scope, ticket_info.column_id, ticket_info.id, ticket_info.desc);
+    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc);
   }
 }
 
-function generate_kanban($scope, kanban) {
-  var kanban_name = kanban.project_name;
-  var columns = kanban.columns;
+function generate_kanban(received_project) {
+  var k_scope = angular.element($('#kanban_table')).scope();
 
-  //TODO: Generate table columns corresponding to columns and update project name on ui.
+  var project = new Project(k_scope.pid);
+  k_scope.project = project;
+
+  project.title = received_project.project_name;
+  project.col = received_project.columns;
+
+
+  for (var i = 0; i < received_project.columns.length; i++) {
+    var column = new Column(received_project.columns[i].column_id);
+    column.title = received_project.columns[i].title;
+    project.columns.push(column);
+  }
 }
