@@ -57,19 +57,19 @@
       </tr>
 
       <tr>
-          <td ng-repeat="col in project.columns" class="ticket_column" id={{col.id}}>
+        <td ng-repeat="col in project.columns" class="ticket_column">
           <div class="buttonHeader">
-            <add-btn></add-btn>
+            <button replace="true" type='button' class='btn btn-primary' column_id={{col.column_id}} onclick='addBTN(event)'>
+            Add
+            </button>
           </div>
-        </td>
-      </tr>
 
-      <tr>
-        <td ng-repeat="col in project.columns">
-          <div ng-repeat="ticket in col.tickets" >
-               <div ng-click="$ModalCtrl.open(ticket.ticket_id)" ondragstart="handleDragStart" class="ticket">
+          <div>
+          <div ng-repeat="ticket in col.tickets" ng-click="$ModalCtrl.open(ticket.ticket_id)" draggable="true"
+               id="{{ticket.ticket_id}}" ng-drag ondragstart="handleDragStart(event)" class="ticket">
+            Ticket id# {{ticket.ticket_id}} </br>
                 {{ticket.desc}}
-               </div>
+          </div>
           </div>
         </td>
       </tr>

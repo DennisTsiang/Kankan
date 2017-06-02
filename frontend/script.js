@@ -59,19 +59,34 @@ app.controller('kanban_ctrl', function($scope) {
 
 });
 
+function addBTN(event) {
+  let k_scope = angular.element($('#kanban_table')).scope();
+  let project = k_scope.project;
+
+  var ticket = new Ticket(project.tickets.length);
+  let column_id = event.target.getAttribute("column_id");
+
+  ticket.setColumn(column_id);
+
+  k_scope.project.tickets.push(ticket);
+  k_scope.project.columns[column_id].tickets[ticket.ticket_id] = ticket;
+}
 //Angular directive for the add ticket buttons
-app.directive('addBtn', function($compile) {
-  $c = $compile;
+/*app.directive('addBtn', function($compile) {
   return {
     replace: true,
     template: "<button type='button' class='btn btn-primary'"+
-    "ng-click='addBTN(($event).target.parentElement"+
-    ".parentElement.id)'>"+
+    "onclick='addBTN(event)'>"+
     "Add"+
     "</button>",
     controller: function($scope, $element, $attrs) {
       $scope.addBTN = function(id) {
         var ticket = new Ticket(getNextLabel());
+        let k_scope = angular.element($('#kanban_table')).scope();
+        k_scope.project.tickets.push(ticket);
+        console.log(id);
+        k_scope.project.columns[id].tickets[ticket.ticket_id] = ticket;
+        /*
         var newEle = angular.element(ticket.makeDiv());
         $compile(newEle)($scope); //Must compile angular again to get ng-click to work
         var target = document.getElementById(id);
@@ -80,6 +95,7 @@ app.directive('addBtn', function($compile) {
     }
   }
 });
+*/
 
 app.factory('socket', function ($rootScope) {
   var socket = io.connect();
@@ -149,10 +165,15 @@ function enableDnDColumns() {
 }
 
 function addTicket($scope, col, ticket_id, desc) {
+  let ticket_row = 1;
+  //var table = document.getElementById("kanban");
+  //var ticket_container = table.rows[ticket_row].cells[col];
   var ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
+  ticket.setColumn(col);
   var s = angular.element($("#kanban_table")).scope();
-  s.project.columns[col].tickets.push(ticket);
+  s.project.tickets.push(ticket);
+  s.project.columns[col].tickets[ticket_id] = ticket;
 }
 
 app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {
@@ -162,6 +183,7 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
   $scope.tid = -1;
   ctrl.open = function(tid) {
     $scope.tid = tid;
+    console.log(tid);
     var parentElem = angular.element($document[0].querySelector('.ticket-menu'));
     var modalInstance = $uibModal.open({
       animation: ctrl.animationsEnabled,
@@ -199,11 +221,6 @@ function addKeyPressEventListenerToTicketsPopups() {
 
 }
 
-function updateTicketTextHTML(ticket) {
-  var target = document.getElementById(ticket.ticket_id);
-  target.innerHTML = "Ticked id#" + ticket.ticket_id + "</br>" + ticket.desc;
-}
-
 function saveEdit(el) {
   var content = el.innerHTML;
 }
@@ -211,28 +228,37 @@ function saveEdit(el) {
 app.controller('textCtrl', function($scope) {
   function getTicket(id) {
     //var tickets = document.querySelectorAll(".ticket");
-    for (let ticket of ticketList) {
+    var k_scope = angular.element($('#kanban_table')).scope();
+    return k_scope.project.tickets[id];
+
+    /*
+    for (let ticket of k_scope.project.tickets) {
       if (ticket.ticket_id === id) {
         console.log("Found");
         return ticket;
       }
     }
+    */
   }
   function getTid() {
     var sel = 'div[ng-controller="ModalCtrl as $ModalCtrl"]';
     return angular.element(sel).scope().tid;
-
   }
+
+
+  console.log(getTid());
+  console.log(getTicket(getTid()));
   $scope.desc = getTicket(getTid()).desc;
   $scope.saveEdit = function(text) {
     var tid = getTid();
     var ticket = getTicket(tid);
     ticket.desc = text;
-    updateTicketTextHTML(ticket);
+    sendTicketUpdateInfo(ticket, 0, text);
   };
 });
 
 function generateTickets($scope, ticket_info_list) {
+  console.log(ticket_info_list);
   for (let ticket_info of ticket_info_list) {
     addTicket($scope, ticket_info.column_id, ticket_info.id, ticket_info.desc);
   }

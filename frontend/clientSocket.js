@@ -21,9 +21,13 @@ function setOnEvents($scope) {
     updateHandler($scope, JSON.parse(reply));
   });
 
+  socket.on('storereply', function(reply){
+    storeHandler($scope, reply);
+  });
+
   printSocketStatus($scope);
   if (isSocketConnected($scope)) {
-
+    //move in here line below
   }
   sendTicketsRequest($scope, 0);
 }
@@ -46,15 +50,21 @@ function sendTicketsRequest($scope, pid) {
   socket.emit("request", JSON.stringify(ticketObj));
 }
 
-function sendTicketUpdateMoved($scope, ticket, pid, to, from) {
-  var jsonString = {ticket: ticket, pid : pid,
+function sendTicketUpdateMoved(ticket, pid, to, from) {
+  console.log(to);
+  var jsonString = {type: 'ticket_moved', ticket: ticket, pid : pid,
     to : to, from : from};
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-function sendTicketUpdateInfo($scope, ticket, pid, desc) {
-  var jsonString = {ticket: ticket, pid : pid, new_description : desc};
+function sendTicketUpdateInfo(ticket, pid, desc) {
+  var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
   socket.emit("update", JSON.stringify(jsonString));
+}
+
+function sendStoreTicket(type, pid, ticket, col) {
+  var jsonString = {type:type, pid : pid, ticket : ticket, column_name : col};
+  socket.emit("store", JSON.stringify(jsonString));
 }
 
 function requestHandler($scope, reply) {
@@ -70,8 +80,9 @@ function requestHandler($scope, reply) {
       break;
     }
   }
+}
 
-  function updateHandler($scope, reply) {
+function updateHandler($scope, reply) {
     let type = reply.type;
     switch (type) {
       case "ticket_moved" : {
@@ -80,6 +91,14 @@ function requestHandler($scope, reply) {
       case "ticket_info" : {
         break;
       }
+    }
+}
+
+function storeHandler($scope, reply) {
+  let type = reply.type;
+  switch (type) {
+    case "newticket" : {
+      break;
     }
   }
 }
