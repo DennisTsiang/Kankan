@@ -70,6 +70,8 @@ function addBTN(event) {
 
   k_scope.project.tickets.push(ticket);
   k_scope.project.columns[column_id].tickets[ticket.ticket_id] = ticket;
+
+  sendStoreTicket('ticket_new', 0, ticket, column_id);
 }
 //Angular directive for the add ticket buttons
 /*app.directive('addBtn', function($compile) {
