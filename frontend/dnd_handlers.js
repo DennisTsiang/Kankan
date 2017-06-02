@@ -20,18 +20,14 @@ function handleDragLeave(e) {
 function handleDrop(e) {
   e.preventDefault();
 
-  var scope = angular.element($("#kanban_table")).scope();
+  var scope = get_kanban_scope();
   var start_col = scope.project.tickets[id].col;
 
   var cell = $(e.toElement).closest('td');
   var end_col = cell[0].cellIndex;
 
-  scope.project.tickets[id].setColumn(end_col);
-  delete scope.project.columns[start_col].tickets[id];
-  scope.project.columns[end_col].tickets[id] = scope.project.tickets[id];
-
+  move_tickets(end_col, start_col, id);
   sendTicketUpdateMoved(scope.project.tickets[id], 0, end_col, start_col);
-  scope.$apply();
 
   $(e.toElement).closest('.ticket_column')[0].style.border = "";
   e.srcElement.style.border = "";

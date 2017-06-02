@@ -28,7 +28,6 @@ function setOnEvents() {
   printSocketStatus();
   if (isSocketConnected()) {
     sendKanbanRequest(0/*pid*/);
-    sendTicketsRequest(0/*pid*/);
   }
 }
 
@@ -71,6 +70,11 @@ function sendStoreTicket(type, pid, col_id) {
   socket.emit("store", JSON.stringify(jsonString));
 }
 
+function sendTicketDelete(pid, ticket_id) {
+  var jsonString = {type:'ticket_delete', pid : pid, ticket_id: ticket_id};
+  socket.emit("update", JSON.stringify(jsonString));
+}
+
 function requestHandler(reply) {
   var type = reply.type;
   var request_data = reply.object;
@@ -81,31 +85,38 @@ function requestHandler(reply) {
     }
     case "kanban" : {
       generate_kanban(request_data);
+
+      //Send for tickets, once received kanban.
+      sendTicketsRequest(0/*pid*/);
       break;
     }
   }
 }
 
 function updateHandler(reply) {
-    let type = reply.type;
-    switch (type) {
-      case "ticket_moved" : {
-        var scope = angular.element($("#kanban_table")).scope();
-        delete scope.project.columns[reply.from_col].tickets[reply.ticket_id];
-        scope.project.columns[reply.to_col].tickets[reply.ticket_id]
-          = scope.project.tickets[reply.ticket_id];
-        scope.$apply();
-        break;
-      }
-      case "ticket_info" : {
-        var scope = angular.element($("#kanban_table")).scope();
-        var ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
-        ticket.setDesc(reply.desc);
-        ticket.setDeadline(7);
-        scope.$apply();
-        break;
-      }
+  let type = reply.type;
+  switch (type) {
+    case "ticket_moved" : {
+      move_tickets(reply.to_col, reply.from_col, reply.ticket_id);
+      break;
     }
+    case "ticket_info" : {
+      let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
+      ticket.setDesc(reply.desc);
+      ticket.setDeadline(7);
+      break;
+    }
+    case 'ticket_delete' : {
+      let ticket_id = reply.ticket_id;
+      let project_id = reply.project_id;
+      if (project_id == scope.pid) {
+        delete_ticket(ticket_id);
+      } else {
+        console.error("Getting deletion info for different project.")
+      }
+      break;
+    }
+  }
 }
 
 function storeHandler(reply) {
