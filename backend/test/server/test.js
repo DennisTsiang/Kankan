@@ -18,8 +18,8 @@ describe('Database', function () {
     });
     it('Calls correct query', function () {
 
-      assert(test_db.query.calledWith('SELECT DISTINCT project_name, column_id, column_position FROM ' +
-          'project WHERE project_id = $1::int ORDER BY column_position ASC'));
+     assert(test_db.query.calledWith('SELECT DISTINCT project_name, column_title, column_id, column_position FROM ' +
+         'project WHERE project_id = $1::int ORDER BY column_position ASC'));
     });
   });
 });
