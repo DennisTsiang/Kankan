@@ -18,11 +18,6 @@ function addBTN(event) {
   sendStoreTicket('ticket_new', k_scope.pid, column_id);
 }
 
-function saveEdit(el) {
-  //TODO: work out how this works
-  var content = el.innerHTML;
-}
-
 function enableDnDColumns() {
 //Each column has drag and drop event listeners
   elems = document.querySelectorAll('.ticket_column');
@@ -98,12 +93,13 @@ app.controller('textCtrl', function($scope) {
   }
 
   $scope.desc = getTicket(getTid()).desc;
-  $scope.saveEdit = function(text) {
+  $scope.deadline = getTicket(getTid()).deadline;
+  $scope.saveEditDesc = function(text) {
     var tid = getTid();
     var ticket = getTicket(tid);
-    ticket.desc = text;
     sendTicketUpdateInfo(ticket, $scope.pid, text);
   };
+
 });
 
 function generateTickets(ticket_info_list) {

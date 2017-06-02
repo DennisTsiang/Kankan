@@ -28,7 +28,10 @@
 
     <div class="modal-body" id="modal-body">
       <div ng-controller="textCtrl">
-        <p editable-textarea="desc" onaftersave="saveEdit(desc)">{{desc || 'empty'}}</p>
+        <p editable-textarea="desc" onaftersave="saveEditDesc(desc)">{{desc || 'empty'}}</p>
+
+        <p editable-textarea="deadline" onaftersave="saveEditDesc(desc)">{{deadline || 'empty'}}</p>
+
       </div>
     </div>
   </script>
