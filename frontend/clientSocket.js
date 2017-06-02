@@ -1,38 +1,38 @@
 var socket = null;
 
-function initiateSocket($scope, s_socket) {
+function initiateConnection() {
   //Set listener events
-  socket = s_socket;
-  setOnEvents($scope)
+  socket = io();
+  socket.on('connect', function () {
+    setOnEvents()
+  });
 }
 
-function setOnEvents($scope) {
-  console.log("Connected");
-
+function setOnEvents() {
   socket.on('disconnect', function(){
     alert("Disconnected");
   });
 
   socket.on('requestreply', function(reply) {
-    requestHandler($scope, JSON.parse(reply));
+    requestHandler(JSON.parse(reply));
   });
 
   socket.on('updatereply', function(reply){
-    updateHandler($scope, JSON.parse(reply));
+    updateHandler(JSON.parse(reply));
   });
 
   socket.on('storereply', function(reply){
-    storeHandler($scope, JSON.parse(reply));
+    storeHandler(JSON.parse(reply));
   });
 
-  printSocketStatus($scope);
-  if (isSocketConnected($scope)) {
-    //move in here line below
+  printSocketStatus();
+  if (isSocketConnected()) {
+    sendKanbanRequest(0/*pid*/);
+    sendTicketsRequest(0/*pid*/);
   }
-  sendTicketsRequest($scope, 0);
 }
 
-function printSocketStatus($scope){
+function printSocketStatus(){
   if (!socket.connected) {
     console.log("Not connected");
   } else {
@@ -41,17 +41,21 @@ function printSocketStatus($scope){
 }
 
 //check socket status
-function isSocketConnected($scope) {
+function isSocketConnected() {
   return socket.connected;
 }
 
-function sendTicketsRequest($scope, pid) {
+function sendKanbanRequest(pid) {
+  var ticketObj = {type : "kanban", pid : pid};
+  socket.emit("request", JSON.stringify(ticketObj));
+}
+
+function sendTicketsRequest(pid) {
   var ticketObj = {type : "tickets", pid : pid};
   socket.emit("request", JSON.stringify(ticketObj));
 }
 
 function sendTicketUpdateMoved(ticket, pid, to, from) {
-  console.log(to);
   var jsonString = {type: 'ticket_moved', ticket: ticket, pid : pid,
     to : to, from : from};
   socket.emit("update", JSON.stringify(jsonString));
@@ -62,27 +66,29 @@ function sendTicketUpdateInfo(ticket, pid, desc) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-function sendStoreTicket(type, pid, ticket, col) {
-  var jsonString = {type:type, pid : pid, ticket : ticket, column_name : col};
-  socket.emit("store", JSON.stringify(jsonString));
+function sendStoreTicket(type, pid, ticket_id, col_id) {
+  ticket_id;
+  //TODO: request ticket from database
+  //var jsonString = {type:type, pid : pid, ticket_id: ticket_id, column_id: col_id};
+  //socket.emit("store", JSON.stringify(jsonString));
 }
 
-function requestHandler($scope, reply) {
+function requestHandler(reply) {
   var type = reply.type;
   var request_data = reply.object;
   switch (type) {
     case "tickets" : {
-      generateTickets($scope, request_data);
+      generateTickets(request_data);
       break;
     }
     case "kanban" : {
-      generate_kanban($scope, request_data);
+      generate_kanban(request_data);
       break;
     }
   }
 }
 
-function updateHandler($scope, reply) {
+function updateHandler(reply) {
     let type = reply.type;
     switch (type) {
       case "ticket_moved" : {
@@ -100,7 +106,7 @@ function updateHandler($scope, reply) {
     }
 }
 
-function storeHandler($scope, reply) {
+function storeHandler(reply) {
   let type = reply.type;
   console.log(type);
   switch (type) {

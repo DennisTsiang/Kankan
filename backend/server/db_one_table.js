@@ -6,6 +6,7 @@
 
 var locks = require('locks');
 var ticket = require('./ticket');
+var column = require('./column');
 var kanban = require('./kanban');
 
 function Database(pool) {
@@ -29,19 +30,21 @@ function Database(pool) {
 
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT DISTINCT project_name, column_id, column_position FROM project WHERE project_id = $1::int ' +
-          'ORDER BY column_position ASC', [pid], function (res) {
+      pool.query('SELECT DISTINCT project_name, column_title,' +
+          ' column_id, column_position FROM project WHERE' +
+          ' project_id = $1::int ORDER BY column_position ASC', [pid], function (res) {
 
-        var column_order = [];
+        var columns = [];
         var project_name = null;
         res.rows.forEach(function (row) {
-          //Get column ordering
-          column_order.push(row["column_id"]);
+          //Get column orderin
+          var c = new column.Column(row["column_id"], row["column_title"]);
+          columns.push(c);
           project_name = row["project_name"]
         });
 
         rwlock.unlock();
-        callback(new kanban.Kanban(project_name, column_order));
+        callback(new kanban.Kanban(project_name, columns));
       });
     });
   };

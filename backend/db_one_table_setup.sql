@@ -27,13 +27,14 @@ DROP TABLE project;
 Contains the general state of a game. There will be one row for each game in progress.
 */
 CREATE TABLE project (
-  project_id integer Primary Key, --unique project ID
+  project_id integer, --unique project ID
   project_name varchar(255) not null, --project name
-  column_id integer Primary Key, --unique column id
+  column_id integer, --unique column id
   column_title varchar(255) not null, --column title
   column_position integer not null, --column position
-  ticket_id integer Primary Key, --unique ticket id
-  ticket_description varchar(255) --ticket description
+  ticket_id integer, --unique ticket id
+  ticket_description varchar(255), --ticket description
+  PRIMARY KEY (project_id, ticket_id)
 );
 
 --------------------------------------------------------------------------------------------------
