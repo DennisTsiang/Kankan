@@ -32,7 +32,7 @@ app.controller('kanban_ctrl', function($scope) {
   var progress_column = new Column(1);
   progress_column.title = 'In Progreess';
   var done_column = new Column(2);
-  done_column.title = 'Done';
+  done_column.title = 'Finished';
 
   $scope.project = new Project(0);
   $scope.project.columns.push(todo_column);
