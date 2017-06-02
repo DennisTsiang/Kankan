@@ -42,6 +42,7 @@ function App (db) {
       console.log('Received Store');
       _this.handleStore(JSON.parse(data), function (response) {
         socket.emit('storereply', JSON.stringify(response));
+        socket.broadcast.emit('storereply', JSON.stringify(response));
         console.log('Replied to store');
       });
     });
@@ -49,7 +50,7 @@ function App (db) {
     socket.on('update', function(data) {
       console.log('Received Update');
       _this.handleUpdate(JSON.parse(data), function (response) {
-        socket.emit('updatereply', JSON.stringify(response));
+        socket.broadcast.emit('updatereply', JSON.stringify(response));
         console.log('Replied to update');
       });
     });
@@ -82,8 +83,8 @@ function App (db) {
     //TODO: catch errors and report to client
     switch (store['type']) {
       case 'ticket_new':
-        db.newTicket(update['pid'], update['ticket'], update['column_name'], function (new_ticket) {
-          callback({type:'newticket' ,response: 'ok'});
+        db.newTicket(store['pid'], store['ticket'], store['column_name'], function (new_ticket, position) {
+          callback({type:'newticket', ticket_id:new_ticket.ticket_id, desc:new_ticket.desc, position:position});
         });
         break;
 

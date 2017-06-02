@@ -1,59 +1,107 @@
-var URL = "http://kankan.uk";
 var socket = null;
 
-function initiateSocket() {
-    socket = io();
-
-    //Set listener events
-    socket.on('connect', setOnEvents);
+function initiateSocket($scope, s_socket) {
+  //Set listener events
+  socket = s_socket;
+  setOnEvents($scope)
 }
 
-function setOnEvents() {
-    console.log("Connected");
-    socket.on('event', function(data){});
+function setOnEvents($scope) {
+  console.log("Connected");
 
-    socket.on('disconnect', function(){
-        alert("Disconnected from " + URL);
-    });
+  socket.on('disconnect', function(){
+    alert("Disconnected");
+  });
 
-    socket.on('requestreply', function(reply) {
-        requestHandler(JSON.parse(reply));
-    });
+  socket.on('requestreply', function(reply) {
+    requestHandler($scope, JSON.parse(reply));
+  });
 
-    printSocketStatus();
-    if (isSocketConnected()) {
-        sendTestMessage();
-    }
+  socket.on('updatereply', function(reply){
+    updateHandler($scope, JSON.parse(reply));
+  });
 
+  socket.on('storereply', function(reply){
+    storeHandler($scope, JSON.parse(reply));
+  });
+
+  printSocketStatus($scope);
+  if (isSocketConnected($scope)) {
+    //move in here line below
+  }
+  sendTicketsRequest($scope, 0);
 }
 
-function printSocketStatus(){
-    if (!socket.connected) {
-        console.log("Not connected");
-    } else {
-        console.log("Client has successfully connected");
-    }
+function printSocketStatus($scope){
+  if (!socket.connected) {
+    console.log("Not connected");
+  } else {
+    console.log("Client has successfully connected");
+  }
 }
 
 //check socket status
-function isSocketConnected() {
-    return socket.connected;
+function isSocketConnected($scope) {
+  return socket.connected;
 }
 
-function sendTestMessage() {
-    var ticketObj = {type : "tickets", pid : "0"};
-    socket.emit("request", JSON.stringify(ticketObj));
+function sendTicketsRequest($scope, pid) {
+  var ticketObj = {type : "tickets", pid : pid};
+  socket.emit("request", JSON.stringify(ticketObj));
 }
 
-function requestHandler(reply) {
-    var type = reply.type;
-    switch (type) {
-        case "tickets" : {
-            generateTickets(reply.object);
-            break;
-        }
-        case "kanban" : {
+function sendTicketUpdateMoved(ticket, pid, to, from) {
+  console.log(to);
+  var jsonString = {type: 'ticket_moved', ticket: ticket, pid : pid,
+    to : to, from : from};
+  socket.emit("update", JSON.stringify(jsonString));
+}
 
-        }
+function sendTicketUpdateInfo(ticket, pid, desc) {
+  var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
+  socket.emit("update", JSON.stringify(jsonString));
+}
+
+function sendStoreTicket(type, pid, ticket, col) {
+  var jsonString = {type:type, pid : pid, ticket : ticket, column_name : col};
+  socket.emit("store", JSON.stringify(jsonString));
+}
+
+function requestHandler($scope, reply) {
+  var type = reply.type;
+  var request_data = reply.object;
+  switch (type) {
+    case "tickets" : {
+      generateTickets($scope, request_data);
+      break;
     }
+    case "kanban" : {
+      generate_kanban($scope, request_data);
+      break;
+    }
+  }
+}
+
+function updateHandler($scope, reply) {
+    let type = reply.type;
+    switch (type) {
+      case "ticket_moved" : {
+        break;
+      }
+      case "ticket_info" : {
+        break;
+      }
+    }
+}
+
+function storeHandler($scope, reply) {
+  console.log("Entered store handler");
+  let type = reply.type;
+  console.log(type);
+  switch (type) {
+    case "newticket" : {
+      console.log("new ticket");
+      addTicket(reply.position, reply.ticket_id, reply.desc);
+    }
+  }
 }
