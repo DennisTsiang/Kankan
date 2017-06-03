@@ -1,5 +1,8 @@
 //Fires as soon as the page DOM has finished loading
 $( document ).ready(function(){
+  //Setup default pid
+  get_kanban_scope().pid = 0;
+
   initiateConnection();
 
   //Enables all popovers.
@@ -109,13 +112,12 @@ function generate_kanban(received_project) {
   enableDnDColumns();
 }
 
-var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select']);
+var app = angular.module('Kankan', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select']);
 app.controller('MainCtrl', function($scope) {
   //Empty
 });
 
 app.controller('kanban_ctrl', function($scope) {
-  $scope.pid = 0;
 });
 
 app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {
@@ -142,7 +144,7 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
 });
 
 var popupInstance = this;
-angular.module('Pulse').controller('ModalInstanceCtrl', function($uibModalInstance) {
+angular.module('Kankan').controller('ModalInstanceCtrl', function($uibModalInstance) {
   popupInstance.ok = function() {
     $uibModalInstance.close(ModalCtrl.selected.item);
   };
@@ -174,7 +176,7 @@ app.controller('textCtrl', function($scope) {
 
   $scope.saveEditDesc = function(text) {
     var ticket = getTicket($scope.tid);
-    sendTicketUpdateInfo(ticket, $scope.pid, text);
+    sendTicketUpdateInfo(ticket, get_kanban_scope().pid, text);
 
   };
 });
