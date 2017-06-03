@@ -91,7 +91,12 @@
                        id="{{ticket.ticket_id}}" ondragstart="handleDragStart(event)" class="ticket">
                     Ticket id# {{ticket.ticket_id}} </br>
                     {{ticket.desc}}
+
+                    <uib-progressbar class="progress-striped active" value="ticket.progress" type="{{ticket.deadlineState}}">{{ticket.progress}} <i ng-show="showWarning">Close to Deadline</i></uib-progressbar>
+
+
                   </div>
+
                 </div>
               </td>
             </tr>

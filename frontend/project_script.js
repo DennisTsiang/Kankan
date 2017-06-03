@@ -31,6 +31,7 @@ function addTicket(col_id, ticket_id, desc) {
   let ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
+  ticket.setDeadline(1);
 
   let s = get_kanban_scope();
   s.project.tickets[ticket_id] = ticket;
@@ -175,6 +176,6 @@ app.controller('textCtrl', function($scope) {
   $scope.saveEditDesc = function(text) {
     var ticket = getTicket($scope.tid);
     sendTicketUpdateInfo(ticket, $scope.pid, text);
+
   };
 });
-

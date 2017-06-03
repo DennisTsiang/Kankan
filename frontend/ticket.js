@@ -5,7 +5,8 @@ function Ticket(ticket_id) {
   this.members = [];
   this.desc = "";
   this.col = -1;
-  this.deadline = 0;
+  this.deadline = 50;
+  this.progress = 0;
 
   this.addMembersToTicket = function (array) {
     for (var i = 0; i < array.length; i++) {
@@ -22,7 +23,7 @@ function Ticket(ticket_id) {
   };
 
   this.setDeadline = function(deadline) {
-  this.deadline = deadline;
+    this.deadline = deadline;
   };
 
 }

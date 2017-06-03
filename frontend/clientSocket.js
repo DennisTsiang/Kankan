@@ -60,6 +60,7 @@ function sendTicketUpdateMoved(ticket, pid, to, from) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
+//TODO: Will change this and update handler to support deadline when backend has support
 function sendTicketUpdateInfo(ticket, pid, desc) {
   var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
   socket.emit("update", JSON.stringify(jsonString));
@@ -99,6 +100,8 @@ function requestHandler(reply) {
 }
 
 function updateHandler(reply) {
+
+  let scope = get_kanban_scope();
   let type = reply.type;
   switch (type) {
     case "ticket_moved" : {
@@ -109,6 +112,7 @@ function updateHandler(reply) {
       let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
       ticket.setDesc(reply.desc);
       ticket.setDeadline(7);
+      //ticket.setDeadline(reply.deadline);
       break;
     }
     case 'ticket_delete' : {
@@ -122,6 +126,7 @@ function updateHandler(reply) {
       break;
     }
   }
+
 }
 
 function storeHandler(reply) {
