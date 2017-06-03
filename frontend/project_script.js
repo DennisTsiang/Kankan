@@ -28,11 +28,11 @@ function enableDnDColumns() {
 }
 
 function addTicket(col_id, ticket_id, desc) {
-  var ticket = new Ticket(ticket_id);
+  let ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
 
-  var s = get_kanban_scope();
+  let s = get_kanban_scope();
   s.project.tickets[ticket_id] = ticket;
 
   //col_id may not be col position
@@ -40,6 +40,18 @@ function addTicket(col_id, ticket_id, desc) {
 
   //Update change
   s.$apply();
+}
+
+//TODO: Add/remove column button somewhere - maybe plus minus icon, with popup for more info.
+function addColumn(title, position, id) {
+  let scope = get_kanban_scope();
+  let column = new Column(id, title, position);
+  scope.project.columns[id] = column;
+
+  sendStoreColumn(scope.pid, id, title, position);
+
+  scope.$apply();
+  enableDnDColumns();
 }
 
 function move_tickets(to_col_id, from_col_id, tid) {
@@ -86,9 +98,9 @@ function generate_kanban(received_project) {
 
 
   for (var i = 0; i < received_project.columns.length; i++) {
-    var column = new Column(received_project.columns[i].column_id);
-    column.title = received_project.columns[i].title;
-    column.tickets = {};
+    let title = received_project.columns[i].title;
+    let position = i;
+    var column = new Column(received_project.columns[i].column_id, title, position);
     project.columns[column.column_id] = column;
   }
 

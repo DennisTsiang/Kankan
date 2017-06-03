@@ -65,8 +65,13 @@ function sendTicketUpdateInfo(ticket, pid, desc) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
+function sendStoreColumn(pid, cid, title, position) {
+  let jsonString = {type:'column_new', pid : pid, column_id: cid, title: title, pos: position};
+  socket.emit("store", JSON.stringify(jsonString));
+}
+
 function sendStoreTicket(type, pid, col_id) {
-  var jsonString = {type:type, pid : pid, column_id: col_id};
+  let jsonString = {type:type, pid : pid, column_id: col_id};
   socket.emit("store", JSON.stringify(jsonString));
 }
 

@@ -17,7 +17,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
 
-  <link href="stylesheet.css" rel="stylesheet">
+  <link href="project_stylesheet.css" rel="stylesheet">
 </head>
 
 
@@ -47,40 +47,66 @@
     </div>
   </script>
 
-  <div id="kanban_table" ng-controller="kanban_ctrl">
-    <table id="kanban" class="table table-bordered">
-      <tr>
-        <th ng-repeat="col in project.columns">{{col.title}}</th>
-      </tr>
+  <table>
+    <tr>
+      <col width="100px">
+      <td class="options_column">
+        <!-- Column of options -->
+        <table class="options_column">
+            <tr class="options_button">
+              <!-- Button for user to return to home page - select other project from there. -->
+              <td><button type="button" class="btn btn-primary">Home</button></td>
+            </tr>
+            <tr class="options_button">
+              <td><button type="button" class="btn btn-primary">Option2</button></td>
+            </tr>
+            <tr class="options_button">
+              <td><button type="button" class="btn btn-primary">Option3</button></td>
+            </tr>
+        </table>
+      </td>
+      <td>
+        <div id="kanban_table" ng-controller="kanban_ctrl">
+          <table id="kanban" class="table table-bordered">
+            <tr>
+              <!-- Project title -->
+              <p id="project_title" class="project_title">{{project.title}}</p>
+            </tr>
+            <tr>
+              <th ng-repeat="col in project.columns">{{col.title}}</th>
+            </tr>
 
-      <tr>
-        <!-- Add buttons -->
-        <td ng-repeat="col in project.columns"  class="ticket_column">
-          <div class="buttonHeader">
-            <button replace="true" type='button' class='btn btn-primary' column_id={{col.column_id}} onclick='addBTN(event)'>
-            Add
-            </button>
-          </div>
+            <tr>
+              <!-- Add buttons -->
+              <td ng-repeat="col in project.columns"  class="ticket_column">
+                <div class="buttonHeader">
+                  <button replace="true" type='button' class='btn btn-primary' column_id={{col.column_id}} onclick='addBTN(event)'>
+                    Add
+                  </button>
+                </div>
 
-          <div>
-            <!-- Add tickets -->
-          <div ng-repeat="ticket in col.tickets" ng-click="$ModalCtrl.open(ticket.ticket_id)" draggable="true"
-               id="{{ticket.ticket_id}}" ondragstart="handleDragStart(event)" class="ticket">
-            Ticket id# {{ticket.ticket_id}} </br>
-                {{ticket.desc}}
-          </div>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
+                <div>
+                  <!-- Add tickets -->
+                  <div ng-repeat="ticket in col.tickets" ng-click="$ModalCtrl.open(ticket.ticket_id)" draggable="true"
+                       id="{{ticket.ticket_id}}" ondragstart="handleDragStart(event)" class="ticket">
+                    Ticket id# {{ticket.ticket_id}} </br>
+                    {{ticket.desc}}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
 </div>
 </body>
 
 <script src="project.js"></script>
 <script src="column.js"></script>
 <script src="ticket.js"></script>
-<script src="script.js"></script>
+<script src="project_script.js"></script>
 <script src="dnd_handlers.js"></script>
 <script src="clientSocket.js"></script>
 
