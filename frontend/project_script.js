@@ -109,7 +109,7 @@ function generate_kanban(received_project) {
   enableDnDColumns();
 }
 
-var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable']);
+var app = angular.module('Pulse', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select']);
 app.controller('MainCtrl', function($scope) {
   //Empty
 });
@@ -141,8 +141,6 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
   };
 });
 
-// Please note that $uibModalInstance represents a modal window (instance) dependency.
-// It is not the same as the $uibModal service used above.
 var popupInstance = this;
 angular.module('Pulse').controller('ModalInstanceCtrl', function($uibModalInstance) {
   popupInstance.ok = function() {
@@ -168,10 +166,11 @@ app.controller('textCtrl', function($scope) {
   //Enables all popovers.
   $('[data-toggle="popover"]').popover();
 
-
+  $scope.days = ['0', '1'];
   $scope.tid = getTid();
   $scope.desc = getTicket($scope.tid).desc;
   $scope.deadline = getTicket(getTid()).deadline;
+  $scope.day = $scope.deadline.getDay();
 
   $scope.saveEditDesc = function(text) {
     var ticket = getTicket($scope.tid);

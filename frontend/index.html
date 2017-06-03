@@ -5,6 +5,8 @@
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
+
+
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-animate.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
@@ -16,6 +18,10 @@
   <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
+
+  <script src="ui-select-master/dist/select.min.js"></script>
+
+  <link href="ui-select-master/dist/select.min.css" rel="stylesheet" media="screen">
 
   <link href="project_stylesheet.css" rel="stylesheet">
 </head>
@@ -35,8 +41,18 @@
       <div ng-controller="textCtrl">
         <p editable-textarea="desc" onaftersave="saveEditDesc(desc)">{{desc || 'empty'}}</p>
 
-        <p editable-textarea="deadline" onaftersave="saveEditDesc(desc)">{{deadline || 'empty'}}</p>
-`
+
+        <ui-select ng-model="day">
+    <ui-select-match>
+        <span ng-bind="$select.day"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="day in (days | filter: $select.search) track by day">
+        <span ng-bind="day"></span>
+    </ui-select-choices>
+</ui-select>
+
+
+
       <button replace="true" type='button' class='btn btn-sm btn-warning' data-toggle="popover"
               data-content="<button replace='true' type='button' class='btn btn-sm btn-danger'
                 onclick='delete_ticket_button_click({{tid}})'>I'm sure</button>"
