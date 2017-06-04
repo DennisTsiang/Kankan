@@ -36,12 +36,13 @@ pool.on('error', function (err, client) {
 });
 
 //export the query method for passing queries to the pool
-module.exports.query = async (function (text, values, callback) {
+module.exports.query = function (text, values, callback) {
   console.log('query:', text, values);
 
-  var res = await (pool.query(text, values));
-  callback (res);
-});
+  pool.query(text, values, function (err, res) {
+    callback (res);
+  });
+};
 
 // the pool also supports checking out a client for
 // multiple operations, such as a transaction

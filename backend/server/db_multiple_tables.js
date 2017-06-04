@@ -2,11 +2,14 @@
 var locks = require('locks');
 var ticket = require('./ticket');
 var kanban = require('./kanban');
+var column = require('./column');
 
 function Database(pool) {
   var rwlock = locks.createReadWriteLock();
+  var _this = this;
 
   this.newProject = function (project_name, callback) {
+    console.error("Called new project");
     rwlock.writeLock(function () {
       pool.query('SELECT Max(project_id) FROM project_table', [], function (res) {
         var pid;
@@ -63,12 +66,12 @@ function Database(pool) {
 
   this.deleteProject = function (pid, callback) {
     rwlock.writeLock(function () {
-      pool.query('DROP TABLE columns_' + pid, [], function(res) {
-        pool.query('DELETE FROM project_table WHERE project_id = $1::int', [pid], function (res2) {
-          pool.query('DROP TABLE tickets_' + pid, [], function (res3) {
+      pool.query('DROP TABLE columns_' + pid, [], function (err, res) {
+        pool.query('DELETE FROM project_table WHERE project_id = $1::int', [pid], function (err, res2) {
+          pool.query('DROP TABLE tickets_' + pid, [], function (err, res3) {
             console.log('Deleted project ' + pid);
             rwlock.unlock();
-            callback();
+            callback(true);
           });
         });
       });
@@ -91,19 +94,20 @@ function Database(pool) {
 
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_name, column_id, column_position FROM project NATURAL JOIN column_' + pid +
+      pool.query('SELECT project_name, column_id, column_position FROM project_table NATURAL JOIN columns_' + pid +
           ' ORDER BY column_id ASC', [], function(res) {
 
-        var column_order = [];
+        var columns = [];
         var project_name = null;
         res.rows.forEach(function (row) {
           //Get column ordering
-          column_order.push(row["column_id"]);
+          var c = new column.Column(row["column_id"], row["column_title"]);
+          columns.push(c);
           project_name = row["project_name"]
         });
 
         rwlock.unlock();
-        callback(new kanban.Kanban(project_name, column_order));
+        callback(new kanban.Kanban(project_name, columns));
       });
     });
   };

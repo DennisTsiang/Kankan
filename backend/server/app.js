@@ -18,6 +18,7 @@ start_server(httpPort);
 function App (db) {
 
   var _this = this;
+  var resetLock = require('locks').createMutex();
 
   this.handleFileConnection = function (request, response) {
     var frontend = __dirname;
@@ -25,14 +26,23 @@ function App (db) {
     if (request.originalUrl === "/") {
       response.sendFile(frontend + 'frontend/index.html');
     } else if (request.originalUrl === "/ResetTable") {
-      db.deleteProject(0, function () {
-        db.newProject("Kanban", function (newPid) {
-          db.newColumn(0, "To Do", 0, function (res1) {
-            db.newColumn(0, "In Progess", 1, function(res2) {
-              db.newColumn(0, "Done", 2, function (res3) {
-                response.sendFile(frontend + 'frontend/index.html');
+      resetLock.lock(function () {
+        db.deleteProject(0, function (successful) {
+          db.newProject("Kanban", function (newPid) {
+            if (newPid === 0) {
+              db.newColumn(newPid, "To Do", 0, function (res1) {
+                db.newColumn(newPid, "In Progess", 1, function (res2) {
+                  db.newColumn(newPid, "Done", 2, function (res3) {
+                    resetLock.unlock();
+                    console.log("Finished Setup");
+                    response.sendFile(frontend + 'frontend/index.html');
+                  });
+                });
               });
-            });
+            } else {
+              resetLock.unlock();
+              console.error("Wrong pid!");
+            }
           });
         });
       });
