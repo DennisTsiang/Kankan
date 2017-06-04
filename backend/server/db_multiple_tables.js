@@ -9,7 +9,6 @@ function Database(pool) {
   var _this = this;
 
   this.newProject = function (project_name, callback) {
-    console.error("Called new project");
     rwlock.writeLock(function () {
       pool.query('SELECT Max(project_id) FROM project_table', [], function (res) {
         var pid;
@@ -112,22 +111,21 @@ function Database(pool) {
     });
   };
 
-  this.newTicket = function (pid, ticket, columnPos, callback) {
+  this.newTicket = function (pid, column_id, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT column_id FROM columns_' + pid + ' WHERE column_position = $1::int',
-          [columnPos], function (res) {
-        if (res.rows.length === 1) {
-          var cid = res.rows[0]["column_id"];
-          pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, $4::text)',
-              [ticket.ticket_id, cid, pid, ticket.desc],
+      pool.query('SELECT Max(ticket_id) FROM tickets_' + pid, [], function (res) {
+        var tid;
+        if (res.rows[0].max === null) {
+          tid = 0;
+        } else {
+          tid = res.rows[0].max + 1;
+        }
+        pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, $4::text)',
+            [tid, column_id, pid, ''],
             function (insertion) {
               rwlock.unlock();
-              callback(ticket, columnPos);
+              callback();
             });
-        } else {
-          rwlock.unlock();
-          console.error("Error getting column id");
-        }
       });
     });
   };

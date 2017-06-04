@@ -102,6 +102,8 @@ app.controller('textCtrl', function($scope) {
     var tid = getTid();
     var ticket = getTicket(tid);
     ticket.desc = text;
+    //TODO: THIS PID IS UNDEFINED
+    console.log("SEND TICKET UPDATE PID: " + $scope.pid);
     sendTicketUpdateInfo(ticket, $scope.pid, text);
   };
 });
