@@ -24,19 +24,26 @@ function Ticket(ticket_id) {
   };
 
 
-//TODO:There must be a better way to do this?
+//TODO:At the moment the start date updates when the deadline is made
   this.setDeadline = function(year, month, day, hours, minutes) {
-    this.deadline.setYear(year);
-    this.deadline.setMonth(month);
-    this.deadline.setDate(day);
-    this.deadline.setHours(hours);
-    this.deadline.setMinutes(minutes);
+    this.deadline = new Date(year, month, day, hours, minutes);
+    this.startdate = new Date();
 
   };
 
-  this.setStartDate = function(){
-    //Currently just sets it to current date, will change later
-    this.startDate = Date();
+  this.updateProgress = function(){
+
+    let endtime = this.deadline.getTime();
+    let starttime = this.startdate.getTime();
+
+    let currentDate = new Date();
+
+    let timeWidth = endtime - starttime;
+
+    let milliProgress = (currentDate.getTime() -starttime)/timeWidth
+
+    this.progress =  (milliProgress * 100);
+
   }
 
 }

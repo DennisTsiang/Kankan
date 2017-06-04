@@ -111,7 +111,7 @@ function updateHandler(reply) {
     case "ticket_info" : {
       let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
       ticket.setDesc(reply.desc);
-      ticket.setDeadline(7);
+      //ticket.setDeadline(7);
       //ticket.setDeadline(reply.deadline);
       break;
     }

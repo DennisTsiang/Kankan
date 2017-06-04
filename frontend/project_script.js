@@ -168,15 +168,58 @@ app.controller('textCtrl', function($scope) {
   //Enables all popovers.
   $('[data-toggle="popover"]').popover();
 
-  $scope.days = ['0', '1'];
+  //Initialise arrays for drop down boxes
+  //TODO: Seems bad to do this very time?
+  $scope.days = generateArray(1,31);
+  $scope.months = generateArray(1,12);
+  $scope.years = ["2017", "2018"];
+  $scope.hours = generateArray(0,23);
+  $scope.minutes = generateArray(0,59);
+
   $scope.tid = getTid();
   $scope.desc = getTicket($scope.tid).desc;
-  $scope.deadline = getTicket(getTid()).deadline;
-  $scope.day = $scope.deadline.getDay();
 
-  $scope.saveEditDesc = function(text) {
+  //TODO: Remove the obvious duplicate code below
+  //TODO: remove coupling, stuff like tostring is ugly
+  //TODO: Deal with problems with month being 0-11 not 1-12
+  //      as some edge cases to not work
+
+  $scope.deadline = getTicket(getTid()).deadline;
+  $scope.selectedDay = $scope.deadline.getDate().toString();
+  $scope.selectedMonth = $scope.deadline.getMonth().toString();
+  $scope.selectedYear = $scope.deadline.getFullYear().toString();
+  $scope.selectedHour = $scope.deadline.getHours().toString();
+  $scope.selectedMinute = $scope.deadline.getMinutes().toString();
+
+  $scope.saveEditDeadline = function(){
+
+    var ticket = getTicket($scope.tid);
+    ticket.setDeadline($scope.selectedYear, $scope.selectedMonth - 1, $scope.selectedDay, $scope.selectedHour, $scope.selectedMinute);
+
+  }
+
+  $scope.saveEditDesc = function(text, day) {
     var ticket = getTicket($scope.tid);
     sendTicketUpdateInfo(ticket, get_kanban_scope().pid, text);
 
   };
+
+  $scope.updateProgress = function(){
+
+    var ticket = getTicket($scope.tid);
+    ticket.updateProgress();
+
+  }
 });
+
+function generateArray(start, end){
+returnArray = [];
+
+for(var i = start; i <=end; i++){
+
+  returnArray.push(i.toString());
+
+}
+
+return returnArray;
+}
