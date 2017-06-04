@@ -10,18 +10,25 @@ $( document ).ready(function(){
 });
 
 function get_kanban_scope() {
-  return angular.element($('#kanban_table')).scope();
+  return angular.element($('#kanban_location')).scope();
 }
 
 function addBTN(event) {
   let k_scope = get_kanban_scope();
-  let column_id = event.target.getAttribute("column_id");
-  sendStoreTicket('ticket_new', k_scope.pid, column_id);
+  let columns = k_scope.project.columns;
+  let column_id_position_0;
+  for (let cid in columns) {
+      if (columns[cid].position === 0) {
+        column_id_position_0 = columns[cid].column_id;
+        break;
+    }
+  }
+  sendStoreTicket('ticket_new', k_scope.pid, column_id_position_0);
 }
 
 function enableDnDColumns() {
 //Each column has drag and drop event listeners
-  elems = document.querySelectorAll('.ticket_column');
+  elems = document.querySelectorAll('.ticket-column');
   for (var i=0; i < elems.length; i++) {
     el = elems[i];
     el.addEventListener('dragover', handleDragOver, false);

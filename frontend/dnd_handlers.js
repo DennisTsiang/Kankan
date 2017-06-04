@@ -9,12 +9,12 @@ function handleDragStart(e) {
 
 function handleDragOver(e) {
   e.preventDefault();
-  $(e.toElement).closest('.ticket_column')[0].style.border = "thick solid #0000FF"
+  $(e.toElement).closest('.ticket-column')[0].style.border = "thick solid #0000FF"
 }
 
 function handleDragLeave(e) {
   e.toElement.style.border = "";
-  $(e.toElement).closest('.ticket_column')[0].style.border = ""
+  $(e.toElement).closest('.ticket-column')[0].style.border = ""
 }
 
 function handleDrop(e) {
@@ -29,7 +29,7 @@ function handleDrop(e) {
   move_tickets(end_col, start_col, id);
   sendTicketUpdateMoved(scope.project.tickets[id], 0, end_col, start_col);
 
-  $(e.toElement).closest('.ticket_column')[0].style.border = "";
+  $(e.toElement).closest('.ticket-column')[0].style.border = "";
   e.srcElement.style.border = "";
   e.toElement.style.border = "";
 }
