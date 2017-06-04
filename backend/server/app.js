@@ -4,7 +4,7 @@
 module.exports.App = App;
 
 var httpPort = process.argv[3];
-var db_module = require('./db_one_table');
+var db_module = require('./db_multiple_tables');
 var pool = require('./db');
 var db = new db_module.Database(pool);
 var app = new App(db);
@@ -24,6 +24,18 @@ function App (db) {
     frontend = frontend.substring(0, frontend.length - 14);
     if (request.originalUrl === "/") {
       response.sendFile(frontend + 'frontend/index.html');
+    } else if (request.originalUrl === "/ResetTable") {
+      db.deleteProject(0, function () {
+        db.newProject("Kanban", function (newPid) {
+          db.newColumn(0, "To Do", 0, function (res1) {
+            db.newColumn(0, "In Progess", 1, function(res2) {
+              db.newColumn(0, "Done", 2, function (res3) {
+                response.sendFile(frontend + 'frontend/index.html');
+              });
+            });
+          });
+        });
+      });
     } else {
       response.sendFile(frontend + 'frontend' + request.originalUrl);
     }
