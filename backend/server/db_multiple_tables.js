@@ -77,6 +77,15 @@ function Database(pool) {
     });
   };
 
+  this.deleteColumn = function (pid, cid, callback) {
+    rwlock.writeLock(function () {
+      pool.query('DELETE FROM columns_' + pid + ' WHERE column_id = $1::int', [cid], function (res) {
+        rwlock.unlock();
+        callback(true);
+      });
+    });
+  };
+
   this.getTickets = function (pid, callback) {
     rwlock.readLock(function () {
       pool.query('SELECT * FROM tickets_' + pid + ' ORDER BY ticket_id ASC', [], function(res) {
@@ -130,10 +139,10 @@ function Database(pool) {
     });
   };
 
-  this.deleteTicket = function(pid, ticket, callback) {
+  this.deleteTicket = function(pid, ticket_id, callback) {
     rwlock.writeLock(function () {
       pool.query('DELETE FROM tickets_' + pid + ' WHERE ticket_id = $1::int',
-          [ticket.ticket_id], function (res) {
+          [ticket_id], function (res) {
         rwlock.unlock();
         callback(true);
       });

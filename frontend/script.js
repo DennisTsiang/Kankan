@@ -15,7 +15,7 @@ app.controller('kanban_ctrl', function($scope) {
 function addBTN(event) {
   let k_scope = angular.element($('#kanban_table')).scope();
   let column_id = event.target.getAttribute("column_id");
-  sendStoreTicket('ticket_new', k_scope.pid, column_id);
+  sendNewTicket(k_scope.pid, column_id);
 }
 
 function saveEdit(el) {

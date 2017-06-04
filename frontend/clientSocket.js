@@ -25,6 +25,10 @@ function setOnEvents() {
     storeHandler(JSON.parse(reply));
   });
 
+  socket.on('removereply', function(reply) {
+    removeHandler(JSON.parse(reply));
+  });
+
   printSocketStatus();
   if (isSocketConnected()) {
     sendKanbanRequest(0/*pid*/);
@@ -66,10 +70,38 @@ function sendTicketUpdateInfo(ticket, pid, desc) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-function sendStoreTicket(type, pid, col_id) {
-  var jsonString = {type:type, pid : pid, column_id: col_id};
+function sendNewTicket(pid, col_id) {
+  var jsonString = {type:'ticket_new', pid : pid, column_id: col_id};
   socket.emit("store", JSON.stringify(jsonString));
 }
+
+function sendStoreProject(project_name) {
+  var jsonString = {type:'project_new', project_name:project_name};
+  socket.emit("store", JSON.stringify(jsonString));
+}
+
+function sendStoreColumn(pid, column_name, position) {
+  var jsonString = {type:'column_new', pid:pid, column_name:column_name, position:position};
+  socket.emit("store", JSON.stringify(jsonString));
+}
+
+function removeProject(pid) {
+  var jsonString = {type:'project_remove', pid:pid};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
+function removeColumn(pid, column_id) {
+  var jsonString = {type:'project_remove', pid:pid, column_id:column_id};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
+function removeTicket(pid, ticket_id) {
+  var jsonString = {type:'project_remove', pid:pid, ticket_id:ticket_id};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
+
+
 
 function requestHandler(reply) {
   var type = reply.type;
@@ -81,6 +113,26 @@ function requestHandler(reply) {
     }
     case "kanban" : {
       generate_kanban(request_data);
+      break;
+    }
+  }
+}
+
+function removeHandler(reply) {
+  //TODO FINISH REMOVE HANDLER
+  let type = reply.type;
+  switch (type) {
+    case "project_remove" : {
+      var scope = angular.element($("#kanban_table")).scope();
+      break;
+    }
+    case "column_remove" : {
+      var scope = angular.element($("#kanban_table")).scope();
+      break;
+    }
+    case "ticket_remove": {
+      var scope = angular.element($("#kanban_table")).scope();
+
       break;
     }
   }

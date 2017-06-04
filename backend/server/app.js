@@ -78,6 +78,14 @@ function App (db) {
       });
     });
 
+    socket.on('remove', function (data) {
+      console.log('Received Remove');
+      _this.handleRemove(JSON.parse(data), function (response) {
+        socket.emit('removereply', JSON.stringify(response));
+        socket.broadcast.emit('removereply', JSON.stringify(response));
+        console.log('Replied to delete');
+      });
+    });
   };
 
   this.handleRequest = function (request, callback) {
@@ -106,7 +114,6 @@ function App (db) {
     //TODO: catch errors and report to client
     switch (store['type']) {
       case 'ticket_new':
-        console.log(store);
         db.newTicket(store['pid'], store['column_id'], function () {
           //TODO: Copied from getTickets - return all tickets
           db.getTickets(store['pid'], function(tickets) {
@@ -114,7 +121,16 @@ function App (db) {
           });
         });
         break;
-
+      case 'project_new':
+        db.newProject(store["project_name"], function (pid) {
+          callback();
+        });
+        break;
+      case 'column_new':
+        db.newColumn(store["pid"], store["column_name"], store["position"], function (cid) {
+          callback();
+        });
+        break;
       default:
         //TODO: Handle unknown store.
         break;
@@ -142,6 +158,32 @@ function App (db) {
         break;
     }
   };
+
+  this.handleRemove = function (remove, callback) {
+    //TODO: Handle correct delete data - not blow up
+    //TODO: catch errors and report to client
+    switch (remove['type']) {
+      case 'ticket_remove':
+        db.deleteTicket(remove.pid, remove.ticket_id,
+            callback({type:'ticket_remove', pid:remove.pid, ticket_id:remove.ticket_id})
+        );
+        break;
+      case 'column_remove':
+        db.deleteColumn(remove.pid, remove.column_id,
+            callback({type:'column_remove', pid:remove.pid, column_id:remove.column_id})
+        );
+        break;
+      case 'project_remove':
+        db.deleteProject(remove.pid,
+            callback({type:'project_remove', pid:remove.pid})
+        );
+        break;
+      default:
+        //TODO: Handle unknown update.
+        break;
+    }
+  };
+
 
   /*this.handleCommunication = function (jsonInput, callback) {
     if ('request' in jsonInput) {
