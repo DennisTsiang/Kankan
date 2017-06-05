@@ -40,7 +40,7 @@ module.exports.query = function (text, values, callback) {
   console.log('query:', text, values);
 
   pool.query(text, values, function (err, res) {
-    callback (res);
+    callback (res, err);
   });
 };
 

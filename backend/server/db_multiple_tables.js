@@ -102,7 +102,7 @@ function Database(pool) {
 
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_name, column_id, column_position FROM project_table NATURAL JOIN columns_' + pid +
+      pool.query('SELECT project_name, column_id, column_title FROM project_table NATURAL JOIN columns_' + pid +
           ' ORDER BY column_id ASC', [], function(res) {
 
         var columns = [];
