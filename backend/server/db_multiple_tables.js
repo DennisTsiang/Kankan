@@ -221,7 +221,7 @@ function Database(pool) {
         }
       });
     });
-  }
+  };
 
   this.addUserToProject = function (username, pid, callback) {
     rwlock.writeLock(function () {
@@ -238,7 +238,63 @@ function Database(pool) {
         }
       });
     })
-  }
+  };
+
+  this.addUserToTicket = function (username, tid, pid, callback) {
+    rwlock.writeLock(function () {
+      pool.query('SELECT username FROM user_tickets WHERE username = $1::text AND' +
+          ' project_id = $2::int AND ticket_id = $3::int', [username, pid, tid], function (checkRes) {
+        if (checkRes.rows.length === 0 ) {
+          pool.query('INSERT INTO user_tickets VALUES($1::int, $2::int, $3::text)', [tid, pid, username],
+          function (res) {
+            rwlock.unlock();
+            callback(true);
+          });
+        } else {
+          rwlock.unlock();
+          console.error("Mapping to ticket already exists");
+        }
+      });
+    });
+  };
+
+  this.getUserTickets = function (username, pid, callback) {
+    rwlock.readLock(function () {
+      pool.query('SELECT ticket_id FROM user_tickets WHERE username = $1::text AND ' +
+          'project_id = $2::int', [username, pid], function (res) {
+        if (res.rows.length > 0) {
+          var array = [];
+          for (var row of res.rows) {
+            array.push(row.ticket_id);
+          }
+          rwlock.unlock();
+          callback(array);
+        } else {
+          rwlock.unlock();
+          console.error("User does not exist in db");
+        }
+      });
+    });
+  };
+
+  this.getTicketUsers = function (pid, tid, callback) {
+    rwlock.readLock(function () {
+      pool.query('SELECT username FROM user_tickets WHERE ticket_id = $1::int AND ' +
+          'project_id = $2::int', [tid, pid], function (res) {
+        if (res.rows.length > 0) {
+          var array = [];
+          for (var row of res.rows) {
+            array.push(row.username);
+          }
+          rwlock.unlock();
+          callback(array);
+        } else {
+          rwlock.unlock();
+          console.error("Ticket does not exist in db");
+        }
+      });
+    });
+  };
 }
 
 module.exports.Database = Database;

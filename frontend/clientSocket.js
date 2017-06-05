@@ -120,6 +120,22 @@ function addUserToProject(username, pid) {
   socket.emit("request", JSON.stringify(jsonString));
 }
 
+function addUserToTicket(username, pid, tid) {
+  var jsonString = {type:'add_user_to_ticket', username : username, pid : pid, tid : tid};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+function getTicketUsers(pid, tid) {
+  var jsonString = {type:'ticket_users', pid : pid, tid : tid};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+function getUserTickets(username, pid) {
+  var jsonString = {type:'user_tickets', pid : pid, username : username};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+
 function requestHandler(reply) {
   var type = reply.type;
   var request_data = reply.object;
@@ -140,6 +156,19 @@ function requestHandler(reply) {
       break;
     }
     case "new_user_project": {
+
+      break;
+    }
+    case "user_tickets": {
+      var tickets = reply.object;
+      break;
+    }
+    case "ticket_users": {
+      var users = reply.object;
+
+      break;
+    }
+    case "add_user_to_ticket": {
 
       break;
     }

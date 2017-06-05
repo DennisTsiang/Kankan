@@ -114,6 +114,21 @@ function App (db) {
           callback({type:'new_user_project'});
         });
         break;
+      case 'add_user_to_ticket':
+        db.addUserToTicket(request["username"], request["tid"], request["pid"], function(success) {
+          callback({type:'add_user_to_project'});
+        });
+        break;
+      case 'user_tickets':
+        db.getUserTickets(request["username"], request["pid"], function (tickets) {
+          callback({type:'user_tickets', object:tickets});
+        });
+        break;
+      case 'ticket_users':
+        db.getTicketUsers(request["pid"], request["tid"], function (users) {
+          callback({type:'user_tickets', object:users});
+        });
+        break;
       default:
         //TODO: Handle unknown request.
         break;
