@@ -54,22 +54,10 @@
           <select ng-model="selectedHour" ng-options="hour for hour in hours">
           </select>
 
-          <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
-
-          <button replace="true" type='button' class='btn btn-sm btn-warning' data-toggle="popover" data-content="<button replace='true' type='button' class='btn btn-sm btn-danger'
-              onclick='delete_ticket_button_click({{tid}})'>I'm sure</button>" data-placement="right" data-trigger="click" data-html="true"> Remove
-          </button>
-
-           <ui-select ng-model="day">
-              <ui-select-match>
-                  <span ng-bind="$select.day"></span>
-              </ui-select-match>
-              <ui-select-choices repeat="day in (days | filter: $select.search) track by day">
-                  <span ng-bind="day"></span>
-              </ui-select-choices>
-          </ui-select>
           <select ng-model="selectedMinute" ng-options="minute for minute in minutes">
           </select>
+
+          <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
 
           <h1> You selected {{selectedDay}} and {{selectedMonth}} and {{selectedYear}}</h1>
 
