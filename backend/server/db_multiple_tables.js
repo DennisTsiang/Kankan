@@ -151,19 +151,35 @@ function Database(pool) {
 
   this.moveTicket = function (pid, ticket, toPosition, fromPos, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT column_id FROM columns_' + pid + ' WHERE column_position = $1::int',
-          [toPosition], function (res) {
-        if (res.rows.length === 1) {
-          var cid = res.rows[0]["column_id"];
-          pool.query('UPDATE tickets_' + pid + ' SET column_id = $1::int WHERE ticket_id = $2::int',
-              [cid, ticket.ticket_id],
-            function (insertion) {
-              rwlock.unlock();
-              callback(true);
-            });
+      pool.query('SELECT column_position FROM columns_' + pid + ' NATURAL JOIN tickets_' + pid + ' ' +
+          'WHERE ticket_id = $1::int', [ticket.ticket_id], function (checkResult) {
+        if (checkResult.rows.length === 1) {
+          if (checkResult.rows[0]["column_position"] === fromPos) {
+            pool.query('SELECT column_id FROM columns_' + pid + ' WHERE column_position = $1::int',
+                [toPosition], function (res) {
+                  if (res.rows.length === 1) {
+                    var cid = res.rows[0]["column_id"];
+                    pool.query('UPDATE tickets_' + pid + ' SET column_id = $1::int WHERE ticket_id = $2::int',
+                        [cid, ticket.ticket_id],
+                        function (insertion) {
+                          rwlock.unlock();
+                          callback(true);
+                        });
+                  } else {
+                    rwlock.unlock();
+                    console.error("Error getting column id");
+                  }
+                });
+          } else {
+            rwlock.unlock();
+            console.error("Error adding ticket: column_position is " + checkResult.rows[0]["column_position"]
+                + " is not fromPos:" + fromPos);
+            callback(false);
+          }
         } else {
           rwlock.unlock();
-          console.error("Error getting column id");
+          console.error("Error adding ticket: ticket does not exist in db.");
+          callback(false);
         }
       });
     });

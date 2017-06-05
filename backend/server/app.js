@@ -71,10 +71,12 @@ function App (db) {
 
     socket.on('update', function(data) {
       console.log('Received Update');
-      _this.handleUpdate(JSON.parse(data), function (response) {
-        socket.emit('updatereply', JSON.stringify(response));
-        socket.broadcast.emit('updatereply', JSON.stringify(response));
-        console.log('Replied to update');
+      _this.handleUpdate(JSON.parse(data), function (response, success) {
+        if (success) {
+          socket.emit('updatereply', JSON.stringify(response));
+          socket.broadcast.emit('updatereply', JSON.stringify(response));
+          console.log('Replied to update');
+        }
       });
     });
 
@@ -142,14 +144,24 @@ function App (db) {
     //TODO: catch errors and report to client
     switch (update['type']) {
       case 'ticket_moved':
-        db.moveTicket(update['pid'], update['ticket'], update['to'], update['from'], function (move) {
-          callback({type:'ticket_moved', to_col:update.to, from_col:update.from, ticket_id:update.ticket.ticket_id});
+        db.moveTicket(update['pid'], update['ticket'], update['to'], update['from'], function (success) {
+          if (success) {
+            callback({
+              type: 'ticket_moved',
+              to_col: update.to,
+              from_col: update.from,
+              ticket_id: update.ticket.ticket_id
+            }, success);
+          } else {
+            callback({}, success);
+          }
         });
         break;
 
       case 'ticket_info':
         db.updateTicketDesc(update['pid'], update['ticket'], update['new_description'], function (info) {
-          callback({type:'ticket_info', ticket_id:update.ticket.ticket_id, desc:update.new_description, col:update.ticket.col});
+          callback({type:'ticket_info', ticket_id:update.ticket.ticket_id, desc:update.new_description, col:update.ticket.col} ,
+          true);
         });
         break;
 
