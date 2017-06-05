@@ -104,7 +104,31 @@ function App (db) {
           callback({type:'tickets', object:tickets});
         });
         break;
-
+      case 'user_projects':
+        db.getUsersProjects(request["username"], function (projects) {
+          callback({type:'user_projects', object:projects});
+        });
+        break;
+      case 'new_user_project':
+        db.addUserToProject(request["username"], request["pid"], function(success) {
+          callback({type:'new_user_project'});
+        });
+        break;
+      case 'add_user_to_ticket':
+        db.addUserToTicket(request["username"], request["tid"], request["pid"], function(success) {
+          callback({type:'add_user_to_project'});
+        });
+        break;
+      case 'user_tickets':
+        db.getUserTickets(request["username"], request["pid"], function (tickets) {
+          callback({type:'user_tickets', object:tickets});
+        });
+        break;
+      case 'ticket_users':
+        db.getTicketUsers(request["pid"], request["tid"], function (users) {
+          callback({type:'user_tickets', object:users});
+        });
+        break;
       default:
         //TODO: Handle unknown request.
         break;
@@ -165,6 +189,13 @@ function App (db) {
         });
         break;
 
+      case 'ticket_deadline':
+        db.updateTicketDeadline(update['pid'], update['ticket'], update['deadline'], function (info) {
+          callback({type:'ticket_deadline', ticket_id:update.ticket.ticket_id, deadline:deadline, col:update.ticket.col} ,
+              true);
+        });
+        break;
+
       default:
         //TODO: Handle unknown update.
         break;
@@ -199,24 +230,9 @@ function App (db) {
     }
   };
 
-
-  /*this.handleCommunication = function (jsonInput, callback) {
-    if ('request' in jsonInput) {
-      var request = jsonInput['request'];
-      this.handleRequest(request, callback);
-
-    } else if ('store' in jsonInput) {
-      var store = jsonInput['store'];
-      this.handleStore(store, callback);
-
-    } else if ('update' in jsonInput) {
-      var update = jsonInput['update'];
-      this.handleUpdate(update, callback);
-    }
-  };*/
-
   var clientCodePath = 'Client.html';
   fs = require('fs');
+
   this.sendClientCode = function (response) {
     fs.readFile(clientCodePath, 'utf8', function (err, data) {
       if (err) {

@@ -50,23 +50,12 @@
                 <select ng-model="selectedYear" ng-options="year for year in years">
                 </select>
 
-                <select ng-model="selectedHour" ng-options="hour for hour in hours">
-                </select>
+          <select ng-model="selectedMinute" ng-options="minute for minute in minutes">
+          </select>
 
-                <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
+          <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
 
-                <ui-select ng-model="day">
-                    <ui-select-match>
-                        <span ng-bind="$select.day"></span>
-                    </ui-select-match>
-                    <ui-select-choices repeat="day in (days | filter: $select.search) track by day">
-                        <span ng-bind="day"></span>
-                    </ui-select-choices>
-                </ui-select>
-                <select ng-model="selectedMinute" ng-options="minute for minute in minutes">
-                </select>
-
-                <h1> You selected {{selectedDay}} and {{selectedMonth}} and {{selectedYear}}</h1>
+          <h1> You selected {{selectedDay}} and {{selectedMonth}} and {{selectedYear}}</h1>
 
                 <button type="button" ng-click="saveEditDeadline()" class="btn btn-primary">Save Deadline</button>
 
