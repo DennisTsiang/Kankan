@@ -176,18 +176,21 @@ function App (db) {
     //TODO: catch errors and report to client
     switch (remove['type']) {
       case 'ticket_remove':
-        db.deleteTicket(remove.pid, remove.ticket_id,
-            callback({type:'ticket_remove', pid:remove.pid, ticket_id:remove.ticket_id})
+        db.deleteTicket(remove.pid, remove.ticket_id, function (success) {
+              callback({type: 'ticket_remove', pid: remove.pid, ticket_id: remove.ticket_id});
+            }
         );
         break;
       case 'column_remove':
-        db.deleteColumn(remove.pid, remove.column_id,
-            callback({type:'column_remove', pid:remove.pid, column_id:remove.column_id})
+        db.deleteColumn(remove.pid, remove.column_id, function (success) {
+              callback({type: 'column_remove', pid: remove.pid, column_id: remove.column_id});
+            }
         );
         break;
       case 'project_remove':
-        db.deleteProject(remove.pid,
-            callback({type:'project_remove', pid:remove.pid})
+        db.deleteProject(remove.pid, function (success) {
+              callback({type: 'project_remove', pid: remove.pid});
+            }
         );
         break;
       default:

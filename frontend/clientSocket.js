@@ -101,12 +101,12 @@ function removeProject(pid) {
 }
 
 function removeColumn(pid, column_id) {
-  var jsonString = {type:'project_remove', pid:pid, column_id:column_id};
+  var jsonString = {type:'column_remove', pid:pid, column_id:column_id};
   socket.emit("remove", JSON.stringify(jsonString));
 }
 
 function removeTicket(pid, ticket_id) {
-  var jsonString = {type:'project_remove', pid:pid, ticket_id:ticket_id};
+  var jsonString = {type:'ticket_remove', pid:pid, ticket_id:ticket_id};
   socket.emit("remove", JSON.stringify(jsonString));
 }
 
