@@ -74,14 +74,7 @@ function move_tickets(to_col_id, from_col_id, tid) {
   scope.$apply();
 }
 
-function delete_ticket_button_click(id) {
-  var info_header = $('#ticket_info_title')[0];
-  info_header.innerHTML = "Deleted";
-  removeTicket(get_kanban_scope().pid, id);
-  delete_ticket(id);
-}
-
-function delete_ticket(ticket_id) {
+function delete_ticket(ticket_id, update) {
   let scope = get_kanban_scope();
 
   let ticket = scope.project.tickets[ticket_id];
@@ -89,7 +82,7 @@ function delete_ticket(ticket_id) {
     delete scope.project.columns[ticket.col].tickets[ticket_id];
     delete scope.project.tickets[ticket_id];
   }
-  scope.$apply();
+  if(update === undefined || update) scope.$apply();
 }
 
 function generateTickets(ticket_info_list) {
@@ -132,17 +125,31 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
 
   ctrl.animationsEnabled = true;
   $scope.tid = -1;
-  ctrl.open = function(tid) {
+  ctrl.open_ticket_description = function(tid) {
     $scope.tid = tid;
     var parentElem = angular.element($document[0].querySelector('.ticket-menu'));
     var modalInstance = $uibModal.open({
       animation: ctrl.animationsEnabled,
-      ariaLabelledBy: 'ticket_info_title',
-      ariaDescribedBy: 'modal-body',
-      templateUrl: 'ticket-popup.html',
+      ariaLabelledBy: 'ticket-info-title',
+      ariaDescribedBy: 'ticket-info-modal-body',
+      templateUrl: 'ticket-popup',
       controller: 'ModalInstanceCtrl',
-      controllerAs: 'ModalCtrl',
+      controllerAs: '$ctrl',
       appendTo: parentElem,
+      resolve: {
+
+      }
+    });
+  };
+
+  ctrl.open_edit_column = function (){
+    let modalInstance = $uibModal.open({
+      animation: true,
+      templateUrl: 'edit-column-popup',
+      controller: 'ModalInstanceCtrl',
+      controllerAs: '$ctrl',
+      size:'lg',
+      windowClass: 'edit-columns-popup',
       resolve: {
 
       }
@@ -152,23 +159,33 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
 
 var popupInstance = this;
 angular.module('Kankan').controller('ModalInstanceCtrl', function($uibModalInstance) {
-  popupInstance.ok = function() {
-    $uibModalInstance.close(ModalCtrl.selected.item);
+  let $ctrl = this;
+  $ctrl.close = function() {
+    $uibModalInstance.close($ctrl.selected);
   };
 
-  popupInstance.cancel = function() {
+  $ctrl.cancel = function() {
     $uibModalInstance.dismiss('cancel');
   };
 });
 
-app.controller('textCtrl', function($scope) {
+app.controller('editColumnCtrl', function($scope) {
+  let project = get_kanban_scope().project;
+  $scope.columns = project.columns;
+
+  $scope.addColumn = function() {
+    sendStoreColumn(project.project_id, "New column", Object.keys(project.columns).length);
+  };
+});
+
+app.controller('editTicketCtrl', function($scope) {
   function getTicket(id) {
     var k_scope = get_kanban_scope();
     return k_scope.project.tickets[id];
   }
 
   function getTid() {
-    var sel = 'div[ng-controller="ModalCtrl as $ModalCtrl"]';
+    var sel = 'div[ng-controller="ModalCtrl as $ctrl"]';
     return angular.element(sel).scope().tid;
   }
 
@@ -218,6 +235,25 @@ app.controller('textCtrl', function($scope) {
 
   }
 });
+
+app.controller('deleteTicketCtrl', function ($scope, $sce) {
+  $scope.dynamicPopover = {
+    content: 'Hello world!',
+    templateUrl: 'yousurebutton.html',
+    title: 'Title'
+  };
+
+  $scope.delete_ticket_button_click = function(id) {
+    let info_header = $('#ticket_info_title')[0];
+
+    //DIRTY - done to close modal.
+    $scope.$parent.$parent.$close();
+
+    removeTicket(get_kanban_scope().pid, id);
+    delete_ticket(id, false);
+  }
+});
+
 
 function generateArray(start, end){
 returnArray = [];
