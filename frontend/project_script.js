@@ -77,7 +77,7 @@ function move_tickets(to_col_id, from_col_id, tid) {
 function delete_ticket_button_click(id) {
   var info_header = $('#ticket_info_title')[0];
   info_header.innerHTML = "Deleted";
-  sendTicketDelete(get_kanban_scope().pid, id);
+  removeTicket(get_kanban_scope().pid, id);
   delete_ticket(id);
 }
 

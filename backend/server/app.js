@@ -4,7 +4,7 @@
 module.exports.App = App;
 
 var httpPort = process.argv[3];
-var db_module = require('./db_one_table');
+var db_module = require('./db_multiple_tables');
 var pool = require('./db');
 var db = new db_module.Database(pool);
 var app = new App(db);
@@ -18,12 +18,34 @@ start_server(httpPort);
 function App (db) {
 
   var _this = this;
+  var resetLock = require('locks').createMutex();
 
   this.handleFileConnection = function (request, response) {
     var frontend = __dirname;
     frontend = frontend.substring(0, frontend.length - 14);
     if (request.originalUrl === "/") {
       response.sendFile(frontend + 'frontend/index.html');
+    } else if (request.originalUrl === "/ResetTable") {
+      resetLock.lock(function () {
+        db.deleteProject(0, function (successful) {
+          db.newProject("Kanban", function (newPid) {
+            if (newPid === 0) {
+              db.newColumn(newPid, "To Do", 0, function (res1) {
+                db.newColumn(newPid, "In Progess", 1, function (res2) {
+                  db.newColumn(newPid, "Done", 2, function (res3) {
+                    resetLock.unlock();
+                    console.log("Finished Setup");
+                    response.sendFile(frontend + 'frontend/index.html');
+                  });
+                });
+              });
+            } else {
+              resetLock.unlock();
+              console.error("Wrong pid!");
+            }
+          });
+        });
+      });
     } else {
       response.sendFile(frontend + 'frontend' + request.originalUrl);
     }
@@ -56,6 +78,14 @@ function App (db) {
       });
     });
 
+    socket.on('remove', function (data) {
+      console.log('Received Remove');
+      _this.handleRemove(JSON.parse(data), function (response) {
+        socket.emit('removereply', JSON.stringify(response));
+        socket.broadcast.emit('removereply', JSON.stringify(response));
+        console.log('Replied to delete');
+      });
+    });
   };
 
   this.handleRequest = function (request, callback) {
@@ -84,7 +114,6 @@ function App (db) {
     //TODO: catch errors and report to client
     switch (store['type']) {
       case 'ticket_new':
-        console.log(store);
         db.newTicket(store['pid'], store['column_id'], function () {
           //TODO: Copied from getTickets - return all tickets
           db.getTickets(store['pid'], function(tickets) {
@@ -92,7 +121,16 @@ function App (db) {
           });
         });
         break;
-
+      case 'project_new':
+        db.newProject(store["project_name"], function (pid) {
+          callback();
+        });
+        break;
+      case 'column_new':
+        db.newColumn(store["pid"], store["column_name"], store["position"], function (cid) {
+          callback();
+        });
+        break;
       default:
         //TODO: Handle unknown store.
         break;
@@ -120,6 +158,32 @@ function App (db) {
         break;
     }
   };
+
+  this.handleRemove = function (remove, callback) {
+    //TODO: Handle correct delete data - not blow up
+    //TODO: catch errors and report to client
+    switch (remove['type']) {
+      case 'ticket_remove':
+        db.deleteTicket(remove.pid, remove.ticket_id,
+            callback({type:'ticket_remove', pid:remove.pid, ticket_id:remove.ticket_id})
+        );
+        break;
+      case 'column_remove':
+        db.deleteColumn(remove.pid, remove.column_id,
+            callback({type:'column_remove', pid:remove.pid, column_id:remove.column_id})
+        );
+        break;
+      case 'project_remove':
+        db.deleteProject(remove.pid,
+            callback({type:'project_remove', pid:remove.pid})
+        );
+        break;
+      default:
+        //TODO: Handle unknown update.
+        break;
+    }
+  };
+
 
   /*this.handleCommunication = function (jsonInput, callback) {
     if ('request' in jsonInput) {
