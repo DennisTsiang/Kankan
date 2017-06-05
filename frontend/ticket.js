@@ -26,7 +26,7 @@ function Ticket(ticket_id) {
 
 //TODO:At the moment the start date updates when the deadline is made
   this.setDeadline = function(year, month, day, hours, minutes) {
-    this.deadline = new Date(year, month, day, hours, minutes);
+    this.deadline = new Date(year, month -1, day, hours, minutes);
     this.startdate = new Date();
 
   };
