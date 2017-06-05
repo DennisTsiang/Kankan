@@ -65,8 +65,14 @@ function sendTicketUpdateMoved(ticket, pid, to, from) {
 }
 
 //TODO: Will change this and update handler to support deadline when backend has support
-function sendTicketUpdateInfo(ticket, pid, desc) {
+function sendTicketUpdateDesc(ticket, pid, desc) {
   var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
+  socket.emit("update", JSON.stringify(jsonString));
+}
+
+function sendTicketUpdateDeadline(ticket, pid, month, year, day, hour, minute) {
+  var deadline = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00";
+  var jsonString = {type: "ticket_deadline", ticket: ticket, pid : pid, deadline : deadline};
   socket.emit("update", JSON.stringify(jsonString));
 }
 
@@ -110,6 +116,32 @@ function removeTicket(pid, ticket_id) {
   socket.emit("remove", JSON.stringify(jsonString));
 }
 
+function getUserProjects(username) {
+  var jsonString = {type:'user_projects', username : username};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+function addUserToProject(username, pid) {
+  var jsonString = {type:'user_projects', username : username, pid : pid};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+function addUserToTicket(username, pid, tid) {
+  var jsonString = {type:'add_user_to_ticket', username : username, pid : pid, tid : tid};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+function getTicketUsers(pid, tid) {
+  var jsonString = {type:'ticket_users', pid : pid, tid : tid};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+function getUserTickets(username, pid) {
+  var jsonString = {type:'user_tickets', pid : pid, username : username};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+
 function requestHandler(reply) {
   var type = reply.type;
   var request_data = reply.object;
@@ -123,6 +155,27 @@ function requestHandler(reply) {
 
       //Send for tickets, once received kanban.
       sendTicketsRequest(get_kanban_scope().pid);
+      break;
+    }
+    case "user_projects" : {
+      var projects = reply.object;
+      break;
+    }
+    case "new_user_project": {
+
+      break;
+    }
+    case "user_tickets": {
+      var tickets = reply.object;
+      break;
+    }
+    case "ticket_users": {
+      var users = reply.object;
+
+      break;
+    }
+    case "add_user_to_ticket": {
+
       break;
     }
   }
@@ -160,6 +213,19 @@ function updateHandler(reply) {
       scope.$apply();
       //ticket.setDeadline(7);
       //ticket.setDeadline(reply.deadline);
+      break;
+    }
+    case "ticket_deadline" : {
+      var datetime = reply.deadline;
+      var year = deadline.substring(0, 4);
+      var month =  deadline.substring(5, 7);
+      var day = deadline.substring(8, 10);
+      var hour = deadline.substring(11, 13);
+      var minute = deadline.substring(14, 16);
+      console.log(year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00");
+      let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
+      ticket.setDeadline(year, month, day, hour, minute);
+      scope.$apply();
       break;
     }
     case 'ticket_delete' : {
