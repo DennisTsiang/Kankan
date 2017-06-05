@@ -45,6 +45,7 @@ CREATE TABLE tickets_0 (
     column_id integer,
     project_id integer,
     ticket_description varchar(255),
+    deadline timestamp,
     PRIMARY KEY (project_id, ticket_id)
 );
 
