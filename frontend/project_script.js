@@ -176,6 +176,11 @@ app.controller('editColumnCtrl', function($scope) {
   $scope.addColumn = function() {
     sendStoreColumn(project.project_id, "New column", Object.keys(project.columns).length);
   };
+
+  $scope.removeColumn = function (col) {
+    removeColumn(project.project_id, col.column_id);
+    delete project.columns[col.column_id];
+  };
 });
 
 app.controller('editTicketCtrl', function($scope) {
