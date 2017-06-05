@@ -233,12 +233,16 @@ function updateHandler(reply) {
       }
       break;
     }
+
+    case 'column_delete' :{
+      //TODO: Handle columns being deleted. - updating positions
+      break;
+    }
   }
 
 }
 
 function storeHandler(reply) {
-  console.log(reply);
   let type = reply.type;
   switch (type) {
     case "tickets": {//"newticket" : {
@@ -248,7 +252,13 @@ function storeHandler(reply) {
       requestHandler(reply);
       break;
     }
+    case "column_new": {
+      let col_info = reply.object;
+      let newColumn = new Column(col_info.cid, col_info.title, col_info.position);
 
+      get_kanban_scope().project.columns[col_info.cid] = newColumn;
+      break;
+    }
 
   }
 }
