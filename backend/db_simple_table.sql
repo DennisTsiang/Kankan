@@ -48,6 +48,12 @@ CREATE TABLE tickets_0 (
     PRIMARY KEY (project_id, ticket_id)
 );
 
+CREATE TABLE users (
+  username varchar(20),
+  project_id integer,
+  PRIMARY KEY username
+);
+
 --------------------------------------------------------------------------------------------------
 -- Finally we populate the tables with the basic game state information.
 

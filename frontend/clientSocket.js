@@ -110,6 +110,16 @@ function removeTicket(pid, ticket_id) {
   socket.emit("remove", JSON.stringify(jsonString));
 }
 
+function getUserProjects(username) {
+  var jsonString = {type:'user_projects', username : username};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+function addUserToProject(username, pid) {
+  var jsonString = {type:'user_projects', username : username, pid : pid};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
 function requestHandler(reply) {
   var type = reply.type;
   var request_data = reply.object;
@@ -123,6 +133,14 @@ function requestHandler(reply) {
 
       //Send for tickets, once received kanban.
       sendTicketsRequest(0/*pid*/);
+      break;
+    }
+    case "user_projects" : {
+      var projects = reply.object;
+      break;
+    }
+    case "new_user_project": {
+
       break;
     }
   }

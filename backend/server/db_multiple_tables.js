@@ -187,14 +187,58 @@ function Database(pool) {
 
   this.updateTicketDesc = function (pid, ticket, newDescription, callback) {
     rwlock.writeLock(function () {
-      pool.query('UPDATE tickets_' + pid + ' SET ticket_description = $1::text WHERE ticket_id = $2::int',
-          [newDescription, ticket.ticket_id],
-        function (insertion) {
+      pool.query('SELECT ticket_id FROM tickets_' + pid + 'WHERE ticket_id = $1::int',
+          [ticket.ticket_id], function (res) {
+        if (res.rows.length === 1) {
+          pool.query('UPDATE tickets_' + pid + ' SET ticket_description = $1::text WHERE ticket_id = $2::int',
+              [newDescription, ticket.ticket_id],
+            function (insertion) {
+              rwlock.unlock();
+              callback(true);
+            });
+        } else {
           rwlock.unlock();
-          callback(true);
-        });
+          console.error("Ticket was not in database");
+        }
+      });
+
     });
   };
+
+  this.getUsersProjects = function (username, callback) {
+    rwlock.readLock(function () {
+      pool.query('SELECT project_id FROM users WHERE username = $1::text', [username], function (res) {
+        if (res.rows.length > 0) {
+          var array = [];
+          for (var row of res.rows) {
+            array.push(row.project_id);
+          }
+          rwlock.unlock();
+          callback(array);
+        } else {
+          rwlock.unlock();
+          console.error("User does not exist in db");
+        }
+      });
+    });
+  }
+
+  this.addUserToProject = function (username, pid, callback) {
+    rwlock.writeLock(function () {
+      pool.query('SELECT username FROM users WHERE username = $1::text AND project_id = $2::int',
+          [username, pid], function (checkRes) {
+        if (checkRes.rows.length === 0 ) {
+          pool.query('INSERT INTO users VALUES($1::text, $2::int)', [username, pid], function (res) {
+            rwlock.unlock();
+            callback(true);
+          });
+        } else {
+          rwlock.unlock();
+          console.error("User already exists in db");
+        }
+      });
+    })
+  }
 }
 
 module.exports.Database = Database;
