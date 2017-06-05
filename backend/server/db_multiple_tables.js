@@ -104,20 +104,22 @@ function Database(pool) {
 
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_name, column_id, column_title FROM project_table NATURAL JOIN columns_' + pid +
+      pool.query('SELECT project_id, project_name, column_id, column_title FROM project_table NATURAL JOIN columns_' + pid +
           ' ORDER BY column_id ASC', [], function(res) {
 
         var columns = [];
         var project_name = null;
+        var project_id = null;
         res.rows.forEach(function (row) {
           //Get column ordering
           var c = new column.Column(row["column_id"], row["column_title"]);
           columns.push(c);
-          project_name = row["project_name"]
+          project_name = row["project_name"];
+          project_id = row["project_id"];
         });
 
         rwlock.unlock();
-        callback(new kanban.Kanban(project_name, columns));
+        callback(new kanban.Kanban(project_id, project_name, columns));
       });
     });
   };

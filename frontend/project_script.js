@@ -2,8 +2,13 @@
 $( document ).ready(function(){
   //Setup default pid
   get_kanban_scope().pid = 0;
+  get_kanban_scope().username = "harry";
+
 
   initiateConnection();
+
+  get_kanban_scope().projects = [];
+  getUserProjects(get_kanban_scope().username);
 
   //Enables all popovers.
   $('[data-toggle="popover"]').popover();
@@ -94,6 +99,7 @@ function generateTickets(ticket_info_list) {
 function generate_kanban(received_project) {
   var k_scope = get_kanban_scope();
 
+  k_scope.pid = received_project.project_id;
   var project = new Project(k_scope.pid);
   k_scope.project = project;
 
@@ -118,6 +124,9 @@ app.controller('MainCtrl', function($scope) {
 });
 
 app.controller('kanban_ctrl', function($scope) {
+  $scope.sendKanbanRequest = function (pid) {
+    sendKanbanRequest(pid);
+  }
 });
 
 app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {

@@ -31,7 +31,7 @@ function setOnEvents() {
 
   printSocketStatus();
   if (isSocketConnected()) {
-    sendKanbanRequest(0/*pid*/);
+    sendKanbanRequest(get_kanban_scope().pid);
   }
 }
 
@@ -153,7 +153,8 @@ function requestHandler(reply) {
       break;
     }
     case "user_projects" : {
-      var projects = reply.object;
+      let projects = reply.object;
+      get_kanban_scope().projects = projects;
       break;
     }
     case "new_user_project": {

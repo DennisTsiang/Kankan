@@ -81,8 +81,8 @@
     <div class="modal-header">
       <!-- Modal content-->
       <h3 class="modal-title">Edit Columns</h3>
-
     </div>
+    
     <div class="modal-body">
       <div ng-controller="editColumnCtrl">
         <div class="container-fluid">
@@ -125,8 +125,24 @@
                           <li><button class="btn btn-primary btn-lg" onclick="addBTN()">Add ticket</button></li>
 
                           <!-- Button for user to return to home page - select other project from there. -->
-                          <li><a href="">Home</a></li>
-                          <li><a href="" ng-click="$ctrl.open_edit_column()">Edit Columns</a></li>
+                          <li>
+                            <div class="btn-group btn-lg" uib-dropdown=>
+                              <button type="button" class="btn btn-link btn-md">Home</button>
+                              <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
+                                <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+                                <li role="menuitem">
+                                  <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
+                                </li>
+
+                                <!-- Go to other projects -->
+                                <li class="divider" ng-repeat-start="proj in projects"></li>
+                                <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
+                              </ul>
+                            </div>
+                          </li>
+                          <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
                         </ul>
                     </div>
                     <div class="col-xs-1">
