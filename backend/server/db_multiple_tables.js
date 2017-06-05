@@ -26,12 +26,12 @@ function Database(pool) {
               'column_position integer not null, ' +
               'PRIMARY KEY (project_id, column_id) )',
               [], function (create) {
-                pool.query('CREATE TABLE tickets_' + pid + '(' +
+                pool.query('CREATE TABLE tickets_' + pid + ' (' +
                     'ticket_id integer,' +
                     'column_id integer,' +
                     'project_id integer,' +
                     'ticket_description varchar(255),' +
-                    'deadline DATETIME' +
+                    'deadline timestamp, ' +
                     'PRIMARY KEY (project_id, ticket_id) )',
                     [], function (finishedCreate) {
                       rwlock.unlock();
