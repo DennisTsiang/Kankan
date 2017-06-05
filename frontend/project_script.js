@@ -193,7 +193,8 @@ app.controller('textCtrl', function($scope) {
 
   $scope.deadline = getTicket(getTid()).deadline;
   $scope.selectedDay = $scope.deadline.getDate().toString();
-  $scope.selectedMonth = $scope.deadline.getMonth().toString();
+  //Account for the fact months are stored as 0-11 in date object
+  $scope.selectedMonth = ($scope.deadline.getMonth() +1 ).toString();
   $scope.selectedYear = $scope.deadline.getFullYear().toString();
   $scope.selectedHour = $scope.deadline.getHours().toString();
   $scope.selectedMinute = $scope.deadline.getMinutes().toString();
@@ -201,11 +202,17 @@ app.controller('textCtrl', function($scope) {
   $scope.saveEditDeadline = function(){
 
     var ticket = getTicket($scope.tid);
-    ticket.setDeadline($scope.selectedYear, $scope.selectedMonth - 1, $scope.selectedDay, $scope.selectedHour, $scope.selectedMinute);
+  //  ticket.setDeadline($scope.selectedYear, $scope.selectedMonth - 1, $scope.selectedDay, $scope.selectedHour, $scope.selectedMinute);
+
+    sendTicketUpdateDeadline(ticket, get_kanban_scope().pid,
+                             $scope.selectedDay, $scope.selectedMonth,
+                             $scope.selectedYear,
+                             $scope.selectedHour,
+                             $scope.selectedMinute);
 
   }
 
-  $scope.saveEditDesc = function(text, day) {
+  $scope.saveEditDesc = function(text) {
     var ticket = getTicket($scope.tid);
     sendTicketUpdateInfo(ticket, get_kanban_scope().pid, text);
 
