@@ -209,7 +209,7 @@ function Database(pool) {
 
   this.updateTicketDeadline = function (pid, ticket, datetime, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT ticket_id FROM tickets_' + pid + 'WHERE ticket_id = $1::int',
+      pool.query('SELECT ticket_id FROM tickets_' + pid + ' WHERE  ticket_id = $1::int',
           [ticket.ticket_id], function (res) {
             if (res.rows.length === 1) {
               pool.query('UPDATE tickets_' + pid + ' SET deadline = $1::text WHERE ticket_id = $2::int',
