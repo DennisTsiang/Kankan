@@ -132,7 +132,7 @@ function requestHandler(reply) {
       generate_kanban(request_data);
 
       //Send for tickets, once received kanban.
-      sendTicketsRequest(0/*pid*/);
+      sendTicketsRequest(get_kanban_scope().pid);
       break;
     }
     case "user_projects" : {
@@ -151,16 +151,13 @@ function removeHandler(reply) {
   let type = reply.type;
   switch (type) {
     case "project_remove" : {
-      var scope = angular.element($("#kanban_table")).scope();
       break;
     }
     case "column_remove" : {
-      var scope = angular.element($("#kanban_table")).scope();
       break;
     }
     case "ticket_remove": {
-      var scope = angular.element($("#kanban_table")).scope();
-
+      delete_ticket(reply.ticket_id);
       break;
     }
   }
@@ -178,6 +175,7 @@ function updateHandler(reply) {
     case "ticket_info" : {
       let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
       ticket.setDesc(reply.desc);
+      scope.$apply();
       //ticket.setDeadline(7);
       //ticket.setDeadline(reply.deadline);
       break;

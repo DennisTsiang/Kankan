@@ -26,7 +26,7 @@ function handleDrop(e) {
   var cell = $(e.toElement).closest('td');
   var end_col = cell[0].cellIndex;
 
-  move_tickets(end_col, start_col, id);
+  //move_tickets(end_col, start_col, id);
   sendTicketUpdateMoved(scope.project.tickets[id], 0, end_col, start_col);
 
   $(e.toElement).closest('.ticket-column')[0].style.border = "";
