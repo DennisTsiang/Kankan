@@ -41,6 +41,11 @@ div {
 
 }
 
+.vertical-align {
+  display: flex;
+  align-items: center;
+}
+
 .table {
   table-layout: fixed;
   width: 100%;
@@ -49,6 +54,10 @@ div {
 
 .ticket-column {
 
+}
+
+.modal-lg {
+  width: 75%
 }
 
 .offset-navbar-height {

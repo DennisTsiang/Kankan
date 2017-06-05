@@ -31,7 +31,7 @@ function setOnEvents() {
 
   printSocketStatus();
   if (isSocketConnected()) {
-    sendKanbanRequest(0/*pid*/);
+    sendKanbanRequest(get_kanban_scope().pid);
   }
 }
 
@@ -74,11 +74,6 @@ function sendTicketUpdateDeadline(ticket, pid, month, year, day, hour, minute) {
   var deadline = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00";
   var jsonString = {type: "ticket_deadline", ticket: ticket, pid : pid, deadline : deadline};
   socket.emit("update", JSON.stringify(jsonString));
-}
-
-function sendStoreColumn(pid, cid, title, position) {
-  let jsonString = {type:'column_new', pid : pid, column_id: cid, title: title, pos: position};
-  socket.emit("store", JSON.stringify(jsonString));
 }
 
 function sendStoreTicket(type, pid, col_id) {
@@ -158,7 +153,8 @@ function requestHandler(reply) {
       break;
     }
     case "user_projects" : {
-      var projects = reply.object;
+      let projects = reply.object;
+      get_kanban_scope().projects = projects;
       break;
     }
     case "new_user_project": {
@@ -237,6 +233,11 @@ function updateHandler(reply) {
       }
       break;
     }
+
+    case 'column_delete' :{
+      //TODO: Handle columns being deleted. - updating positions
+      break;
+    }
   }
 
 }
@@ -251,5 +252,13 @@ function storeHandler(reply) {
       requestHandler(reply);
       break;
     }
+    case "column_new": {
+      let col_info = reply.object;
+      let newColumn = new Column(col_info.cid, col_info.title, col_info.position);
+
+      get_kanban_scope().project.columns[col_info.cid] = newColumn;
+      break;
+    }
+
   }
 }
