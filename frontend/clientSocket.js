@@ -211,12 +211,11 @@ function updateHandler(reply) {
       let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
       ticket.setDesc(reply.desc);
       scope.$apply();
-      //ticket.setDeadline(7);
-      //ticket.setDeadline(reply.deadline);
       break;
     }
     case "ticket_deadline" : {
-      var datetime = reply.deadline;
+      console.log("reply now is " + JSON.stringify(reply));
+      var deadline = reply.deadline;
       var year = deadline.substring(0, 4);
       var month =  deadline.substring(5, 7);
       var day = deadline.substring(8, 10);

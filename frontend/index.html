@@ -3,27 +3,27 @@
 <meta charset="utf-8">
 
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 
 
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-animate.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
-    <link href="angular-xeditable/css/xeditable.css" rel="stylesheet">
-    <script src="angular-xeditable/js/xeditable.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-animate.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
+  <link href="angular-xeditable/css/xeditable.css" rel="stylesheet">
+  <script src="angular-xeditable/js/xeditable.js"></script>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
 
-    <script src="ui-select-master/dist/select.min.js"></script>
+  <script src="ui-select-master/dist/select.min.js"></script>
 
-    <link href="ui-select-master/dist/select.min.css" rel="stylesheet" media="screen">
+  <link href="ui-select-master/dist/select.min.css" rel="stylesheet" media="screen">
 
-    <link href="project_stylesheet.css" rel="stylesheet">
+  <link href="project_stylesheet.css" rel="stylesheet">
 </head>
 
 
@@ -57,80 +57,76 @@
           <select ng-model="selectedMinute" ng-options="minute for minute in minutes">
           </select>
 
-          <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
-
-          <h1> You selected {{selectedDay}} and {{selectedMonth}} and {{selectedYear}}</h1>
-
           <button type="button" ng-click="saveEditDeadline()" class="btn btn-primary">Save Deadline</button>
 
-                <button replace="true" type='button' class='btn btn-sm btn-warning' data-toggle="popover"
-                        data-content="<button replace='true' type='button' class='btn btn-sm btn-danger'
-                onclick='delete_ticket_button_click({{tid}})'>I'm sure</button>"
-                        data-placement="right" data-trigger="click" data-html="true">
-                    Remove
-                </button>
-            </div>
+          <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
+
+          <button replace="true" type='button' class='btn btn-sm btn-warning' data-toggle="popover" data-content="<button replace='true' type='button' class='btn btn-sm btn-danger'
+                onclick='delete_ticket_button_click({{tid}})'>I'm sure</button>" data-placement="right" data-trigger="click" data-html="true"> Remove
+          </button>
         </div>
+      </div>
     </script>
 
     <div id="kanban_location" ng-controller="kanban_ctrl">
 
-    <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
+      <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
         <div class="container-fluid">
-        <div class="row">
+          <div class="row">
             <div class="col-xs-11">
-            <ul class="nav navbar-nav">
+              <ul class="nav navbar-nav">
                 <!-- Button for user to return to home page - select other project from there. -->
                 <li><a href="">Home</a></li>
                 <li><a href="">Edit Columns</a></li>
                 <li><a href="">Option 3</a></li>
-                <li> <a id="project_title" class="project-title">
+                <li>
+                  <a id="project_title" class="project-title">
                     <!-- Project title -->
-                    <!--//TODO: Add separation to distinguish project title, from other buttons --> {{project.title}}
-                </a></li>
-            </ul>
+                    <!--//TODO: Add separation to distinguish project title, from other buttons -->{{project.title}}
+                  </a>
+                </li>
+              </ul>
             </div>
             <div class="col-xs-1">
-                <ul class="nav navbar-nav">
+              <ul class="nav navbar-nav">
                 <!-- Add buttons -->
                 <li><a href="" onclick="addBTN()">Add ticket</a></li>
-                </ul>
+              </ul>
             </div>
+          </div>
         </div>
-        </div>
-    </nav>
+      </nav>
 
-    <div class="offset-navbar-height container-fluid">
+      <div class="offset-navbar-height container-fluid">
 
         <div class="row">
-        <!-- Kanban table -->
-        <div class="col-xs-12">
-           <table id="kanban" class="table table-bordered">
+          <!-- Kanban table -->
+          <div class="col-xs-12">
+            <table id="kanban" class="table table-bordered">
 
-           <tr>
-           <th class="column-title" ng-repeat="col in project.columns">{{col.title}}</th>
-           </tr>
+              <tr>
+                <th class="column-title" ng-repeat="col in project.columns">{{col.title}}</th>
+              </tr>
 
-           <tr>
-           <td ng-repeat="col in project.columns"  class="ticket-column">
+              <tr>
+                <td ng-repeat="col in project.columns" class="ticket-column">
 
-           <!-- Tickets -->
-           <div ng-repeat="ticket in col.tickets" ng-click="$ModalCtrl.open(ticket.ticket_id)" draggable="true"
-           id="{{ticket.ticket_id}}" ondragstart="handleDragStart(event)" class="ticket">
-           Ticket id# {{ticket.ticket_id}} </br>
-           {{ticket.desc}}
+                  <!-- Tickets -->
+                  <div ng-repeat="ticket in col.tickets" ng-click="$ModalCtrl.open(ticket.ticket_id)" draggable="true" id="{{ticket.ticket_id}}" ondragstart="handleDragStart(event)" class="ticket">
+                    Ticket id# {{ticket.ticket_id}} </br>
+                    {{ticket.desc}}
 
-           <uib-progressbar class="progress-striped active" value="ticket.progress" type="{{ticket.deadlineState}}">{{ticket.progress}} <i ng-show="showWarning">Close to Deadline</i></uib-progressbar>
-           </div>
+                    <uib-progressbar class="progress-striped active" value="ticket.progress" type="{{ticket.deadlineState}}">{{ticket.progress}} <i ng-show="showWarning">Close to Deadline</i></uib-progressbar>
+                  </div>
 
-           </td>
-           </tr>
-           </table>
-           </div>
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
-    </div>
-</div>
+  </div>
 </body>
 
 <script src="project.js"></script>

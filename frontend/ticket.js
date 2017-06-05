@@ -5,8 +5,8 @@ function Ticket(ticket_id) {
   this.members = [];
   this.desc = "";
   this.col = -1;
-  this.deadline = new Date();
-  this.startdate = new Date();
+  this.deadline = null;
+  this.startdate = null;
   this.progress = 0;
 
   this.addMembersToTicket = function (array) {
@@ -31,18 +31,37 @@ function Ticket(ticket_id) {
 
   };
 
+this.setDeadlineFlat = function(deadline){
+  if(deadline == null){
+    //this.deadline = new Date();
+  }else{
+  this.deadline = deadline;
+}
+}
+
+
   this.updateProgress = function(){
 
     let endtime = this.deadline.getTime();
     let starttime = this.startdate.getTime();
 
+    console.log("start time is " + starttime);
+    console.log("end time is " + endtime);
+
+
     let currentDate = new Date();
 
     let timeWidth = endtime - starttime;
 
+    console.log("width time is " + timeWidth);
+
+
     let milliProgress = (currentDate.getTime() -starttime)/timeWidth
 
     this.progress =  (milliProgress * 100);
+
+    console.log("progress is " + this.progress);
+
 
   }
 
