@@ -208,7 +208,7 @@ app.controller('textCtrl', function($scope) {
   $scope.saveEditDesc = function(text, day) {
     var ticket = getTicket($scope.tid);
     if (ticket !== undefined) {
-      sendTicketUpdateInfo(ticket, get_kanban_scope().pid, text);
+      sendTicketUpdateDesc(ticket, get_kanban_scope().pid, text);
     }
 
   };

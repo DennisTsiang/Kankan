@@ -189,6 +189,13 @@ function App (db) {
         });
         break;
 
+      case 'ticket_deadline':
+        db.updateTicketDeadline(update['pid'], update['ticket'], update['deadline'], function (info) {
+          callback({type:'ticket_deadline', ticket_id:update.ticket.ticket_id, deadline:deadline, col:update.ticket.col} ,
+              true);
+        });
+        break;
+
       default:
         //TODO: Handle unknown update.
         break;
@@ -223,24 +230,9 @@ function App (db) {
     }
   };
 
-
-  /*this.handleCommunication = function (jsonInput, callback) {
-    if ('request' in jsonInput) {
-      var request = jsonInput['request'];
-      this.handleRequest(request, callback);
-
-    } else if ('store' in jsonInput) {
-      var store = jsonInput['store'];
-      this.handleStore(store, callback);
-
-    } else if ('update' in jsonInput) {
-      var update = jsonInput['update'];
-      this.handleUpdate(update, callback);
-    }
-  };*/
-
   var clientCodePath = 'Client.html';
   fs = require('fs');
+
   this.sendClientCode = function (response) {
     fs.readFile(clientCodePath, 'utf8', function (err, data) {
       if (err) {

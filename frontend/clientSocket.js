@@ -65,8 +65,14 @@ function sendTicketUpdateMoved(ticket, pid, to, from) {
 }
 
 //TODO: Will change this and update handler to support deadline when backend has support
-function sendTicketUpdateInfo(ticket, pid, desc) {
+function sendTicketUpdateDesc(ticket, pid, desc) {
   var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
+  socket.emit("update", JSON.stringify(jsonString));
+}
+
+function sendTicketUpdateDeadline(ticket, pid, month, year, day, hour, minute) {
+  var deadline = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00";
+  var jsonString = {type: "ticket_deadline", ticket: ticket, pid : pid, deadline : deadline};
   socket.emit("update", JSON.stringify(jsonString));
 }
 
@@ -207,6 +213,19 @@ function updateHandler(reply) {
       scope.$apply();
       //ticket.setDeadline(7);
       //ticket.setDeadline(reply.deadline);
+      break;
+    }
+    case "ticket_deadline" : {
+      var datetime = reply.deadline;
+      var year = deadline.substring(0, 4);
+      var month =  deadline.substring(5, 7);
+      var day = deadline.substring(8, 10);
+      var hour = deadline.substring(11, 13);
+      var minute = deadline.substring(14, 16);
+      console.log(year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00");
+      let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
+      ticket.setDeadline(year, month, day, hour, minute);
+      scope.$apply();
       break;
     }
     case 'ticket_delete' : {

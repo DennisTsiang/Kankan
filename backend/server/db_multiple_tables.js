@@ -31,6 +31,7 @@ function Database(pool) {
                     'column_id integer,' +
                     'project_id integer,' +
                     'ticket_description varchar(255),' +
+                    'deadline DATETIME' +
                     'PRIMARY KEY (project_id, ticket_id) )',
                     [], function (finishedCreate) {
                       rwlock.unlock();
@@ -92,7 +93,8 @@ function Database(pool) {
         var tickets = [];
         res.rows.forEach(function (row) {
           //Create ticket objects
-          tickets.push(new ticket.Ticket(row["ticket_id"], row["column_id"], row["ticket_description"]));
+          tickets.push(new ticket.Ticket(row["ticket_id"], row["column_id"],
+              row["ticket_description"], row["deadline"]));
         });
         rwlock.unlock();
         callback(tickets);
@@ -129,8 +131,8 @@ function Database(pool) {
         } else {
           tid = res.rows[0].max + 1;
         }
-        pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, $4::text)',
-            [tid, column_id, pid, ''],
+        pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, \'\', NULL)',
+            [tid, column_id, pid],
             function (insertion) {
               rwlock.unlock();
               callback();
@@ -187,7 +189,7 @@ function Database(pool) {
 
   this.updateTicketDesc = function (pid, ticket, newDescription, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT ticket_id FROM tickets_' + pid + 'WHERE ticket_id = $1::int',
+      pool.query('SELECT ticket_id FROM tickets_' + pid + ' WHERE ticket_id = $1::int',
           [ticket.ticket_id], function (res) {
         if (res.rows.length === 1) {
           pool.query('UPDATE tickets_' + pid + ' SET ticket_description = $1::text WHERE ticket_id = $2::int',
@@ -201,6 +203,26 @@ function Database(pool) {
           console.error("Ticket was not in database");
         }
       });
+
+    });
+  };
+
+  this.updateTicketDeadline = function (pid, ticket, datetime, callback) {
+    rwlock.writeLock(function () {
+      pool.query('SELECT ticket_id FROM tickets_' + pid + 'WHERE ticket_id = $1::int',
+          [ticket.ticket_id], function (res) {
+            if (res.rows.length === 1) {
+              pool.query('UPDATE tickets_' + pid + ' SET deadline = $1::text WHERE ticket_id = $2::int',
+                  [datetime, ticket.ticket_id],
+                  function (insertion) {
+                    rwlock.unlock();
+                    callback(true);
+                  });
+            } else {
+              rwlock.unlock();
+              console.error("Ticket was not in database");
+            }
+          });
 
     });
   };
