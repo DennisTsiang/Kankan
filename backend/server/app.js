@@ -149,12 +149,12 @@ function App (db) {
         break;
       case 'project_new':
         db.newProject(store["project_name"], function (pid) {
-          callback();
+          callback({type:'project_new', object:pid});
         });
         break;
       case 'column_new':
         db.newColumn(store["pid"], store["column_name"], store["position"], function (cid) {
-          callback();
+          callback({type:'column_new',object:cid});
         });
         break;
       default:
