@@ -191,7 +191,7 @@ function App (db) {
 
       case 'ticket_deadline':
         db.updateTicketDeadline(update['pid'], update['ticket'], update['deadline'], function (info) {
-          callback({type:'ticket_deadline', ticket_id:update.ticket.ticket_id, deadline:deadline, col:update.ticket.col} ,
+          callback({type:'ticket_deadline', ticket_id:update.ticket.ticket_id, deadline:update.deadline, col:update.ticket.col} ,
               true);
         });
         break;
