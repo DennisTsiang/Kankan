@@ -51,6 +51,10 @@
                 <select ng-model="selectedYear" ng-options="year for year in years">
                 </select>
 
+                <select ng-model="selectedHour" ng-options="hour for hour in hours">
+                </select>
+
+
           <select ng-model="selectedMinute" ng-options="minute for minute in minutes">
           </select>
 
@@ -83,7 +87,7 @@
       <!-- Modal content-->
       <h3 class="modal-title">Edit Columns</h3>
     </div>
-    
+
     <div class="modal-body">
       <div ng-controller="editColumnCtrl">
         <div class="container-fluid">
