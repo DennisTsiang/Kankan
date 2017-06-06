@@ -255,6 +255,7 @@ function updateHandler(reply) {
       var cid = reply.cid;
       var title = reply.title;
       get_kanban_scope().project.columns[cid].title = title;
+      get_kanban_scope().$apply();
     }
   }
 
