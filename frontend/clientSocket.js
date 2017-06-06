@@ -101,8 +101,8 @@ function removeProject(pid) {
   socket.emit("remove", JSON.stringify(jsonString));
 }
 
-function removeColumn(pid, column_id) {
-  var jsonString = {type:'column_remove', pid:pid, column_id:column_id};
+function removeColumn(pid, column_id, column_position) {
+  var jsonString = {type:'column_remove', pid:pid, column_id:column_id, column_position: column_position};
   socket.emit("remove", JSON.stringify(jsonString));
 }
 
@@ -179,17 +179,25 @@ function requestHandler(reply) {
 }
 
 function removeHandler(reply) {
-  //TODO FINISH REMOVE HANDLER
   let type = reply.type;
   switch (type) {
     case "project_remove" : {
+      //TODO: Implement project deletion
+      //Kick out of kanban view, take back to home page?
       break;
     }
     case "column_remove" : {
+      console.err("Column deletion case - should not occur. Use send kanban instead.");
       break;
     }
     case "ticket_remove": {
-      delete_ticket(reply.ticket_id);
+      let ticket_id = reply.ticket_id;
+      let project_id = reply.pid;
+      if (project_id == get_kanban_scope().pid) {
+        delete_ticket(ticket_id);
+      } else {
+        console.error("Getting deletion info for different project.")
+      }
       break;
     }
   }
@@ -224,21 +232,6 @@ function updateHandler(reply) {
       scope.$apply();
       break;
     }
-    case 'ticket_delete' : {
-      let ticket_id = reply.ticket_id;
-      let project_id = reply.project_id;
-      if (project_id == scope.pid) {
-        delete_ticket(ticket_id);
-      } else {
-        console.error("Getting deletion info for different project.")
-      }
-      break;
-    }
-
-    case 'column_delete' :{
-      //TODO: Handle columns being deleted. - updating positions
-      break;
-    }
   }
 
 }
@@ -251,13 +244,14 @@ function storeHandler(reply) {
       // in the project back, like the getTickets request (hence type="tickets"). We only want the ticket that's been
       // created to be sent back.
       requestHandler(reply);
+      console.log(reply);
       break;
     }
+
     case "column_new": {
       let col_info = reply.object;
-      let newColumn = new Column(col_info.cid, col_info.title, col_info.position);
-
-      get_kanban_scope().project.columns[col_info.cid] = newColumn;
+      console.log(col_info);
+      addColumn(col_info.column_name, col_info.position, col_info.cid);
       break;
     }
 

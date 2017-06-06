@@ -66,8 +66,6 @@ function addColumn(title, position, id) {
   let column = new Column(id, title, position);
   scope.project.columns[id] = column;
 
-  sendStoreColumn(scope.pid, id, title, position);
-
   scope.$apply();
   enableDnDColumns();
 }
@@ -167,15 +165,13 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
   $scope.tid = -1;
   ctrl.open_ticket_description = function(tid) {
     $scope.tid = tid;
-    var parentElem = angular.element($document[0].querySelector('.ticket-menu'));
-    var modalInstance = $uibModal.open({
+    let modalInstance = $uibModal.open({
       animation: ctrl.animationsEnabled,
       ariaLabelledBy: 'ticket-info-title',
       ariaDescribedBy: 'ticket-info-modal-body',
       templateUrl: 'ticket-popup',
       controller: 'ModalInstanceCtrl',
       controllerAs: '$ctrl',
-      appendTo: parentElem,
       resolve: {
 
       }
@@ -210,17 +206,15 @@ angular.module('Kankan').controller('ModalInstanceCtrl', function($uibModalInsta
 });
 
 app.controller('editColumnCtrl', function($scope) {
-  let project = get_kanban_scope().project;
-  $scope.columns = project.columns;
+  $scope.project = get_kanban_scope().project;
 
   $scope.addColumn = function() {
-    sendStoreColumn(project.project_id, "New column", Object.keys(project.columns).length);
+    sendStoreColumn($scope.project.project_id, "New column", Object.keys($scope.project.columns).length);
   };
 
   $scope.removeColumn = function (col) {
-    removeColumn(project.project_id, col.column_id);
-    //TODO: Handle deletion and affecting column positions.
-    delete project.columns[col.column_id];
+    removeColumn($scope.project.project_id, col.column_id, col.position);
+    delete $scope.project.columns[col.column_id];
   };
 });
 

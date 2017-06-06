@@ -35,7 +35,15 @@ this.setDeadlineFlat = function(deadline){
   if(deadline == null){
     //this.deadline = new Date();
   }else{
-  this.deadline = deadline;
+    console.log("setting deadline as " + deadline);
+
+  var year = deadline.substring(0, 4);
+  var month =  deadline.substring(5, 7);
+  var day = deadline.substring(8, 10);
+  var hour = deadline.substring(11, 13);
+  var minute = deadline.substring(14, 16);
+
+  this.setDeadline(year, month, day, hour, minute);
 }
 }
 
