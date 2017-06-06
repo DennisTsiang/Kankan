@@ -212,9 +212,11 @@ function App (db) {
         break;
       case 'column_remove':
         db.deleteColumn(remove.pid, remove.column_id, remove.column_position, function (success) {
-              callback({type: 'column_remove', pid: remove.pid, column_id: remove.column_id});
-            }
-        );
+          console.log("Delete column success: " + success);
+          db.getKanban(remove['pid'], function (kanban) {
+            callback({type:'kanban', object:kanban});
+          });
+        });
         break;
       case 'project_remove':
         db.deleteProject(remove.pid, function (success) {
