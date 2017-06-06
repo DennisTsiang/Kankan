@@ -260,12 +260,12 @@ app.controller('editTicketCtrl', function($scope) {
   console.log("current id is " + getTid());
   console.log("current deadline is is " + $scope.deadline);
 
-  //$scope.selectedDay = $scope.deadline.getDate().toString();
+  $scope.currentDay = $scope.deadline.getDate().toString();
   //Account for the fact months are stored as 0-11 in date object
-  //$scope.selectedMonth = ($scope.deadline.getMonth() + 1 ).toString();
-  //$scope.selectedYear = $scope.deadline.getFullYear().toString();
-  //$scope.selectedHour = $scope.deadline.getHours().toString();
-  //$scope.selectedMinute = $scope.deadline.getMinutes().toString();
+  $scope.currentMonth = ($scope.deadline.getMonth() + 1 ).toString();
+  $scope.currentYear = $scope.deadline.getFullYear().toString();
+  $scope.currentHour = $scope.deadline.getHours().toString();
+  $scope.currentMinute = $scope.deadline.getMinutes().toString();
 
   console.log("selected day first  is " + $scope.selectedDay);
   console.log("selected month first is " + $scope.selectedMonth);
@@ -291,6 +291,20 @@ app.controller('editTicketCtrl', function($scope) {
                              $scope.selectedDay,
                              $scope.selectedHour,
                              $scope.selectedMinute);
+
+                             $scope.updateModal();
+
+
+  }
+
+  $scope.updateModal = function(){
+
+    $scope.currentDay = $scope.selectedDay;
+    //Account for the fact months are stored as 0-11 in date object
+    $scope.currentMonth = $scope.selectedMonth;
+    $scope.currentYear = $scope.selectedYear;
+    $scope.currentHour = $scope.selectedHour;
+    $scope.currentMinute = $scope.selectedMinute;
 
   }
 
