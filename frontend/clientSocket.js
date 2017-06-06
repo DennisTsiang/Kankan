@@ -187,7 +187,10 @@ function removeHandler(reply) {
       break;
     }
     case "column_remove" : {
-      console.error("Column deletion case - should not occur. Use send kanban instead.");
+      generate_kanban(reply.object);
+
+      //Send for tickets, once received kanban.
+      sendTicketsRequest(get_kanban_scope().pid);
       break;
     }
     case "ticket_remove": {

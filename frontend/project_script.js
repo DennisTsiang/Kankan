@@ -100,6 +100,7 @@ function generateTickets(ticket_info_list) {
 function generate_kanban(received_project) {
   var k_scope = get_kanban_scope();
 
+  console.log(received_project);
   k_scope.pid = received_project.project_id;
   var project = new Project(k_scope.pid);
   k_scope.project = project;
