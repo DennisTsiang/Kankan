@@ -193,6 +193,12 @@ function App (db) {
               true);
         });
         break;
+      case 'column_moved' :
+        db.moveColumn(update['pid'], update['cid'], update['to'], update['from'], function (info) {
+          db.getKanban(request['pid'], function (kanban) {
+            callback({type:'column_moved', object:kanban});
+          });
+        });
 
       default:
         //TODO: Handle unknown update.

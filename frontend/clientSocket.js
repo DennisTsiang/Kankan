@@ -64,6 +64,12 @@ function sendTicketUpdateMoved(ticket, pid, to, from) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
+function sendColumnUpdateMoved(pid, cid, to, from) {
+  var jsonString = {type: 'column_moved', pid : pid, cid: cid,
+    to : to, from : from};
+  socket.emit("update", JSON.stringify(jsonString));
+}
+
 //TODO: Will change this and update handler to support deadline when backend has support
 function sendTicketUpdateDesc(ticket, pid, desc) {
   var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
@@ -231,6 +237,10 @@ function updateHandler(reply) {
       let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
       ticket.setDeadline(year, month, day, hour, minute);
       scope.$apply();
+      break;
+    }
+    case "column_moved" : {
+      var kanban = reply.object;
       break;
     }
   }
