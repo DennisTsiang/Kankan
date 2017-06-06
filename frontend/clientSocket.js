@@ -189,7 +189,14 @@ function removeHandler(reply) {
       break;
     }
     case "ticket_remove": {
-      delete_ticket(reply.ticket_id);
+      let ticket_id = reply.ticket_id;
+      let project_id = reply.pid;
+      if (project_id == get_kanban_scope().pid) {
+        delete_ticket(ticket_id);
+      } else {
+        console.error("Getting deletion info for different project.")
+      }
+      console.log(reply);
       break;
     }
   }
@@ -224,19 +231,9 @@ function updateHandler(reply) {
       scope.$apply();
       break;
     }
-    case 'ticket_delete' : {
-      let ticket_id = reply.ticket_id;
-      let project_id = reply.project_id;
-      if (project_id == scope.pid) {
-        delete_ticket(ticket_id);
-      } else {
-        console.error("Getting deletion info for different project.")
-      }
-      break;
-    }
 
     case 'column_delete' :{
-      //TODO: Handle columns being deleted. - updating positions
+      console.err("Column deletion case - should not occur. Use send kanban instead.");
       break;
     }
   }
@@ -255,9 +252,8 @@ function storeHandler(reply) {
     }
     case "column_new": {
       let col_info = reply.object;
-      let newColumn = new Column(col_info.cid, col_info.title, col_info.position);
-
-      get_kanban_scope().project.columns[col_info.cid] = newColumn;
+      console.log(col_info);
+      addColumn(col_info.column_name, col_info.position, col_info.cid);
       break;
     }
 
