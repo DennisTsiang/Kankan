@@ -104,20 +104,22 @@ function Database(pool) {
 
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_name, column_id, column_title FROM project_table NATURAL JOIN columns_' + pid +
+      pool.query('SELECT project_id, project_name, column_id, column_title FROM project_table NATURAL JOIN columns_' + pid +
           ' ORDER BY column_id ASC', [], function(res) {
 
         var columns = [];
         var project_name = null;
+        var project_id = null;
         res.rows.forEach(function (row) {
           //Get column ordering
           var c = new column.Column(row["column_id"], row["column_title"]);
           columns.push(c);
-          project_name = row["project_name"]
+          project_name = row["project_name"];
+          project_id = row["project_id"];
         });
 
         rwlock.unlock();
-        callback(new kanban.Kanban(project_name, columns));
+        callback(new kanban.Kanban(project_id, project_name, columns));
       });
     });
   };
@@ -212,8 +214,8 @@ function Database(pool) {
       pool.query('SELECT ticket_id FROM tickets_' + pid + ' WHERE  ticket_id = $1::int',
           [ticket.ticket_id], function (res) {
             if (res.rows.length === 1) {
-              pool.query('UPDATE tickets_' + pid + ' SET deadline = $1::text WHERE ticket_id = $2::int',
-                  [datetime, ticket.ticket_id],
+              pool.query('UPDATE tickets_' + pid + ' SET deadline = TIMESTAMP \'' + datetime +
+                  '\' WHERE ticket_id = $1::int', [ticket.ticket_id],
                   function (insertion) {
                     rwlock.unlock();
                     callback(true);

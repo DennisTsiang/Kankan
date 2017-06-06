@@ -1,28 +1,9 @@
+<!-- CURRENTLY UNUSED -->
 <!DOCTYPE html>
-<html lang="en-GB" ng-app="Kankan">
+<html lang="en-GB">
 <meta charset="utf-8">
 
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-animate.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
-    <link href="angular-xeditable/css/xeditable.css" rel="stylesheet">
-    <script src="angular-xeditable/js/xeditable.js"></script>
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
-
-    <script src="ui-select-master/dist/select.min.js"></script>
-
-    <link href="ui-select-master/dist/select.min.css" rel="stylesheet" media="screen">
-
-    <link href="project_stylesheet.css" rel="stylesheet">
 </head>
 
 
@@ -49,6 +30,10 @@
 
                 <select ng-model="selectedYear" ng-options="year for year in years">
                 </select>
+
+                <select ng-model="selectedHour" ng-options="hour for hour in hours">
+                </select>
+
 
           <select ng-model="selectedMinute" ng-options="minute for minute in minutes">
           </select>
@@ -81,8 +66,8 @@
     <div class="modal-header">
       <!-- Modal content-->
       <h3 class="modal-title">Edit Columns</h3>
-
     </div>
+
     <div class="modal-body">
       <div ng-controller="editColumnCtrl">
         <div class="container-fluid">
@@ -116,6 +101,7 @@
     <div id="kanban_location" ng-controller="kanban_ctrl">
 
 
+
         <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
             <div class="container-fluid">
                 <div class="row">
@@ -125,8 +111,24 @@
                           <li><button class="btn btn-primary btn-lg" onclick="addBTN()">Add ticket</button></li>
 
                           <!-- Button for user to return to home page - select other project from there. -->
-                          <li><a href="">Home</a></li>
-                          <li><a href="" ng-click="$ctrl.open_edit_column()">Edit Columns</a></li>
+                          <li>
+                            <div class="btn-group btn-lg" uib-dropdown=>
+                              <button type="button" class="btn btn-link btn-md">Home</button>
+                              <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
+                                <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+                                <li role="menuitem">
+                                  <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
+                                </li>
+
+                                <!-- Go to other projects -->
+                                <li class="divider" ng-repeat-start="proj in projects"></li>
+                                <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
+                              </ul>
+                            </div>
+                          </li>
+                          <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
                         </ul>
                     </div>
                     <div class="col-xs-1">
@@ -174,14 +176,13 @@
             </div>
         </div>
     </div>
+
 </div>
 </body>
 
 <script src="project.js"></script>
 <script src="column.js"></script>
 <script src="ticket.js"></script>
-<script src="project_script.js"></script>
 <script src="dnd_handlers.js"></script>
-<script src="clientSocket.js"></script>
 
 </html>

@@ -1,9 +1,15 @@
 //Fires as soon as the page DOM has finished loading
 $( document ).ready(function(){
   //Setup default pid
+
   get_kanban_scope().pid = 0;
+  get_kanban_scope().username = "harry";
+
 
   initiateConnection();
+
+  //get_kanban_scope().projects = [];
+  getUserProjects(get_kanban_scope().username);
 
   //Enables all popovers.
   $('[data-toggle="popover"]').popover();
@@ -37,11 +43,12 @@ function enableDnDColumns() {
   }
 }
 
-function addTicket(col_id, ticket_id, desc) {
+function addTicket(col_id, ticket_id, desc, deadline) {
   let ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
-  ticket.setDeadline(1);
+  console.log("new deadline is " + deadline);
+  ticket.setDeadlineFlat(deadline);
 
   let s = get_kanban_scope();
   s.project.tickets[ticket_id] = ticket;
@@ -86,14 +93,16 @@ function delete_ticket(ticket_id, update) {
 }
 
 function generateTickets(ticket_info_list) {
+  console.log("list is " + JSON.stringify(ticket_info_list));
   for (let ticket_info of ticket_info_list) {
-    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc);
+    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime);
   }
 }
 
 function generate_kanban(received_project) {
   var k_scope = get_kanban_scope();
 
+  k_scope.pid = received_project.project_id;
   var project = new Project(k_scope.pid);
   k_scope.project = project;
 
@@ -113,11 +122,30 @@ function generate_kanban(received_project) {
 }
 
 var app = angular.module('Kankan', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select']);
+
+/*
+app.config(['$routeProvider'], function config($routeProvider) {
+  $routeProvider
+  .when("/", {
+   templateUrl : "login.html",
+   controller: "loginCtrl"
+   })
+   .when("/", {
+     templateUrl : "/kanban.html",
+     controller: "MainCtrl"
+    })
+   .otherwise('/');
+});
+*/
+
 app.controller('MainCtrl', function($scope) {
   //Empty
 });
 
 app.controller('kanban_ctrl', function($scope) {
+  $scope.sendKanbanRequest = function (pid) {
+    sendKanbanRequest(pid);
+  }
 });
 
 app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {
@@ -217,12 +245,21 @@ app.controller('editTicketCtrl', function($scope) {
   //      as some edge cases to not work
 
   $scope.deadline = getTicket(getTid()).deadline;
-  $scope.selectedDay = $scope.deadline.getDate().toString();
+  console.log("current id is " + getTid());
+  console.log("current deadline is is " + $scope.deadline);
+
+  //$scope.selectedDay = $scope.deadline.getDate().toString();
   //Account for the fact months are stored as 0-11 in date object
-  $scope.selectedMonth = ($scope.deadline.getMonth() + 1 ).toString();
-  $scope.selectedYear = $scope.deadline.getFullYear().toString();
-  $scope.selectedHour = $scope.deadline.getHours().toString();
-  $scope.selectedMinute = $scope.deadline.getMinutes().toString();
+  //$scope.selectedMonth = ($scope.deadline.getMonth() + 1 ).toString();
+  //$scope.selectedYear = $scope.deadline.getFullYear().toString();
+  //$scope.selectedHour = $scope.deadline.getHours().toString();
+  //$scope.selectedMinute = $scope.deadline.getMinutes().toString();
+
+  console.log("selected day first  is " + $scope.selectedDay);
+  console.log("selected month first is " + $scope.selectedMonth);
+  console.log("selected year first is " + $scope.selectedYear);
+  console.log("selected hours first is " + $scope.selectedHour);
+  console.log("selected minutes first is " + $scope.selectedMinute);
 
   $scope.saveEditDeadline = function(){
 

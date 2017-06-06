@@ -24,7 +24,7 @@ function App (db) {
     var frontend = __dirname;
     frontend = frontend.substring(0, frontend.length - 14);
     if (request.originalUrl === "/") {
-      response.sendFile(frontend + 'frontend/index.html');
+      response.sendFile(frontend + 'frontend/kankan.html');
     } else if (request.originalUrl === "/ResetTable") {
       resetLock.lock(function () {
         db.deleteProject(0, function (successful) {
@@ -35,7 +35,7 @@ function App (db) {
                   db.newColumn(newPid, "Done", 2, function (res3) {
                     resetLock.unlock();
                     console.log("Finished Setup");
-                    response.sendFile(frontend + 'frontend/index.html');
+                    response.sendFile(frontend + 'frontend/kankan.html');
                   });
                 });
               });
