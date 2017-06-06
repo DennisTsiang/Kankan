@@ -187,6 +187,13 @@ function App (db) {
         });
         break;
 
+      case 'column_title':
+        db.updateColumnTitle(update['cid'], update['pid'], update['new_title'], function (info) {
+          callback({type:'column_title', cid:update.cid, pid:update.pid, title:update.new_title},
+              true);
+        });
+        break;
+
       case 'ticket_deadline':
         db.updateTicketDeadline(update['pid'], update['ticket'], update['deadline'], function (info) {
           callback({type:'ticket_deadline', ticket_id:update.ticket.ticket_id, deadline:update.deadline, col:update.ticket.col} ,
