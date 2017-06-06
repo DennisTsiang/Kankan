@@ -1,3 +1,4 @@
+<!-- CURRENTLY UNUSED -->
 <!DOCTYPE html>
 <html lang="en-GB">
 <meta charset="utf-8">
@@ -29,6 +30,10 @@
 
                 <select ng-model="selectedYear" ng-options="year for year in years">
                 </select>
+
+                <select ng-model="selectedHour" ng-options="hour for hour in hours">
+                </select>
+
 
           <select ng-model="selectedMinute" ng-options="minute for minute in minutes">
           </select>
@@ -94,6 +99,7 @@
     </script>
 
     <div id="kanban_location" ng-controller="kanban_ctrl">
+
 
 
         <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
@@ -170,6 +176,7 @@
             </div>
         </div>
     </div>
+
 </div>
 </body>
 
