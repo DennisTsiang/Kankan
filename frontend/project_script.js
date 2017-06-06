@@ -1,5 +1,5 @@
 //Fires as soon as the page DOM has finished loading
-$( document ).ready(function(){
+$(document).ready(function() {
   //Setup default pid
 
   get_kanban_scope().pid = 0;
@@ -25,18 +25,18 @@ function addBTN(event) {
   let columns = k_scope.project.columns;
   let column_id_position_0;
   for (let cid in columns) {
-      if (columns[cid].position === 0) {
-        column_id_position_0 = columns[cid].column_id;
-        break;
+    if (columns[cid].position === 0) {
+      column_id_position_0 = columns[cid].column_id;
+      break;
     }
   }
   sendStoreTicket('ticket_new', k_scope.pid, column_id_position_0);
 }
 
 function enableDnDColumns() {
-//Each column has drag and drop event listeners
+  //Each column has drag and drop event listeners
   elems = document.querySelectorAll('.ticket-column');
-  for (var i=0; i < elems.length; i++) {
+  for (var i = 0; i < elems.length; i++) {
     el = elems[i];
     el.addEventListener('dragover', handleDragOver, false);
     el.addEventListener('drop', handleDrop, false);
@@ -74,8 +74,7 @@ function move_tickets(to_col_id, from_col_id, tid) {
   let scope = get_kanban_scope();
   scope.project.tickets[tid].setColumn(to_col_id);
   delete scope.project.columns[from_col_id].tickets[tid];
-  scope.project.columns[to_col_id].tickets[tid]
-      = scope.project.tickets[tid];
+  scope.project.columns[to_col_id].tickets[tid] = scope.project.tickets[tid];
   scope.$apply();
 }
 
@@ -87,7 +86,7 @@ function delete_ticket(ticket_id, update) {
     delete scope.project.columns[ticket.col].tickets[ticket_id];
     delete scope.project.tickets[ticket_id];
   }
-  if(update === undefined || update) scope.$apply();
+  if (update === undefined || update) scope.$apply();
 }
 
 function generateTickets(ticket_info_list) {
@@ -155,7 +154,7 @@ app.controller('MainCtrl', function($scope) {
 });
 
 app.controller('kanban_ctrl', function($scope) {
-  $scope.sendKanbanRequest = function (pid) {
+  $scope.sendKanbanRequest = function(pid) {
     sendKanbanRequest(pid);
   }
 });
@@ -180,13 +179,13 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
     });
   };
 
-  ctrl.open_edit_column = function (){
+  ctrl.open_edit_column = function() {
     let modalInstance = $uibModal.open({
       animation: true,
       templateUrl: 'edit-column-popup',
       controller: 'ModalInstanceCtrl',
       controllerAs: '$ctrl',
-      size:'lg',
+      size: 'lg',
       windowClass: 'edit-columns-popup',
       resolve: {
 
@@ -214,17 +213,32 @@ app.controller('editColumnCtrl', function($scope) {
     sendStoreColumn($scope.project.project_id, "New column", Object.keys($scope.project.columns).length);
   };
 
-  $scope.removeColumn = function (col) {
+  $scope.removeColumn = function(col) {
     removeColumn($scope.project.project_id, col.column_id, col.position);
   };
 
 
-  $scope.updateColTitle = function (col, title) {
+  $scope.updateColTitle = function(col, title) {
     updateColumnTitle(col.column_id, get_kanban_scope().pid, title);
   }
 });
 
 app.controller('editTicketCtrl', function($scope) {
+
+  $scope.deadlineUpdate = function() {
+
+    $scope.deadline = getTicket(getTid()).deadline;
+    $scope.selectedDay = $scope.deadline.getDate().toString();
+    //Account for the fact months are stored as 0-11 in date object
+    $scope.selectedMonth = ($scope.deadline.getMonth() + 1).toString();
+    $scope.selectedYear = $scope.deadline.getFullYear().toString();
+    $scope.selectedHour = $scope.deadline.getHours().toString();
+    $scope.selectedMinute = $scope.deadline.getMinutes().toString();
+
+
+  }
+
+
   function getTicket(id) {
     var k_scope = get_kanban_scope();
     return k_scope.project.tickets[id];
@@ -240,58 +254,51 @@ app.controller('editTicketCtrl', function($scope) {
 
   //Initialise arrays for drop down boxes
   //TODO: Seems bad to do this every time?
-  $scope.days = generateArray(1,31);
-  $scope.months = generateArray(1,12);
+  $scope.days = generateArray(1, 31);
+  $scope.months = generateArray(1, 12);
   $scope.years = ["2017", "2018"];
-  $scope.hours = generateArray(0,23);
-  $scope.minutes = generateArray(0,59);
+  $scope.hours = generateArray(0, 23);
+  $scope.minutes = generateArray(0, 59);
 
   $scope.tid = getTid();
   $scope.desc = getTicket($scope.tid).desc;
 
-  //TODO: Remove the obvious duplicate code below
-  //TODO: remove coupling, stuff like tostring is ugly
-  //TODO: Deal with problems with month being 0-11 not 1-12
-  //      as some edge cases to not work
 
-  $scope.deadline = getTicket(getTid()).deadline;
-  console.log("current id is " + getTid());
-  console.log("current deadline is is " + $scope.deadline);
+  $scope.deadlineUpdate();
 
-  $scope.selectedDay = $scope.deadline.getDate().toString();
-  //Account for the fact months are stored as 0-11 in date object
-  $scope.selectedMonth = ($scope.deadline.getMonth() + 1 ).toString();
-  $scope.selectedYear = $scope.deadline.getFullYear().toString();
-  $scope.selectedHour = $scope.deadline.getHours().toString();
-  $scope.selectedMinute = $scope.deadline.getMinutes().toString();
-
-  console.log("selected day first  is " + $scope.selectedDay);
-  console.log("selected month first is " + $scope.selectedMonth);
-  console.log("selected year first is " + $scope.selectedYear);
-  console.log("selected hours first is " + $scope.selectedHour);
-  console.log("selected minutes first is " + $scope.selectedMinute);
-
-  $scope.saveEditDeadline = function(){
-
-    console.log("selected day is " + $scope.selectedDay);
-    console.log("selected month is " + $scope.selectedMonth);
-    console.log("selected year is " + $scope.selectedYear);
-    console.log("selected hours is " + $scope.selectedHour);
-    console.log("selected minutes is " + $scope.selectedMinute);
-
+  $scope.saveEditDeadline = function() {
 
     var ticket = getTicket($scope.tid);
-  //  ticket.setDeadline($scope.selectedYear, $scope.selectedMonth - 1, $scope.selectedDay, $scope.selectedHour, $scope.selectedMinute);
 
+    //duplicate code?
     sendTicketUpdateDeadline(ticket, get_kanban_scope().pid,
-                             $scope.selectedMonth,
-                             $scope.selectedYear,
-                             $scope.selectedDay,
-                             $scope.selectedHour,
-                             $scope.selectedMinute);
+      $scope.selectedMonth,
+      $scope.selectedYear,
+      $scope.selectedDay,
+      $scope.selectedHour,
+      $scope.selectedMinute);
 
 
   }
+
+  $scope.resetDeadline = function() {
+
+    console.log("resetting");
+
+    //var ticket was already defined???
+    var ticket = getTicket($scope.tid);
+    ticket.resetDeadline();
+    $scope.deadlineUpdate();
+    sendTicketUpdateDeadline(ticket, get_kanban_scope().pid,
+      $scope.selectedMonth,
+      $scope.selectedYear,
+      $scope.selectedDay,
+      $scope.selectedHour,
+      $scope.selectedMinute);
+
+  }
+
+
 
 
   $scope.saveEditDesc = function(text) {
@@ -302,7 +309,7 @@ app.controller('editTicketCtrl', function($scope) {
 
   };
 
-  $scope.updateProgress = function(){
+  $scope.updateProgress = function() {
 
     var ticket = getTicket($scope.tid);
     ticket.updateProgress();
@@ -310,7 +317,7 @@ app.controller('editTicketCtrl', function($scope) {
   }
 });
 
-app.controller('deleteTicketCtrl', function ($scope, $sce) {
+app.controller('deleteTicketCtrl', function($scope, $sce) {
   $scope.dynamicPopover = {
     content: 'Hello world!',
     templateUrl: 'yousurebutton.html',
@@ -329,32 +336,32 @@ app.controller('deleteTicketCtrl', function ($scope, $sce) {
 });
 
 
-function generateArray(start, end){
-let returnArray = [];
+function generateArray(start, end) {
+  let returnArray = [];
 
-for(var i = start; i <=end; i++){
+  for (var i = start; i <= end; i++) {
 
-  returnArray.push(i.toString());
+    returnArray.push(i.toString());
 
+  }
+
+  return returnArray;
 }
 
-return returnArray;
-}
-
-function updateProgressTickets(){
-  setInterval(updateProgressBars,30000);
+function updateProgressTickets() {
+  setInterval(updateProgressBars, 30000);
   //updateProgressBars();
 }
 
 
-function updateProgressBars(){
+function updateProgressBars() {
   //alert("hi");
   let s = get_kanban_scope();
-  for(var ticket in s.project.tickets){
+  for (var ticket in s.project.tickets) {
     let tick = s.project.tickets[ticket];
-    if(tick.deadlineActive){
-    tick.updateProgress();
-     }
+    if (tick.deadlineActive) {
+      tick.updateProgress();
+    }
   }
   s.$apply();
 }

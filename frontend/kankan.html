@@ -88,9 +88,14 @@
 
               <button type="button" ng-click="saveEditDeadline()" class="btn btn-primary">Save Deadline</button>
 
+              <button type="button" ng-click="resetDeadline()" class="btn btn-primary">Reset Deadline</button>
+
+
               <h2>Current Deadline: {{selectedHour}}:{{selectedMinute}} on {{selectedDay}}/{{selectedMonth}}/{{selectedYear}}</h2>
 
               <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
+
+
 
 
               <div ng-controller="deleteTicketCtrl">
