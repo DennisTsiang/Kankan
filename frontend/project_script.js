@@ -121,6 +121,18 @@ function generate_kanban(received_project) {
   enableDnDColumns();
 }
 
+function generate_user_kanbans(projects) {
+  get_kanban_scope().projects = projects;
+
+  let other_projects = {};
+  for (let proj in projects) {
+    other_projects[proj] = projects[proj];
+  }
+  delete other_projects[get_kanban_scope().pid];
+
+  get_kanban_scope().other_projects = other_projects;
+}
+
 var app = angular.module('Kankan', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select']);
 
 /*

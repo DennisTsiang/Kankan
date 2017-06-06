@@ -154,7 +154,8 @@ function requestHandler(reply) {
     }
     case "user_projects" : {
       let projects = reply.object;
-      get_kanban_scope().projects = projects;
+      //Generates/updates projects and other_projects variables.
+      generate_user_kanbans(projects);
       break;
     }
     case "new_user_project": {

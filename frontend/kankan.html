@@ -141,7 +141,7 @@
                     </li>
 
                     <!-- Go to other projects -->
-                    <li class="divider" ng-repeat-start="proj in projects"></li>
+                    <li class="divider" ng-repeat-start="proj in other_projects"></li>
                     <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
                   </ul>
                 </div>

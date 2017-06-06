@@ -231,11 +231,11 @@ function Database(pool) {
 
   this.getUsersProjects = function (username, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_id, project_name FROM users WHERE username = $1::text', [username], function (res) {
+      pool.query('SELECT project_id, project_name FROM users NATURAL JOIN project_table WHERE username = $1::text', [username], function (res) {
         if (res.rows.length > 0) {
           var array = [];
           for (var row of res.rows) {
-            array.push({pid:row.project_id, title:row.project_name});
+            array.push({project_id:row.project_id, title:row.project_name});
           }
           rwlock.unlock();
           callback(array);
