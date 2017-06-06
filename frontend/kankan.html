@@ -178,7 +178,7 @@
             </tr>
 
             <tr>
-              <td ng-repeat="col in project.columns" class="ticket-column">
+              <td ng-repeat="col in project.columns" class="ticket-column" cid="{{col.column_id}}">
 
                 <!-- Tickets -->
                 <div ng-repeat="ticket in col.tickets"
