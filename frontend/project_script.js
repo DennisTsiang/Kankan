@@ -60,7 +60,6 @@ function addTicket(col_id, ticket_id, desc, deadline) {
   s.$apply();
 }
 
-//TODO: Add/remove column button somewhere - maybe plus minus icon, with popup for more info.
 function addColumn(title, position, id) {
   let scope = get_kanban_scope();
   let column = new Column(id, title, position);
@@ -101,18 +100,20 @@ function generate_kanban(received_project) {
   var k_scope = get_kanban_scope();
 
   k_scope.pid = received_project.project_id;
-  var project = new Project(k_scope.pid);
-  k_scope.project = project;
+  if (k_scope.project === undefined) {
+    let project = new Project(k_scope.pid);
+    k_scope.project = project;
+  }
 
-  project.title = received_project.project_name;
-  project.col = received_project.columns;
+  k_scope.project.project_id = received_project.project_id;
+  k_scope.project.title = received_project.project_name;
+  k_scope.project.columns = {};
 
-
-  for (var i = 0; i < received_project.columns.length; i++) {
+  for (let i = 0; i < received_project.columns.length; i++) {
     let title = received_project.columns[i].title;
     let position = i;
-    var column = new Column(received_project.columns[i].column_id, title, position);
-    project.columns[column.column_id] = column;
+    let column = new Column(received_project.columns[i].column_id, title, position);
+    k_scope.project.columns[column.column_id] = column;
   }
 
   k_scope.$apply();
@@ -214,13 +215,12 @@ app.controller('editColumnCtrl', function($scope) {
 
   $scope.removeColumn = function (col) {
     removeColumn($scope.project.project_id, col.column_id, col.position);
-    delete $scope.project.columns[col.column_id];
   };
 
+
   $scope.updateColTitle = function (title) {
-    console.log(title);
     //TODO: Handle update column description
-    
+
   }
 });
 
@@ -260,12 +260,12 @@ app.controller('editTicketCtrl', function($scope) {
   console.log("current id is " + getTid());
   console.log("current deadline is is " + $scope.deadline);
 
-  //$scope.selectedDay = $scope.deadline.getDate().toString();
+  $scope.currentDay = $scope.deadline.getDate().toString();
   //Account for the fact months are stored as 0-11 in date object
-  //$scope.selectedMonth = ($scope.deadline.getMonth() + 1 ).toString();
-  //$scope.selectedYear = $scope.deadline.getFullYear().toString();
-  //$scope.selectedHour = $scope.deadline.getHours().toString();
-  //$scope.selectedMinute = $scope.deadline.getMinutes().toString();
+  $scope.currentMonth = ($scope.deadline.getMonth() + 1 ).toString();
+  $scope.currentYear = $scope.deadline.getFullYear().toString();
+  $scope.currentHour = $scope.deadline.getHours().toString();
+  $scope.currentMinute = $scope.deadline.getMinutes().toString();
 
   console.log("selected day first  is " + $scope.selectedDay);
   console.log("selected month first is " + $scope.selectedMonth);
@@ -291,6 +291,20 @@ app.controller('editTicketCtrl', function($scope) {
                              $scope.selectedDay,
                              $scope.selectedHour,
                              $scope.selectedMinute);
+
+                             $scope.updateModal();
+
+
+  }
+
+  $scope.updateModal = function(){
+
+    $scope.currentDay = $scope.selectedDay;
+    //Account for the fact months are stored as 0-11 in date object
+    $scope.currentMonth = $scope.selectedMonth;
+    $scope.currentYear = $scope.selectedYear;
+    $scope.currentHour = $scope.selectedHour;
+    $scope.currentMinute = $scope.selectedMinute;
 
   }
 
@@ -330,7 +344,7 @@ app.controller('deleteTicketCtrl', function ($scope, $sce) {
 
 
 function generateArray(start, end){
-returnArray = [];
+let returnArray = [];
 
 for(var i = start; i <=end; i++){
 

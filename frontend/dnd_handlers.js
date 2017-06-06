@@ -21,13 +21,12 @@ function handleDrop(e) {
   e.preventDefault();
 
   var scope = get_kanban_scope();
-  var start_col = scope.project.tickets[id].col;
+  var start_col_id = scope.project.tickets[id].col;
 
   var cell = $(e.toElement).closest('td');
-  var end_col = cell[0].cellIndex;
+  var end_col_id = cell[0].getAttribute('cid');
 
-  //move_tickets(end_col, start_col, id);
-  sendTicketUpdateMoved(scope.project.tickets[id], 0, end_col, start_col);
+  sendTicketUpdateMoved(scope.project.tickets[id], get_kanban_scope().pid, end_col_id, start_col_id);
 
   $(e.toElement).closest('.ticket-column')[0].style.border = "";
   e.srcElement.style.border = "";

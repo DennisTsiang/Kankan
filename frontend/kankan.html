@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-GB" ng-app="Kankan">
+
 <head>
   <meta charset="UTF-8">
   <!-- All routing happens through here -->
@@ -32,174 +33,199 @@
 
 <body ng-controller="MainCtrl">
 
-<!-- Ticket popup options -->
-<div ng-controller="ModalCtrl as $ctrl" class="ticket-menu">
-  <script type="text/ng-template" id="ticket-popup">
+  <!-- Ticket popup options -->
+  <div ng-controller="ModalCtrl as $ctrl" class="ticket-menu">
+    <script type="text/ng-template" id="ticket-popup">
 
-    <div class="modal-header">
-      <h3 class="modal-title" id="ticket-info-title">Edit Ticket</h3>
-    </div>
-
-    <div class="modal-body" id="ticket-info-modal-body">
-      <div ng-controller="editTicketCtrl">
-        <p editable-textarea="desc" onaftersave="saveEditDesc(desc)">{{desc || 'empty'}}</p>
-
-
-        <select ng-model="selectedDay" ng-options="day for day in days">
-        </select>
-
-        <select ng-model="selectedMonth" ng-options="month for month in months">
-        </select>
-
-        <select ng-model="selectedYear" ng-options="year for year in years">
-        </select>
-
-        <select ng-model="selectedHour" ng-options="hour for hour in hours">
-        </select>
-
-        <select ng-model="selectedMinute" ng-options="minute for minute in minutes">
-        </select>
-
-        <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
-
-        <h1> You selected {{selectedDay}} and {{selectedMonth}} and {{selectedYear}}</h1>
-
-        <button type="button" ng-click="saveEditDeadline()" class="btn btn-primary">Save Deadline</button>
-
-        <div ng-controller="deleteTicketCtrl">
-          <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-sm btn-warning">
-            Remove
-          </button>
-        </div>
+      <div class="modal-header">
+        <h3 class="modal-title" id="ticket-info-title">Edit Ticket</h3>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default" ng-click="$ctrl.close()">Close</button>
-    </div>
-  </script>
 
-  <script type="text/ng-template" id="yousurebutton.html">
-    <button replace='true' type='button' class='btn btn-sm btn-danger' ng-click='delete_ticket_button_click(tid)'>I'm sure</button>
-  </script>
-
-  <!-- Edit columns modal -->
-  <script type="text/ng-template" id="edit-column-popup">
-
-    <div class="modal-header">
-      <!-- Modal content-->
-      <h3 class="modal-title">Edit Columns</h3>
-    </div>
-
-    <div class="modal-body">
-      <div ng-controller="editColumnCtrl">
+      <div class="modal-body" id="ticket-info-modal-body">
         <div class="container-fluid">
-          <div class="row vertical-align">
-            <!-- Editable column -->
-            <div class="col-xs-11 text-center">
-              <table class="table table-bordered">
-                <tr>
-                  <th class="column-title" ng-repeat="col in project.columns">
-                    <p editable-textarea="col.title" onaftersave="updateColTitle(col.title)">{{col.title || 'empty'}}</p>
-                  </th>
-                </tr>
-                <tr>
-                  <td ng-repeat="col in project.columns">
-                    <button type="button" class="btn btn-warning" ng-click="removeColumn(col)">Remove</button>
-                  </td>
-                </tr>
-              </table>
+          <div ng-controller="editTicketCtrl">
+            <p editable-textarea="desc" onaftersave="saveEditDesc(desc)">{{desc || 'empty'}}</p>
+
+
+            <h2> Submit a new deadline for this task</h2>
+            <div class="row">
+              <div class="col-xs-1"></div>
+
+              <div class="col-xs-2">
+                <p>Day</p>
+                <select ng-model="selectedDay" ng-options="day for day in days">
+                  </select>
+              </div>
+
+              <div class="col-xs-2">
+
+                <p>Month</p>
+                <select ng-model="selectedMonth" ng-options="month for month in months">
+                  </select>
+              </div>
+
+              <div class="col-xs-2">
+                <p>Year
+                  <p>
+                    <select ng-model="selectedYear" ng-options="year for year in years">
+                </select>
+              </div>
+
+              <div class="col-xs-4">
+                <p> Time in the day</p>
+
+                <select ng-model="selectedHour" ng-options="hour for hour in hours">
+              </select>
+                <select ng-model="selectedMinute" ng-options="minute for minute in minutes">
+              </select>
+
+              </div>
+
+              <div class="col-xs-1"></div>
+
             </div>
-            <!-- Add new column -->
-            <div class="col-xs-1">
-              <button class="btn btn-info btn-lg" ng-click="addColumn()"><span class="glyphicon glyphicon-plus"></span></button>
+            <div class="row">
+
+              <button type="button" ng-click="saveEditDeadline()" class="btn btn-primary">Save Deadline</button>
+
+              <h2>Current Deadline: {{currentHour}}:{{currentMinute}} on {{currentDay}}/{{currentMonth}}/{{currentYear}}</h2>
+
+              <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
+
+
+              <div ng-controller="deleteTicketCtrl">
+                <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-sm btn-warning">
+                Remove ticket
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default" ng-click="$ctrl.close()">Close</button>
-    </div>
-  </script>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="$ctrl.close()">Close</button>
+      </div>
+    </script>
 
-  <div id="kanban_location" ng-controller="kanban_ctrl">
+    <script type="text/ng-template" id="yousurebutton.html">
+      <button replace='true' type='button' class='btn btn-sm btn-danger' ng-click='delete_ticket_button_click(tid)'>I'm sure</button>
+    </script>
+
+    <!-- Edit columns modal -->
+    <script type="text/ng-template" id="edit-column-popup">
+
+      <div class="modal-header">
+        <!-- Modal content-->
+        <h3 class="modal-title">Edit Columns</h3>
+      </div>
+
+      <div class="modal-body">
+        <div ng-controller="editColumnCtrl">
+          <div class="container-fluid">
+            <div class="row vertical-align">
+              <!-- Editable column -->
+              <div class="col-xs-11 text-center">
+                <table class="table table-bordered">
+                  <tr>
+                    <th class="column-title" ng-repeat="col in project.columns">
+                      <p editable-textarea="col.title" onaftersave="updateColTitle(col.title)">{{col.title || 'empty'}}</p>
+                    </th>
+                  </tr>
+                  <tr>
+                    <td ng-repeat="col in project.columns">
+                      <button type="button" class="btn btn-warning" ng-click="removeColumn(col)">Remove</button>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <!-- Add new column -->
+              <div class="col-xs-1">
+                <button class="btn btn-info btn-lg" ng-click="addColumn()"><span class="glyphicon glyphicon-plus"></span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="$ctrl.close()">Close</button>
+      </div>
+    </script>
+
+    <div id="kanban_location" ng-controller="kanban_ctrl">
 
 
-    <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-xs-11">
-            <ul class="nav navbar-nav vertical-align">
-              <!-- Add buttons -->
-              <li><button class="btn btn-primary btn-lg" onclick="addBTN()">Add ticket</button></li>
+      <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-xs-11">
+              <ul class="nav navbar-nav vertical-align">
+                <!-- Add buttons -->
+                <li><button class="btn btn-primary btn-lg" onclick="addBTN()">Add ticket</button></li>
 
-              <!-- Button for user to return to home page - select other project from there. -->
-              <li>
-                <div class="btn-group btn-lg" uib-dropdown=>
-                  <button type="button" class="btn btn-link btn-md">Home</button>
-                  <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
+                <!-- Button for user to return to home page - select other project from there. -->
+                <li>
+                  <div class="btn-group btn-lg" uib-dropdown=>
+                    <button type="button" class="btn btn-link btn-md">Home</button>
+                    <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
                     <span class="caret"></span>
                   </button>
-                  <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
-                    <li role="menuitem">
-                      <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
-                    </li>
+                    <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+                      <li role="menuitem">
+                        <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
+                      </li>
 
-                    <!-- Go to other projects -->
-                    <li class="divider" ng-repeat-start="proj in other_projects"></li>
-                    <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
-                  </ul>
-                </div>
-              </li>
-              <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
-            </ul>
-          </div>
-          <div class="col-xs-1">
-            <ul class="nav navbar-nav">
-              <li><a id="project_title" class="project-title">
-                <!-- Project title -->
-                {{project.title}}
-              </a></li>
-            </ul>
+                      <!-- Go to other projects -->
+                      <li class="divider" ng-repeat-start="proj in other_projects"></li>
+                      <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
+                    </ul>
+                  </div>
+                </li>
+                <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-1">
+              <ul class="nav navbar-nav">
+                <li>
+                  <a id="project_title" class="project-title">
+                    <!-- Project title -->
+                    {{project.title}}
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
-    <div class="offset-navbar-height container-fluid">
+      <div class="offset-navbar-height container-fluid">
 
-      <div class="row">
-        <!-- Kanban table -->
-        <div class="col-xs-12">
-          <table id="kanban" class="table table-bordered">
+        <div class="row">
+          <!-- Kanban table -->
+          <div class="col-xs-12">
+            <table id="kanban" class="table table-bordered">
+
+              <tr>
+                <th class="column-title" ng-repeat="col in project.columns">{{col.title}}</th>
+              </tr>
 
             <tr>
-              <th class="column-title" ng-repeat="col in project.columns">{{col.title}}</th>
-            </tr>
+              <td ng-repeat="col in project.columns" class="ticket-column" cid="{{col.column_id}}">
+                  <!-- Tickets -->
+                  <div ng-repeat="ticket in col.tickets" ng-click="$ctrl.open_ticket_description(ticket.ticket_id)" draggable="true" id="{{ticket.ticket_id}}" ondragstart="handleDragStart(event)" class="ticket">
+                    Ticket id# {{ticket.ticket_id}} </br>
+                    {{ticket.desc}}
 
-            <tr>
-              <td ng-repeat="col in project.columns" class="ticket-column">
+                    <uib-progressbar class="progress-striped active" value="ticket.progress" type="{{ticket.deadlineState}}">{{ticket.progress}} <i ng-show="showWarning">Close to Deadline</i></uib-progressbar>
+                  </div>
 
-                <!-- Tickets -->
-                <div ng-repeat="ticket in col.tickets"
-                     ng-click="$ctrl.open_ticket_description(ticket.ticket_id)" draggable="true"
-                     id="{{ticket.ticket_id}}" ondragstart="handleDragStart(event)" class="ticket">
-                  Ticket id# {{ticket.ticket_id}} </br>
-                  {{ticket.desc}}
-
-                  <uib-progressbar class="progress-striped active" value="ticket.progress"
-                                   type="{{ticket.deadlineState}}">{{ticket.progress}} <i
-                      ng-show="showWarning">Close to Deadline</i></uib-progressbar>
-                </div>
-
-              </td>
-            </tr>
-          </table>
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </body>
 
 <script src="project.js"></script>
