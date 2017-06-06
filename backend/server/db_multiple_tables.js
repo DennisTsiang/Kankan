@@ -235,7 +235,7 @@ function Database(pool) {
 
   this.updateColumnTitle = function (cid, pid, newTitle, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT column_id FROM tickets_' + pid + ' WHERE column_id = $1::int',
+      pool.query('SELECT column_id FROM columns_' + pid + ' WHERE column_id = $1::int',
           [cid], function (res) {
             if (res.rows.length === 1) {
               pool.query('UPDATE columns_' + pid + ' SET column_title = $1::text WHERE column_id = $2::int',
@@ -246,7 +246,7 @@ function Database(pool) {
                   });
             } else {
               rwlock.unlock();
-              console.error("Ticket was not in database");
+              console.error("Error: more than one column_id was returned");
             }
           });
     });
