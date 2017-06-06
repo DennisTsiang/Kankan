@@ -13,6 +13,7 @@ $( document ).ready(function(){
 
   //Enables all popovers.
   $('[data-toggle="popover"]').popover();
+  updateProgressTickets();
 });
 
 function get_kanban_scope() {
@@ -240,7 +241,6 @@ app.controller('editTicketCtrl', function($scope) {
   //Initialise arrays for drop down boxes
   //TODO: Seems bad to do this every time?
   $scope.days = generateArray(1,31);
-
   $scope.months = generateArray(1,12);
   $scope.years = ["2017", "2018"];
   $scope.hours = generateArray(0,23);
@@ -339,4 +339,22 @@ for(var i = start; i <=end; i++){
 }
 
 return returnArray;
+}
+
+function updateProgressTickets(){
+  setInterval(updateProgressBars,30000);
+  //updateProgressBars();
+}
+
+
+function updateProgressBars(){
+  //alert("hi");
+  let s = get_kanban_scope();
+  for(var ticket in s.project.tickets){
+    let tick = s.project.tickets[ticket];
+    if(tick.deadlineActive){
+    tick.updateProgress();
+     }
+  }
+  s.$apply();
 }

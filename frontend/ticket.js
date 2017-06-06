@@ -8,6 +8,7 @@ function Ticket(ticket_id) {
   this.deadline = null;
   this.startdate = null;
   this.progress = 0;
+  this.deadlineActive = false;
 
   this.addMembersToTicket = function (array) {
     for (var i = 0; i < array.length; i++) {
@@ -28,6 +29,7 @@ function Ticket(ticket_id) {
   this.setDeadline = function(year, month, day, hours, minutes) {
     this.deadline = new Date(year, month -1, day, hours, minutes);
     this.startdate = new Date();
+    this.deadlineActive = true;
 
   };
 
@@ -40,7 +42,9 @@ this.setDeadlineFlat = function(deadline){
 
     console.log("setting deadline as " + deadline);
     var deadlineSplit = deadline.split(" ");
-    this.setDeadline(deadlineSplit[0], deadlineSplit[1], deadlineSplit[2], deadlineSplit[3], deadlineSplit[4]);}
+    this.setDeadline(deadlineSplit[0], deadlineSplit[1], deadlineSplit[2], deadlineSplit[3], deadlineSplit[4]);
+  }
+  this.startdate = new Date();
 }
 
 
