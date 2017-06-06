@@ -154,7 +154,7 @@ function App (db) {
         break;
       case 'column_new':
         db.newColumn(store["pid"], store["column_name"], store["position"], function (cid, column_name, position) {
-          callback({type:'column_new',object:cid, column_name:column_name, position:position});
+          callback({type:'column_new',object: {cid:cid, column_name:column_name, position:position}});
         });
         break;
       default:
