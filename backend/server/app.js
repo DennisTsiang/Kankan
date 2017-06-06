@@ -213,7 +213,7 @@ function App (db) {
         );
         break;
       case 'column_remove':
-        db.deleteColumn(remove.pid, remove.column_id, function (success) {
+        db.deleteColumn(remove.pid, remove.column_id, remove.column_position, function (success) {
               callback({type: 'column_remove', pid: remove.pid, column_id: remove.column_id});
             }
         );

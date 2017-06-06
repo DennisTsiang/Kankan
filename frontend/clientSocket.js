@@ -146,6 +146,7 @@ function requestHandler(reply) {
       break;
     }
     case "kanban" : {
+      console.log("generated");
       generate_kanban(request_data);
 
       //Send for tickets, once received kanban.
@@ -187,7 +188,7 @@ function removeHandler(reply) {
       break;
     }
     case "column_remove" : {
-      console.err("Column deletion case - should not occur. Use send kanban instead.");
+      console.error("Column deletion case - should not occur. Use send kanban instead.");
       break;
     }
     case "ticket_remove": {
@@ -239,18 +240,14 @@ function updateHandler(reply) {
 function storeHandler(reply) {
   let type = reply.type;
   switch (type) {
-    case "tickets": {//"newticket" : {
-      //TODO: Right when new ticket is created we request the server makes the ticket, and it sends all the tickets
-      // in the project back, like the getTickets request (hence type="tickets"). We only want the ticket that's been
-      // created to be sent back.
-      requestHandler(reply);
-      console.log(reply);
+    case "ticket_new" : {
+      let ticket_info = reply.object;
+      addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
       break;
     }
 
     case "column_new": {
       let col_info = reply.object;
-      console.log(col_info);
       addColumn(col_info.column_name, col_info.position, col_info.cid);
       break;
     }
