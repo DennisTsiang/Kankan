@@ -70,6 +70,11 @@ function sendTicketUpdateDesc(ticket, pid, desc) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
+function updateColumnTitle(cid, pid, title) {
+  var jsonString = {type: "column_title", cid:cid, pid:pid, new_title:title};
+  socket.emit("update", JSON.stringify(jsonString));
+}
+
 function sendTicketUpdateDeadline(ticket, pid, month, year, day, hour, minute) {
   var deadline = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00";
   var jsonString = {type: "ticket_deadline", ticket: ticket, pid : pid, deadline : deadline};
@@ -232,6 +237,11 @@ function updateHandler(reply) {
       ticket.setDeadline(year, month, day, hour, minute);
       scope.$apply();
       break;
+    }
+    case "column_title" : {
+      var pid = reply.pid;
+      var cid = reply.cid;
+      var title = reply.title;
     }
   }
 

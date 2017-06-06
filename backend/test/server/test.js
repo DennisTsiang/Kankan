@@ -18,7 +18,6 @@ describe('Database', function () {
     });
     it('Calls correct query', function () {
       var query = test_db.query.getCall(0).args[0];
-      console.log(query);
       assert(query.includes(' FROM project_table '));
       assert(query.includes(' columns_0 '))
     });
