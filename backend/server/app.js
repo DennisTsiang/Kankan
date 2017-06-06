@@ -214,7 +214,7 @@ function App (db) {
         db.deleteColumn(remove.pid, remove.column_id, remove.column_position, function (success) {
           console.log("Delete column success: " + success);
           db.getKanban(remove['pid'], function (kanban) {
-            callback({type:'kanban', object:kanban});
+            callback({type:'column_remove', object:kanban});
           });
         });
         break;
