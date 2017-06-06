@@ -213,8 +213,7 @@ app.controller('editColumnCtrl', function($scope) {
   };
 
   $scope.removeColumn = function (col) {
-    removeColumn($scope.project.project_id, col.column_id);
-    //TODO: Handle deletion and affecting column positions.
+    removeColumn($scope.project.project_id, col.column_id, col.position);
     delete $scope.project.columns[col.column_id];
   };
 });
