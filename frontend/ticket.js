@@ -33,18 +33,14 @@ function Ticket(ticket_id) {
 
 this.setDeadlineFlat = function(deadline){
   if(deadline == null){
+
     this.deadline = new Date();
+
   }else{
+
     console.log("setting deadline as " + deadline);
-
-  var year = deadline.substring(0, 4);
-  var month =  deadline.substring(5, 7);
-  var day = deadline.substring(8, 10);
-  var hour = deadline.substring(11, 13);
-  var minute = deadline.substring(14, 16);
-
-  this.setDeadline(year, month, day, hour, minute);
-}
+    var deadlineSplit = deadline.split(" ");
+    this.setDeadline(deadlineSplit[0], deadlineSplit[1], deadlineSplit[2], deadlineSplit[3], deadlineSplit[4]);}
 }
 
 

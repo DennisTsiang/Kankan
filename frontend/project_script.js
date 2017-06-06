@@ -237,15 +237,14 @@ app.controller('editTicketCtrl', function($scope) {
   //Enables all popovers.
   $('[data-toggle="popover"]').popover();
 
-  var digit10 = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09"];
   //Initialise arrays for drop down boxes
   //TODO: Seems bad to do this every time?
-  $scope.days = digit10.slice(1,9).concat(generateArray(10,31));
+  $scope.days = generateArray(1,31);
 
-  $scope.months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+  $scope.months = generateArray(1,12);
   $scope.years = ["2017", "2018"];
-  $scope.hours = digit10.concat(generateArray(10,23));
-  $scope.minutes = digit10.concat(generateArray(10,59));
+  $scope.hours = generateArray(0,23);
+  $scope.minutes = generateArray(0,59);
 
   $scope.tid = getTid();
   $scope.desc = getTicket($scope.tid).desc;
@@ -259,12 +258,12 @@ app.controller('editTicketCtrl', function($scope) {
   console.log("current id is " + getTid());
   console.log("current deadline is is " + $scope.deadline);
 
-  $scope.currentDay = $scope.deadline.getDate().toString();
+  $scope.selectedDay = $scope.deadline.getDate().toString();
   //Account for the fact months are stored as 0-11 in date object
-  $scope.currentMonth = ($scope.deadline.getMonth() + 1 ).toString();
-  $scope.currentYear = $scope.deadline.getFullYear().toString();
-  $scope.currentHour = $scope.deadline.getHours().toString();
-  $scope.currentMinute = $scope.deadline.getMinutes().toString();
+  $scope.selectedMonth = ($scope.deadline.getMonth() + 1 ).toString();
+  $scope.selectedYear = $scope.deadline.getFullYear().toString();
+  $scope.selectedHour = $scope.deadline.getHours().toString();
+  $scope.selectedMinute = $scope.deadline.getMinutes().toString();
 
   console.log("selected day first  is " + $scope.selectedDay);
   console.log("selected month first is " + $scope.selectedMonth);
@@ -291,21 +290,9 @@ app.controller('editTicketCtrl', function($scope) {
                              $scope.selectedHour,
                              $scope.selectedMinute);
 
-                             $scope.updateModal();
-
 
   }
 
-  $scope.updateModal = function(){
-
-    $scope.currentDay = $scope.selectedDay;
-    //Account for the fact months are stored as 0-11 in date object
-    $scope.currentMonth = $scope.selectedMonth;
-    $scope.currentYear = $scope.selectedYear;
-    $scope.currentHour = $scope.selectedHour;
-    $scope.currentMinute = $scope.selectedMinute;
-
-  }
 
   $scope.saveEditDesc = function(text) {
     var ticket = getTicket($scope.tid);
