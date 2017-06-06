@@ -62,7 +62,7 @@
 
         <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
 
-        <h1> You selected {{selectedDay}} and {{selectedMonth}} and {{selectedYear}}</h1>
+        <h2>Deadline: {{deadline.getHours()}}:{{deadline.getMinutes()}} on {{deadline.getDate()}}/{{deadline.getMonth()+1}}/{{deadline.getFullYear()}}</h2>
 
         <button type="button" ng-click="saveEditDeadline()" class="btn btn-primary">Save Deadline</button>
 
