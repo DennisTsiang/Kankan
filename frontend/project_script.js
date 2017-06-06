@@ -1,13 +1,14 @@
 //Fires as soon as the page DOM has finished loading
 $( document ).ready(function(){
   //Setup default pid
+
   get_kanban_scope().pid = 0;
   get_kanban_scope().username = "harry";
 
 
   initiateConnection();
 
-  get_kanban_scope().projects = [];
+  //get_kanban_scope().projects = [];
   getUserProjects(get_kanban_scope().username);
 
   //Enables all popovers.
@@ -121,6 +122,22 @@ function generate_kanban(received_project) {
 }
 
 var app = angular.module('Kankan', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select']);
+
+/*
+app.config(['$routeProvider'], function config($routeProvider) {
+  $routeProvider
+  .when("/", {
+   templateUrl : "login.html",
+   controller: "loginCtrl"
+   })
+   .when("/", {
+     templateUrl : "/kanban.html",
+     controller: "MainCtrl"
+    })
+   .otherwise('/');
+});
+*/
+
 app.controller('MainCtrl', function($scope) {
   //Empty
 });
