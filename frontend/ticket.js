@@ -33,7 +33,7 @@ function Ticket(ticket_id) {
 
 this.setDeadlineFlat = function(deadline){
   if(deadline == null){
-    //this.deadline = new Date();
+    this.deadline = new Date();
   }else{
     console.log("setting deadline as " + deadline);
 
