@@ -81,8 +81,10 @@ function Database(pool) {
   this.deleteColumn = function (pid, cid, callback) {
     rwlock.writeLock(function () {
       pool.query('DELETE FROM columns_' + pid + ' WHERE column_id = $1::int', [cid], function (res) {
-        rwlock.unlock();
-        callback(true);
+        pool.query('DELETE FROM tickets_' + pid + ' WHERE column_id = $1::int', [cid], function (res2) {
+          rwlock.unlock();
+          callback(true);
+        });
       });
     });
   };
@@ -231,7 +233,8 @@ function Database(pool) {
 
   this.getUsersProjects = function (username, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_id, project_name FROM users WHERE username = $1::text', [username], function (res) {
+      pool.query('SELECT project_id, project_name FROM users NATURAL JOIN project_table ' +
+          'WHERE username = $1::text', [username], function (res) {
         if (res.rows.length > 0) {
           var array = [];
           for (var row of res.rows) {
