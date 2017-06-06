@@ -140,11 +140,9 @@ function App (db) {
     //TODO: catch errors and report to client
     switch (store['type']) {
       case 'ticket_new':
-        db.newTicket(store['pid'], store['column_id'], function () {
-          //TODO: Copied from getTickets - return all tickets
-          db.getTickets(store['pid'], function(tickets) {
-            callback({type:'tickets', object:tickets});
-          });
+        //Returns the new ticket id
+        db.newTicket(store['pid'], store['column_id'], function (tid) {
+            callback({type:'ticket_new', object: {tid : tid, column_id: store['column_id'], pid:store['pid']}});
         });
         break;
       case 'project_new':

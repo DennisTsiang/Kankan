@@ -139,7 +139,7 @@ function Database(pool) {
             [tid, column_id, pid],
             function (insertion) {
               rwlock.unlock();
-              callback();
+              callback(tid);
             });
       });
     });
