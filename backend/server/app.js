@@ -187,12 +187,25 @@ function App (db) {
         });
         break;
 
+      case 'column_title':
+        db.updateColumnTitle(update['cid'], update['pid'], update['new_title'], function (info) {
+          callback({type:'column_title', cid:update.cid, pid:update.pid, title:update.new_title},
+              true);
+        });
+        break;
+
       case 'ticket_deadline':
         db.updateTicketDeadline(update['pid'], update['ticket'], update['deadline'], function (info) {
           callback({type:'ticket_deadline', ticket_id:update.ticket.ticket_id, deadline:update.deadline, col:update.ticket.col} ,
               true);
         });
         break;
+      case 'column_moved' :
+        db.moveColumn(update['pid'], update['cid'], update['to'], update['from'], function (info) {
+          db.getKanban(request['pid'], function (kanban) {
+            callback({type:'column_moved', object:kanban});
+          });
+        });
 
       default:
         //TODO: Handle unknown update.
@@ -214,7 +227,7 @@ function App (db) {
         db.deleteColumn(remove.pid, remove.column_id, remove.column_position, function (success) {
           console.log("Delete column success: " + success);
           db.getKanban(remove['pid'], function (kanban) {
-            callback({type:'kanban', object:kanban});
+            callback({type:'column_remove', object:kanban});
           });
         });
         break;

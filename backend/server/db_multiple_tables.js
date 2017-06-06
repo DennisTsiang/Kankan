@@ -31,7 +31,7 @@ function Database(pool) {
                     'column_id integer,' +
                     'project_id integer,' +
                     'ticket_description varchar(255),' +
-                    'deadline timestamp, ' +
+                    'deadline varchar(30), ' +
                     'PRIMARY KEY (project_id, ticket_id) )',
                     [], function (finishedCreate) {
                       rwlock.unlock();
@@ -92,6 +92,36 @@ function Database(pool) {
     });
   };
 
+  this.moveColumn = function (pid, cid, fromPos, toPos, callback) {
+    rwlock.writeLock(function () {
+      pool.query('SELECT column_position FROM columns_' + pid + 'WHERE column_id = $1::int', [cid], function (res) {
+        if (res.rows[0].column_position !== fromPos) {
+          console.error("Error moving column. FromPos: " + fromPos +
+              "But column_position: " + res.rows[0].column_position);
+        } else {
+          pool.query('UPDATE columns_' + pid + ' SET column_position = toPos' +
+              ' WHERE column_id = $1::int', [cid], function (res2) {
+            if (toPos < fromPos) {
+              pool.query('UPDATE columns_' + pid + 'SET column_position = column_position + 1' +
+                  'WHERE column_id != $1::int AND column_position < $2:int AND column_position > $3::int',
+                  [cid, fromPos, toPos], function (res3) {
+                    rwlock.unlock();
+                    callback(true);
+                  });
+            } else {
+              pool.query('UPDATE columns_' + pid + 'SET column_position = column_position - 1' +
+                  'WHERE column_id != $1::int AND column_position > $2:int AND column_position < $3::int',
+                  [cid, fromPos, toPos], function (res3) {
+                    rwlock.unlock();
+                    callback(true);
+                  });
+            }
+          });
+        }
+      });
+    });
+  };
+
   this.getTickets = function (pid, callback) {
     rwlock.readLock(function () {
       pool.query('SELECT * FROM tickets_' + pid + ' ORDER BY ticket_id ASC', [], function(res) {
@@ -110,7 +140,7 @@ function Database(pool) {
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
       pool.query('SELECT project_id, project_name, column_id, column_title FROM project_table NATURAL JOIN columns_' + pid +
-          ' ORDER BY column_id ASC', [], function(res) {
+          ' ORDER BY column_position ASC', [], function(res) {
 
         var columns = [];
         var project_name = null;
@@ -158,31 +188,21 @@ function Database(pool) {
     });
   };
 
-  this.moveTicket = function (pid, ticket, toPosition, fromPos, callback) {
+  this.moveTicket = function (pid, ticket, toColumn, fromColumn, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT column_position FROM columns_' + pid + ' NATURAL JOIN tickets_' + pid + ' ' +
-          'WHERE ticket_id = $1::int', [ticket.ticket_id], function (checkResult) {
+      pool.query('SELECT column_id FROM tickets_' + pid + ' WHERE ticket_id = $1::int',
+          [ticket.ticket_id], function (checkResult) {
         if (checkResult.rows.length === 1) {
-          if (checkResult.rows[0]["column_position"] === fromPos) {
-            pool.query('SELECT column_id FROM columns_' + pid + ' WHERE column_position = $1::int',
-                [toPosition], function (res) {
-                  if (res.rows.length === 1) {
-                    var cid = res.rows[0]["column_id"];
-                    pool.query('UPDATE tickets_' + pid + ' SET column_id = $1::int WHERE ticket_id = $2::int',
-                        [cid, ticket.ticket_id],
-                        function (insertion) {
-                          rwlock.unlock();
-                          callback(true);
-                        });
-                  } else {
-                    rwlock.unlock();
-                    console.error("Error getting column id");
-                  }
+          if (checkResult.rows[0]["column_id"] == fromColumn) {
+            pool.query('UPDATE tickets_' + pid + ' SET column_id = $1::int WHERE ticket_id = $2::int',
+                [toColumn, ticket.ticket_id],
+                function (insertion) {
+                  rwlock.unlock();
+                  callback(true);
                 });
           } else {
             rwlock.unlock();
-            console.error("Error adding ticket: column_position is " + checkResult.rows[0]["column_position"]
-                + " is not fromPos:" + fromPos);
+            console.error("The ticket that is moving is not in the given from column " + fromColumn);
             callback(false);
           }
         } else {
@@ -210,7 +230,25 @@ function Database(pool) {
           console.error("Ticket was not in database");
         }
       });
+    });
+  };
 
+  this.updateColumnTitle = function (cid, pid, newTitle, callback) {
+    rwlock.writeLock(function () {
+      pool.query('SELECT column_id FROM tickets_' + pid + ' WHERE column_id = $1::int',
+          [cid], function (res) {
+            if (res.rows.length === 1) {
+              pool.query('UPDATE columns_' + pid + ' SET column_title = $1::text WHERE column_id = $2::int',
+                  [newTitle, cid],
+                  function (insertion) {
+                    rwlock.unlock();
+                    callback(true);
+                  });
+            } else {
+              rwlock.unlock();
+              console.error("Ticket was not in database");
+            }
+          });
     });
   };
 
@@ -219,9 +257,8 @@ function Database(pool) {
       pool.query('SELECT ticket_id FROM tickets_' + pid + ' WHERE  ticket_id = $1::int',
           [ticket.ticket_id], function (res) {
             if (res.rows.length === 1) {
-              pool.query('UPDATE tickets_' + pid + ' SET deadline = TIMESTAMP \'' + datetime +
-                  '\' WHERE ticket_id = $1::int', [ticket.ticket_id],
-                  function (insertion) {
+              pool.query('UPDATE tickets_' + pid + ' SET deadline = \'' + datetime +
+                  '\' WHERE ticket_id = $1::int', [ticket.ticket_id], function (insertion) {
                     rwlock.unlock();
                     callback(true);
                   });

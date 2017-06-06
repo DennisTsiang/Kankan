@@ -128,7 +128,7 @@
                 <table class="table table-bordered">
                   <tr>
                     <th class="column-title" ng-repeat="col in project.columns">
-                      <p editable-textarea="col.title" onaftersave="updateColTitle(col.title)">{{col.title || 'empty'}}</p>
+                      <p editable-textarea="col.title" onaftersave="updateColTitle(col, col.title)">{{col.title || 'empty'}}</p>
                     </th>
                   </tr>
                   <tr>
@@ -208,9 +208,8 @@
                 <th class="column-title" ng-repeat="col in project.columns">{{col.title}}</th>
               </tr>
 
-              <tr>
-                <td ng-repeat="col in project.columns" class="ticket-column">
-
+            <tr>
+              <td ng-repeat="col in project.columns" class="ticket-column" cid="{{col.column_id}}">
                   <!-- Tickets -->
                   <div ng-repeat="ticket in col.tickets" ng-click="$ctrl.open_ticket_description(ticket.ticket_id)" draggable="true" id="{{ticket.ticket_id}}" ondragstart="handleDragStart(event)" class="ticket">
                     Ticket id# {{ticket.ticket_id}} </br>

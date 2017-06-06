@@ -5,4 +5,8 @@ var sinon = require('sinon');
 
 
 //export the query method for passing queries to the pool
-module.exports.query = sinon.spy();
+function test_db() {
+  this.query = sinon.spy();
+}
+
+module.exports.test_db = test_db;
