@@ -216,6 +216,12 @@ app.controller('editColumnCtrl', function($scope) {
     removeColumn($scope.project.project_id, col.column_id, col.position);
     delete $scope.project.columns[col.column_id];
   };
+
+  $scope.updateColTitle = function (title) {
+    console.log(title);
+    //TODO: Handle update column description
+    
+  }
 });
 
 app.controller('editTicketCtrl', function($scope) {
