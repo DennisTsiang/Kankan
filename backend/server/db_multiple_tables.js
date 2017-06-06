@@ -214,8 +214,8 @@ function Database(pool) {
       pool.query('SELECT ticket_id FROM tickets_' + pid + ' WHERE  ticket_id = $1::int',
           [ticket.ticket_id], function (res) {
             if (res.rows.length === 1) {
-              pool.query('UPDATE tickets_' + pid + ' SET deadline = $1::text WHERE ticket_id = $2::int',
-                  [datetime, ticket.ticket_id],
+              pool.query('UPDATE tickets_' + pid + ' SET deadline = TIMESTAMP \'' + datetime +
+                  '\' WHERE ticket_id = $1::int', [ticket.ticket_id],
                   function (insertion) {
                     rwlock.unlock();
                     callback(true);
