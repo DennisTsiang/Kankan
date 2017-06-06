@@ -82,7 +82,7 @@ function updateColumnTitle(cid, pid, title) {
 }
 
 function sendTicketUpdateDeadline(ticket, pid, month, year, day, hour, minute) {
-  var deadline = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00";
+  var deadline = year + " " + month + " " + day + " " + hour + " " + minute;
   var jsonString = {type: "ticket_deadline", ticket: ticket, pid : pid, deadline : deadline};
   socket.emit("update", JSON.stringify(jsonString));
 }
@@ -234,15 +234,10 @@ function updateHandler(reply) {
     }
     case "ticket_deadline" : {
       console.log("reply now is " + JSON.stringify(reply));
-      var deadline = reply.deadline;
-      var year = deadline.substring(0, 4);
-      var month =  deadline.substring(5, 7);
-      var day = deadline.substring(8, 10);
-      var hour = deadline.substring(11, 13);
-      var minute = deadline.substring(14, 16);
-      console.log(year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00");
+      var deadline = reply.deadline.split(" ");
+      console.log(reply.deadline);
       let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
-      ticket.setDeadline(year, month, day, hour, minute);
+      ticket.setDeadline(deadline[0], deadline[1], deadline[2], deadline[3], deadline[4]);
       scope.$apply();
       break;
     }
