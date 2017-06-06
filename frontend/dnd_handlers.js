@@ -27,7 +27,7 @@ function handleDrop(e) {
   var end_col = cell[0].cellIndex;
 
   //move_tickets(end_col, start_col, id);
-  sendTicketUpdateMoved(scope.project.tickets[id], 0, end_col, start_col);
+  sendTicketUpdateMoved(scope.project.tickets[id], get_kanban_scope().pid, end_col, start_col);
 
   $(e.toElement).closest('.ticket-column')[0].style.border = "";
   e.srcElement.style.border = "";

@@ -140,11 +140,9 @@ function App (db) {
     //TODO: catch errors and report to client
     switch (store['type']) {
       case 'ticket_new':
-        db.newTicket(store['pid'], store['column_id'], function () {
-          //TODO: Copied from getTickets - return all tickets
-          db.getTickets(store['pid'], function(tickets) {
-            callback({type:'tickets', object:tickets});
-          });
+        //Returns the new ticket id
+        db.newTicket(store['pid'], store['column_id'], function (tid) {
+            callback({type:'ticket_new', object: {tid : tid, column_id: store['column_id'], pid:store['pid']}});
         });
         break;
       case 'project_new':
@@ -214,9 +212,11 @@ function App (db) {
         break;
       case 'column_remove':
         db.deleteColumn(remove.pid, remove.column_id, remove.column_position, function (success) {
-              callback({type: 'column_remove', pid: remove.pid, column_id: remove.column_id});
-            }
-        );
+          console.log("Delete column success: " + success);
+          db.getKanban(remove['pid'], function (kanban) {
+            callback({type:'kanban', object:kanban});
+          });
+        });
         break;
       case 'project_remove':
         db.deleteProject(remove.pid, function (success) {
