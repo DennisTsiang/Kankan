@@ -31,7 +31,7 @@ function Database(pool) {
                     'column_id integer,' +
                     'project_id integer,' +
                     'ticket_description varchar(255),' +
-                    'deadline timestamp, ' +
+                    'deadline varchar(30), ' +
                     'PRIMARY KEY (project_id, ticket_id) )',
                     [], function (finishedCreate) {
                       rwlock.unlock();
@@ -219,9 +219,8 @@ function Database(pool) {
       pool.query('SELECT ticket_id FROM tickets_' + pid + ' WHERE  ticket_id = $1::int',
           [ticket.ticket_id], function (res) {
             if (res.rows.length === 1) {
-              pool.query('UPDATE tickets_' + pid + ' SET deadline = TIMESTAMP \'' + datetime +
-                  '\' WHERE ticket_id = $1::int', [ticket.ticket_id],
-                  function (insertion) {
+              pool.query('UPDATE tickets_' + pid + ' SET deadline = \'' + datetime +
+                  '\' WHERE ticket_id = $1::int', [ticket.ticket_id], function (insertion) {
                     rwlock.unlock();
                     callback(true);
                   });
