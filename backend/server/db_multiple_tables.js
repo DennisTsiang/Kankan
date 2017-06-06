@@ -78,12 +78,15 @@ function Database(pool) {
     });
   };
 
-  this.deleteColumn = function (pid, cid, callback) {
+  this.deleteColumn = function (pid, cid, columnPos, callback) {
     rwlock.writeLock(function () {
       pool.query('DELETE FROM columns_' + pid + ' WHERE column_id = $1::int', [cid], function (res) {
         pool.query('DELETE FROM tickets_' + pid + ' WHERE column_id = $1::int', [cid], function (res2) {
-          rwlock.unlock();
-          callback(true);
+          pool.query('UPDATE columns_' + pid + ' SET column_position = column_position - 1' +
+              ' WHERE column_position > $1::int', [columnPos], function (res3) {
+            rwlock.unlock();
+            callback(true);
+          });
         });
       });
     });
