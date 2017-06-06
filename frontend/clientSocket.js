@@ -30,9 +30,6 @@ function setOnEvents() {
   });
 
   printSocketStatus();
-  if (isSocketConnected()) {
-    sendKanbanRequest(get_kanban_scope().pid);
-  }
 }
 
 function printSocketStatus(){

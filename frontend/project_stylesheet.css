@@ -64,4 +64,22 @@ div {
   padding-top: 60px;
 }
 
+.username-title {
+  text-align: center;
+  font-size: 30px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.username {
+  text-align: center;
+  font-size: 20px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.center-align-text {
+  text-align: center;
+}
+
 .pagination, .carousel, .panel-title a { cursor: pointer; }
