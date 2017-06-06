@@ -7,9 +7,9 @@ function addBTN(event) {
   let columns = k_scope.project.columns;
   let column_id_position_0;
   for (let cid in columns) {
-      if (columns[cid].position === 0) {
-        column_id_position_0 = columns[cid].column_id;
-        break;
+    if (columns[cid].position === 0) {
+      column_id_position_0 = columns[cid].column_id;
+      break;
     }
   }
   sendStoreTicket('ticket_new', k_scope.pid, column_id_position_0);
@@ -18,7 +18,7 @@ function addBTN(event) {
 function enableDnDColumns() {
 //Each column has drag and drop event listeners
   let elems = document.querySelectorAll('.ticket-column');
-  for (var i=0; i < elems.length; i++) {
+  for (let i=0; i < elems.length; i++) {
     let el = elems[i];
     el.addEventListener('dragover', handleDragOver, false);
     el.addEventListener('drop', handleDrop, false);
@@ -30,7 +30,6 @@ function addTicket(col_id, ticket_id, desc, deadline) {
   let ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
-  console.log("new deadline is " + deadline);
   ticket.setDeadlineFlat(deadline);
 
   let s = get_kanban_scope();
@@ -56,8 +55,7 @@ function move_tickets(to_col_id, from_col_id, tid) {
   let scope = get_kanban_scope();
   scope.project.tickets[tid].setColumn(to_col_id);
   delete scope.project.columns[from_col_id].tickets[tid];
-  scope.project.columns[to_col_id].tickets[tid]
-      = scope.project.tickets[tid];
+  scope.project.columns[to_col_id].tickets[tid] = scope.project.tickets[tid];
   scope.$apply();
 }
 
@@ -69,11 +67,10 @@ function delete_ticket(ticket_id, update) {
     delete scope.project.columns[ticket.col].tickets[ticket_id];
     delete scope.project.tickets[ticket_id];
   }
-  if(update === undefined || update) scope.$apply();
+  if (update === undefined || update) scope.$apply();
 }
 
 function generateTickets(ticket_info_list) {
-  console.log("list is " + JSON.stringify(ticket_info_list));
   for (let ticket_info of ticket_info_list) {
     addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime);
   }
@@ -116,16 +113,29 @@ function generate_user_kanbans(projects) {
   get_kanban_scope().$apply();
 }
 
+function generateArray(start, end) {
+  let returnArray = [];
 
-
-function generateArray(start, end){
-let returnArray = [];
-
-for(var i = start; i <=end; i++){
-
-  returnArray.push(i.toString());
-
+  for (let i = start; i <= end; i++) {
+    returnArray.push(i.toString());
+  }
+  return returnArray;
 }
 
-return returnArray;
+function updateProgressTickets() {
+  setInterval(updateProgressBars, 30000);
+  //updateProgressBars();
+}
+
+
+function updateProgressBars() {
+  //alert("hi");
+  let s = get_kanban_scope();
+  for (let ticket in s.project.tickets) {
+    let tick = s.project.tickets[ticket];
+    if (tick.deadlineActive) {
+      tick.updateProgress();
+    }
+  }
+  s.$apply();
 }
