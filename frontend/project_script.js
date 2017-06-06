@@ -324,7 +324,7 @@ app.controller('deleteTicketCtrl', function ($scope, $sce) {
 
 
 function generateArray(start, end){
-returnArray = [];
+let returnArray = [];
 
 for(var i = start; i <=end; i++){
 
