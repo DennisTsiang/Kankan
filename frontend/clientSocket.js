@@ -187,7 +187,7 @@ function removeHandler(reply) {
       break;
     }
     case "column_remove" : {
-      console.err("Column deletion case - should not occur. Use send kanban instead.");
+      console.error("Column deletion case - should not occur. Use send kanban instead.");
       break;
     }
     case "ticket_remove": {
@@ -250,7 +250,6 @@ function storeHandler(reply) {
 
     case "column_new": {
       let col_info = reply.object;
-      console.log(col_info);
       addColumn(col_info.column_name, col_info.position, col_info.cid);
       break;
     }
