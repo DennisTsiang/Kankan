@@ -218,9 +218,8 @@ app.controller('editColumnCtrl', function($scope) {
   };
 
 
-  $scope.updateColTitle = function (title) {
-    //TODO: Handle update column description
-
+  $scope.updateColTitle = function (col, title) {
+    updateColumnTitle(col.column_id, get_kanban_scope().pid, title);
   }
 });
 

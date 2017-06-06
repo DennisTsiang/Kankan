@@ -254,6 +254,7 @@ function updateHandler(reply) {
       var pid = reply.pid;
       var cid = reply.cid;
       var title = reply.title;
+      get_kanban_scope().project.columns[cid].title = title;
     }
   }
 

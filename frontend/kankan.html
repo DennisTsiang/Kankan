@@ -128,7 +128,7 @@
                 <table class="table table-bordered">
                   <tr>
                     <th class="column-title" ng-repeat="col in project.columns">
-                      <p editable-textarea="col.title" onaftersave="updateColTitle(col.title)">{{col.title || 'empty'}}</p>
+                      <p editable-textarea="col.title" onaftersave="updateColTitle(col, col.title)">{{col.title || 'empty'}}</p>
                     </th>
                   </tr>
                   <tr>
