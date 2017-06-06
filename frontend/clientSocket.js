@@ -146,7 +146,6 @@ function requestHandler(reply) {
       break;
     }
     case "kanban" : {
-      console.log("generated");
       generate_kanban(request_data);
 
       //Send for tickets, once received kanban.
