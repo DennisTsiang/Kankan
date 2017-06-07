@@ -20,9 +20,9 @@ function enableDnDColumns() {
   let elems = document.querySelectorAll('.ticket-column');
   for (let i=0; i < elems.length; i++) {
     let el = elems[i];
-    el.addEventListener('dragover', handleDragOver, false);
-    el.addEventListener('drop', handleDrop, false);
-    el.addEventListener('dragleave', handleDragLeave, false);
+    el.addEventListener('dragover', handleTicketDragOver, false);
+    el.addEventListener('drop', handleTicketDrop, false);
+    el.addEventListener('dragleave', handleTicketDragLeave, false);
   }
 }
 

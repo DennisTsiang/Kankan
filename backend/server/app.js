@@ -201,8 +201,8 @@ function App (db) {
         });
         break;
       case 'column_moved' :
-        db.moveColumn(update['pid'], update['cid'], update['to'], update['from'], function (info) {
-          db.getKanban(request['pid'], function (kanban) {
+        db.moveColumn(update['pid'], update['cid'], update['from'], update['to'], function (info) {
+          db.getKanban(update['pid'], function (kanban) {
             callback({type:'column_moved', object:kanban});
           });
         });

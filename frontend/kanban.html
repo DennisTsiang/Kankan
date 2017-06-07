@@ -89,23 +89,30 @@
         <div class="container-fluid">
           <div class="row vertical-align">
             <!-- Editable column -->
-            <div class="col-xs-11 text-center">
-              <table class="table table-bordered">
-                <tr>
-                  <th class="column-title" ng-repeat="col in project.columns">
-                    <p editable-textarea="col.title" onaftersave="updateColTitle(col, col.title)">{{col.title || 'empty'}}</p>
-                  </th>
-                </tr>
+            <div class="col-xs-11">
+              <table>
                 <tr>
                   <td ng-repeat="col in project.columns">
-                    <button type="button" class="btn btn-warning" ng-click="removeColumn(col)">Remove</button>
+                    <table class="table table-bordered" column_id="{{col.column_id}}" draggable="true" ondragstart="handleColumnDragStart(event)" ondragover="handleColumnDragOver(event)" ondrop="handleColumnDrop(event)">
+                      <tr>
+                        <th class="column-title">
+                          <p editable-textarea="col.title" onaftersave="updateColTitle(col, col.title)">{{col.title || 'empty'}}</p>
+                        </th>
+                      </tr>
+                      <tr>
+                        <td class="center-align-text">
+                          <button type="button" class="btn btn-warning" ng-click="removeColumn(col)">Remove</button>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
-            </div>
+          </div>
             <!-- Add new column -->
             <div class="col-xs-1">
               <button class="btn btn-info btn-lg" ng-click="addColumn()"><span class="glyphicon glyphicon-plus"></span></button>
+            </div>
             </div>
           </div>
         </div>
@@ -176,7 +183,7 @@
             <tr>
               <td ng-repeat="col in project.columns" class="ticket-column" cid="{{col.column_id}}">
                 <!-- Tickets -->
-                <div ng-repeat="ticket in col.tickets" ng-click="$ctrl.open_ticket_description(ticket.ticket_id)" draggable="true" id="{{ticket.ticket_id}}" ondragstart="handleDragStart(event)" class="ticket">
+                <div ng-repeat="ticket in col.tickets" ng-click="$ctrl.open_ticket_description(ticket.ticket_id)" draggable="true" id="{{ticket.ticket_id}}" ondragstart="handleTicketDragStart(event)" class="ticket">
                   Ticket id# {{ticket.ticket_id}} </br>
                   {{ticket.desc}}
 

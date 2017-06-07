@@ -94,7 +94,7 @@ function Database(pool) {
 
   this.moveColumn = function (pid, cid, fromPos, toPos, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT column_position FROM columns_' + pid + 'WHERE column_id = $1::int', [cid], function (res) {
+      pool.query('SELECT column_position FROM columns_' + pid + ' WHERE column_id = $1::int', [cid], function (res) {
         if (res.rows[0].column_position !== fromPos) {
           console.error("Error moving column. FromPos: " + fromPos +
               "But column_position: " + res.rows[0].column_position);
@@ -102,14 +102,14 @@ function Database(pool) {
           pool.query('UPDATE columns_' + pid + ' SET column_position = toPos' +
               ' WHERE column_id = $1::int', [cid], function (res2) {
             if (toPos < fromPos) {
-              pool.query('UPDATE columns_' + pid + 'SET column_position = column_position + 1' +
+              pool.query('UPDATE columns_' + pid + ' SET column_position = column_position + 1' +
                   'WHERE column_id != $1::int AND column_position < $2:int AND column_position > $3::int',
                   [cid, fromPos, toPos], function (res3) {
                     rwlock.unlock();
                     callback(true);
                   });
             } else {
-              pool.query('UPDATE columns_' + pid + 'SET column_position = column_position - 1' +
+              pool.query('UPDATE columns_' + pid + ' SET column_position = column_position - 1' +
                   'WHERE column_id != $1::int AND column_position > $2:int AND column_position < $3::int',
                   [cid, fromPos, toPos], function (res3) {
                     rwlock.unlock();
