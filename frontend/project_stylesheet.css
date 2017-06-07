@@ -88,6 +88,9 @@ div {
   margin-bottom: auto;
 }
 
+.button-centered {
+  text-align: center;
+}
 .center-align-text {
   text-align: center;
 }

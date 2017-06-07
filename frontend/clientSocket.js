@@ -166,10 +166,11 @@ function requestHandler(reply) {
       let projects = reply.object;
       //Generates/updates projects and other_projects variables.
       generate_user_kanbans(projects);
+
       break;
     }
     case "new_user_project": {
-
+      getUserProjects(get_kanban_scope().username);
       break;
     }
     case "user_tickets": {
@@ -273,5 +274,9 @@ function storeHandler(reply) {
       break;
     }
 
+    case "project_new": {
+      var pid = reply.object;
+      addUserToProject(get_kanban_scope().username, pid);
+    }
   }
 }
