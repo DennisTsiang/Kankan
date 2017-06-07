@@ -45,13 +45,11 @@ function handleColumnDragStart(event) {
 }
 
 function handleColumnDragOver(event) {
-  event.preventDefault();
   event.dataTransfer.dropEffect = "move";
 
 }
 
 function handleColumnDrop(event) {
-  event.preventDefault();
 
   let cell = $(event.toElement).closest('table');
   let end_column_id = cell[0].getAttribute('column_id');
