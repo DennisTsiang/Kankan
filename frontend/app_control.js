@@ -162,7 +162,7 @@ app.controller('editTicketCtrl', function($scope) {
     $scope.selectedMinute = $scope.deadline.getMinutes().toString();
 
 
-  }
+  };
 
 
   function getTicket(id) {
