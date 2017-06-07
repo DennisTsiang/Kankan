@@ -16,11 +16,6 @@ describe('Database', function () {
     it('calls query once when calling', function () {
       assert(test_db.query.calledOnce);
     });
-    it('Calls correct query', function () {
-      var query = test_db.query.getCall(0).args[0];
-      assert(query.includes(' FROM project_table '));
-      assert(query.includes(' columns_0 '))
-    });
   });
 
 });
