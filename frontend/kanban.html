@@ -92,16 +92,16 @@
             <div class="col-xs-11">
               <table>
                 <tr>
-                  <td ng-repeat="col in project.columns">
-                    <table class="table table-bordered" column_id="{{col.column_id}}" draggable="true" ondragstart="handleColumnDragStart(event)" ondragover="handleColumnDragOver(event)" ondrop="handleColumnDrop(event)">
+                  <td ng-repeat="col in project.column_order">
+                    <table class="table table-bordered" column_id="{{project.columns[col].column_id}}" draggable="true" ondragstart="handleColumnDragStart(event)" ondragover="handleColumnDragOver(event)" ondrop="handleColumnDrop(event)">
                       <tr>
                         <th class="column-title">
-                          <p editable-textarea="col.title" onaftersave="updateColTitle(col, col.title)">{{col.title || 'empty'}}</p>
+                          <p editable-textarea="project.columns[col].title" onaftersave="updateColTitle(project.columns[col], project.columns[col])">{{project.columns[col].title || 'empty'}}</p>
                         </th>
                       </tr>
                       <tr>
                         <td class="center-align-text">
-                          <button type="button" class="btn btn-warning" ng-click="removeColumn(col)">Remove</button>
+                          <button type="button" class="btn btn-warning" ng-click="removeColumn(project.columns[col])">Remove</button>
                         </td>
                       </tr>
                     </table>
@@ -177,13 +177,13 @@
           <table id="kanban" class="table table-bordered">
 
             <tr>
-              <th class="column-title" ng-repeat="col in project.columns">{{col.title}}</th>
+              <th class="column-title" ng-repeat="col in project.column_order">{{project.columns[col].title}}</th>
             </tr>
 
             <tr>
-              <td ng-repeat="col in project.columns" class="ticket-column" cid="{{col.column_id}}">
+              <td ng-repeat="col in project.column_order" class="ticket-column" cid="{{project.columns[col].column_id}}">
                 <!-- Tickets -->
-                <div ng-repeat="ticket in col.tickets" ng-click="$ctrl.open_ticket_description(ticket.ticket_id)" draggable="true" id="{{ticket.ticket_id}}" ondragstart="handleTicketDragStart(event)" class="ticket">
+                <div ng-repeat="ticket in project.columns[col].tickets" ng-click="$ctrl.open_ticket_description(ticket.ticket_id)" draggable="true" id="{{ticket.ticket_id}}" ondragstart="handleTicketDragStart(event)" class="ticket">
                   Ticket id# {{ticket.ticket_id}} </br>
                   {{ticket.desc}}
 

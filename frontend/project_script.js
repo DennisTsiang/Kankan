@@ -5,14 +5,8 @@ function get_kanban_scope() {
 function addBTN(event) {
   let k_scope = get_kanban_scope();
   let columns = k_scope.project.columns;
-  let column_id_position_0;
-  for (let cid in columns) {
-    if (columns[cid].position === 0) {
-      column_id_position_0 = columns[cid].column_id;
-      break;
-    }
-  }
-  sendStoreTicket('ticket_new', k_scope.pid, column_id_position_0);
+  //Get column in position 0
+  sendStoreTicket('ticket_new', k_scope.pid, k_scope.project.column_order[0]);
 }
 
 function enableDnDColumns() {
@@ -46,6 +40,7 @@ function addColumn(title, position, id) {
   let scope = get_kanban_scope();
   let column = new Column(id, title, position);
   scope.project.columns[id] = column;
+  scope.project.column_order[position] = id;
 
   scope.$apply();
   enableDnDColumns();
@@ -88,16 +83,19 @@ function generate_kanban(received_project) {
   k_scope.project.project_id = received_project.project_id;
   k_scope.project.title = received_project.project_name;
   k_scope.project.columns = {};
-  k_scope.project.column_order = [];
+  k_scope.project.column_order = {};
 
   for (let i = 0; i < received_project.columns.length; i++) {
     let title = received_project.columns[i].title;
     let position = received_project.columns[i].position;
-    //TODO: Use column_order to map index=position to column id - this must be kept consistent with every change.
-    
     let column = new Column(received_project.columns[i].column_id, title, position);
+    k_scope.project.column_order[position] = column.column_id;
+    console.log(position);
+
     k_scope.project.columns[column.column_id] = column;
   }
+
+  console.log(k_scope.project.column_order)
 
   k_scope.$apply();
   enableDnDColumns();
