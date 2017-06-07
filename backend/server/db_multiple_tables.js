@@ -24,6 +24,7 @@ function Database(pool) {
               'column_id integer, ' +
               'column_title varchar(255) not null, ' +
               'column_position integer not null, ' +
+              'column_limit integer, ' +
               'PRIMARY KEY (project_id, column_id) )',
               [], function (create) {
                 pool.query('CREATE TABLE tickets_' + pid + ' (' +
@@ -166,21 +167,40 @@ function Database(pool) {
     });
   };
 
+  function newTicketHelper(pid, column_id, callback) {
+    pool.query('SELECT Max(ticket_id) FROM tickets_' + pid, [], function (res) {
+      var tid;
+      if (res.rows[0].max === null) {
+        tid = 0;
+      } else {
+        tid = res.rows[0].max + 1;
+      }
+      pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, \'\', NULL)',
+          [tid, column_id, pid],
+          function (insertion) {
+            rwlock.unlock();
+            callback(tid);
+          });
+    });
+  };
+
   this.newTicket = function (pid, column_id, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT Max(ticket_id) FROM tickets_' + pid, [], function (res) {
-        var tid;
-        if (res.rows[0].max === null) {
-          tid = 0;
-        } else {
-          tid = res.rows[0].max + 1;
-        }
-        pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, \'\', NULL)',
-            [tid, column_id, pid],
-            function (insertion) {
+      pool.query('SELECT column_limit FROM columns_' + pid + ' WHERE column_id = $1::int', [column_id], function (res1) {
+        if (res1.rows[0].column_limit !== null) {
+          let column_limit = res1.rows[0].column_limit;
+          pool.query('SELECT COUNT(ticket_id) as numberOfTickets FROM tickets_' + pid, [], function (res2) {
+            if (res2.rows[0].numberoftickets >= column_limit) {
               rwlock.unlock();
-              callback(tid);
-            });
+              console.log("Reached maximum ticket limit for column_id: " + column_id);
+              callback(-1); //-1 denotes invalid tid
+            } else {
+              newTicketHelper(pid, column_id, callback);
+            }
+          });
+        } else {
+          newTicketHelper(pid, column_id, callback);
+        }
       });
     });
   };

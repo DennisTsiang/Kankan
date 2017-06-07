@@ -153,8 +153,10 @@ function App (db) {
       case 'ticket_new':
         //Returns the new ticket id
         db.newTicket(store['pid'], store['column_id'], function (tid) {
-            callback({type:'ticket_new', object: {tid : tid, column_id: store['column_id'], pid:store['pid']}},
+          if (tid !== -1) {
+            callback({type: 'ticket_new', object: {tid: tid, column_id: store['column_id'], pid: store['pid']}},
                 store["pid"]);
+          }
         });
         break;
       case 'project_new':
