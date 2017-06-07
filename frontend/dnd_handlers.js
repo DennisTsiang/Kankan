@@ -1,6 +1,6 @@
-var dragSrcEl = null;
+let dragSrcEl = null;
 
-var id = null;
+let id = null;
 function handleTicketDragStart(e) {
   dragSrcEl = e.srcElement;
   e.effectAllowed = 'move';
@@ -48,10 +48,6 @@ function handleColumnDragOver(event) {
   event.preventDefault();
   event.dataTransfer.dropEffect = "move";
 
-  /*
-  let cell = $(event.toElement).closest('table');
-  let end_col_id = cell[0].getAttribute('column_id');
-  */
 }
 
 function handleColumnDrop(event) {
