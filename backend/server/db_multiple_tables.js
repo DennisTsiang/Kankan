@@ -390,6 +390,22 @@ function Database(pool) {
       });
     });
   };
+
+  this.addNewUser = function (username, callback) {
+    rwlock.writeLock();
+    pool.query('SELECT username FROM users WHERE username = $1::text', [username], function (res) {
+      if (res.rows[0].length > 0) {
+        console.log("Username already taken.");
+        rwlock.unlock();
+        callback(false);
+      } else {
+        pool.query('INSERT INTO users VALUES($1::text)', [username], function (res2) {
+          rwlock.unlock();
+          callback(true);
+        });
+      }
+    });
+  }
 }
 
 module.exports.Database = Database;

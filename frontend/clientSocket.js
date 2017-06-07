@@ -112,6 +112,11 @@ function sendStoreColumn(pid, column_name, position) {
   socket.emit("store", JSON.stringify(jsonString));
 }
 
+function storeNewUser(username) {
+  var jsonString = {type: 'user_new', username:username};
+  socket.emit("store", JSON.stringify(jsonString));
+}
+
 function removeProject(pid) {
   var jsonString = {type:'project_remove', pid:pid};
   socket.emit("remove", JSON.stringify(jsonString));
@@ -151,6 +156,8 @@ function getUserTickets(username, pid) {
   var jsonString = {type:'user_tickets', pid : pid, username : username};
   socket.emit("request", JSON.stringify(jsonString));
 }
+
+
 
 
 function requestHandler(reply) {

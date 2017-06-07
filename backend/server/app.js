@@ -172,6 +172,11 @@ function App (db) {
           callback({type:'column_new',object: {cid:cid, column_name:column_name, position:position}}, store['pid']);
         });
         break;
+      case 'user_new' :
+        db.addNewUser(store['username'], function (success) {
+          callback( {type: 'user_new', success:success})
+        });
+        break;
       default:
         //TODO: Handle unknown store.
         break;

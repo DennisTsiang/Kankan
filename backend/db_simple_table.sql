@@ -59,8 +59,13 @@ CREATE TABLE user_tickets (
 
 CREATE TABLE users (
   username varchar(20),
+  PRIMARY KEY (username)
+);
+
+CREATE TABLE user_projects (
+  username varchar(20),
   project_id integer,
-  PRIMARY KEY (username, project_id)
+  PRIMARY KEY (username, project_idj)
 );
 
 --------------------------------------------------------------------------------------------------
