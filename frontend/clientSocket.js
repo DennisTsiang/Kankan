@@ -246,7 +246,10 @@ function updateHandler(reply) {
       break;
     }
     case "column_moved" : {
-      var kanban = reply.object;
+      generate_kanban(reply.object);
+
+      //Send for tickets, once received kanban.
+      sendTicketsRequest(get_kanban_scope().pid);
       break;
     }
     case "column_title" : {
