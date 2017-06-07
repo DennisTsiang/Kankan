@@ -96,11 +96,6 @@ function sendStoreTicket(type, pid, col_id) {
   socket.emit("store", JSON.stringify(jsonString));
 }
 
-function sendNewTicket(pid, col_id) {
-  var jsonString = {type:'ticket_new', pid : pid, column_id: col_id};
-  socket.emit("store", JSON.stringify(jsonString));
-}
-
 function sendStoreProject(project_name) {
   var jsonString = {type:'project_new', project_name:project_name};
   socket.emit("store", JSON.stringify(jsonString));
@@ -132,7 +127,7 @@ function getUserProjects(username, pid) {
 }
 
 function addUserToProject(username, pid) {
-  var jsonString = {type:'user_projects', username : username, pid : pid};
+  var jsonString = {type:'new_user_project', username : username, pid : pid};
   socket.emit("request", JSON.stringify(jsonString));
 }
 
