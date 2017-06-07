@@ -46,6 +46,16 @@ app.controller('HomeController', function($scope, $location) {
   }
 });
 
+app.controller('PopoverDemoCtrl', function ($scope, $sce) {
+  $scope.dynamicPopover = {
+    templateUrl: 'myPopoverTemplate.html',
+    title: 'Enter Here'
+  };
+  $scope.newProject = function (project_name) {
+    sendStoreProject(project_name);
+  }
+});
+
 app.controller('LoginController', function ($scope, $location) {
   $scope.a_k = get_kanban_scope();
 
