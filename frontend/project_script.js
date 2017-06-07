@@ -88,10 +88,13 @@ function generate_kanban(received_project) {
   k_scope.project.project_id = received_project.project_id;
   k_scope.project.title = received_project.project_name;
   k_scope.project.columns = {};
+  k_scope.project.column_order = [];
 
   for (let i = 0; i < received_project.columns.length; i++) {
     let title = received_project.columns[i].title;
-    let position = i;
+    let position = received_project.columns[i].position;
+    //TODO: Use column_order to map index=position to column id - this must be kept consistent with every change.
+    
     let column = new Column(received_project.columns[i].column_id, title, position);
     k_scope.project.columns[column.column_id] = column;
   }
