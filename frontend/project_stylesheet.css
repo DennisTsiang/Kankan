@@ -61,6 +61,22 @@ div {
   width: 75%
 }
 
+.go-left {
+  left: 0;
+}
+
+.code-navigator-modal {
+  z-index: 1060;
+}
+
+.ticket-edit-modal {
+  z-index: 1600;
+}
+
+.modal-backdrop.in {
+  z-index: 1040 !important;
+}
+
 .offset-navbar-height {
   padding-top: 60px;
 }

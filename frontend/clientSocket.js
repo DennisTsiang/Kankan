@@ -178,8 +178,11 @@ function requestHandler(reply) {
       break;
     }
     case "ticket_users": {
-      var users = reply.object;
-
+      let users = reply.object.users;
+      let tid = reply.object.tid;
+      console.log(reply);
+      get_kanban_scope().project.tickets[tid].members = users;
+      get_kanban_scope().$apply();
       break;
     }
     case "add_user_to_ticket": {

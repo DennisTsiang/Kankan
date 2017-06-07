@@ -91,7 +91,7 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
 
   ctrl.animationsEnabled = true;
   $scope.tid = -1;
-  ctrl.open_ticket_description = function(tid) {
+  ctrl.open_ticket_editor = function(tid) {
     $scope.tid = tid;
     let modalInstance = $uibModal.open({
       animation: ctrl.animationsEnabled,
@@ -100,6 +100,8 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
       templateUrl: 'ticket-popup',
       controller: 'ModalInstanceCtrl',
       controllerAs: '$ctrl',
+      windowClass: 'code-navigator-modal',
+      size: 'lg',
       resolve: {
 
       }
@@ -150,7 +152,116 @@ app.controller('editColumnCtrl', function($scope) {
   }
 });
 
-app.controller('editTicketCtrl', function($scope) {
+app.controller('DatepickerPopupDemoCtrl', function ($scope) {
+  $scope.today = function() {
+    $scope.dt = new Date();
+  };
+  $scope.today();
+
+  $scope.clear = function() {
+    $scope.dt = null;
+  };
+
+  $scope.inlineOptions = {
+    customClass: getDayClass,
+    minDate: new Date(),
+    showWeeks: true
+  };
+
+  $scope.dateOptions = {
+    formatYear: 'yy',
+    maxDate: new Date(2020, 5, 22),
+    minDate: new Date(),
+    startingDay: 1
+  };
+
+  $scope.format = 'dd-MMMM-yyyy';
+
+  $scope.open1 = function() {
+    $scope.popup1.opened = true;
+  };
+
+  $scope.setDate = function(year, month, day) {
+    $scope.dt = new Date(year, month, day);
+  };
+
+  $scope.popup1 = {
+    opened: false
+  };
+
+  function getDayClass(data) {
+    var date = data.date,
+        mode = data.mode;
+    if (mode === 'day') {
+      var dayToCheck = new Date(date).setHours(0,0,0,0);
+
+      for (var i = 0; i < $scope.events.length; i++) {
+        var currentDay = new Date($scope.events[i].date).setHours(0,0,0,0);
+
+        if (dayToCheck === currentDay) {
+          return $scope.events[i].status;
+        }
+      }
+    }
+
+    return '';
+  }
+});
+
+app.controller('TimepickerDemoCtrl', function ($scope, $log) {
+  $scope.mytime = new Date();
+
+  $scope.hstep = 1;
+  $scope.mstep = 15;
+
+  $scope.options = {
+    hstep: [1, 2, 3],
+    mstep: [1, 5, 10, 15, 25, 30]
+  };
+
+  $scope.ismeridian = true;
+  $scope.toggleMode = function () {
+    $scope.ismeridian = !$scope.ismeridian;
+  };
+
+  $scope.update = function () {
+    var d = new Date();
+    d.setHours(14);
+    d.setMinutes(0);
+    $scope.mytime = d;
+  };
+
+  $scope.changed = function () {
+    $log.log('Time changed to: ' + $scope.mytime);
+  };
+});
+
+app.controller('editTicketCtrl', function($scope, $document, $uibModal) {
+
+  /*$scope.open_code_navigator = function () {
+    angular.element('code-navigator-modal').addClass("go-left");
+    let modalInstance = $uibModal.open({
+      animation: true,
+      ariaLabelledBy: 'code-info-title',
+      ariaDescribedBy: 'code-info-modal-body',
+      templateUrl: 'code-popup',
+      controller: 'ModalInstanceCtrl',
+      //appendTo: parentElem,
+      backdrop: true,
+      windowClass: 'ticket-edit-modal',
+    })};
+  */
+
+  $scope.dynamicPopover = {
+    content: 'Hello world!',
+    templateUrl: 'addUser.html',
+    title: 'Title'
+  };
+
+  $scope.addUser = function (username) {
+    console.log(username);
+    addUserToTicket(username, get_kanban_scope().pid, $scope.tid);
+  };
 
   $scope.deadlineUpdate = function() {
     $scope.deadline = getTicket(getTid()).deadline;
@@ -163,7 +274,6 @@ app.controller('editTicketCtrl', function($scope) {
 
 
   };
-
 
   function getTicket(id) {
     let k_scope = get_kanban_scope();
@@ -178,6 +288,9 @@ app.controller('editTicketCtrl', function($scope) {
   //Enables all popovers.
   $('[data-toggle="popover"]').popover();
 
+  //Get users for this ticket.
+  getTicketUsers(get_kanban_scope().pid, getTid());
+
   //Initialise arrays for drop down boxes
   //TODO: Seems bad to do this every time?
   $scope.days = generateArray(1,31);
@@ -188,7 +301,8 @@ app.controller('editTicketCtrl', function($scope) {
   $scope.minutes = generateArray(0,59);
 
   $scope.tid = getTid();
-  $scope.desc = getTicket($scope.tid).desc;
+  $scope.ticket = getTicket($scope.tid);
+  $scope.desc = $scope.ticket.desc;
 
   $scope.deadlineUpdate();
 
@@ -251,3 +365,6 @@ app.controller('deleteTicketCtrl', function ($scope, $sce) {
   }
 });
 
+app.controller('DeadlineCollapseCtrl', function ($scope) {
+  $scope.isCollapsed = true;
+});

@@ -5,11 +5,11 @@
             <div class="col-xs-6 button-centered">
                 <h2 class="username-title">Welcome {{username}}</h2>
                 <br />
-                <ul class="list-group">
+                <div class="list-group">
                     <a class="list-group-item username" ng-repeat="proj in a_k.projects" ng-click="chooseProject(proj.project_id)">
                     {{proj.title}}
                     </a>
-                </ul>
+                </div>
                 <br />
                 <button uib-popover-template="dynamicPopover.templateUrl" type="button" class="btn btn-primary">Create New Project</button>
             </div>
