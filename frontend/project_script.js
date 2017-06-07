@@ -120,7 +120,7 @@ function generateArray(start, end) {
 }
 
 function updateProgressTickets() {
-  setInterval(updateProgressBars, 30000);
+  setInterval(updateProgressBars, 10000);
   //updateProgressBars();
 }
 
