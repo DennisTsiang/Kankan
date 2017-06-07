@@ -31,9 +31,6 @@ test_server:
 image: $CI_REGISTRY/gdocker
 
 deploy_server:
-  stage: test
-  script:
-    - npm test
   artifacts:
     untracked: true
 

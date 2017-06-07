@@ -189,7 +189,7 @@ function Database(pool) {
     rwlock.writeLock(function () {
       pool.query('SELECT column_limit FROM columns_' + pid + ' WHERE column_id = $1::int', [column_id], function (res1) {
         if (res1.rows[0].column_limit !== null) {
-          let column_limit = res1.rows[0].column_limit;
+          var column_limit = res1.rows[0].column_limit;
           pool.query('SELECT COUNT(ticket_id) as numberOfTickets FROM tickets_' + pid, [], function (res2) {
             if (res2.rows[0].numberoftickets >= column_limit) {
               rwlock.unlock();
