@@ -1,4 +1,4 @@
-var socket = null;
+let socket = null;
 
 function initiateConnection() {
   //Set listener events
