@@ -90,12 +90,8 @@ function generate_kanban(received_project) {
     let position = received_project.columns[i].position;
     let column = new Column(received_project.columns[i].column_id, title, position);
     k_scope.project.column_order[position] = column.column_id;
-    console.log(position);
-
     k_scope.project.columns[column.column_id] = column;
   }
-
-  console.log(k_scope.project.column_order)
 
   k_scope.$apply();
   enableDnDColumns();
