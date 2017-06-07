@@ -96,7 +96,7 @@
                     <table class="table table-bordered" column_id="{{project.columns[col].column_id}}" draggable="true" ondragstart="handleColumnDragStart(event)" ondragover="handleColumnDragOver(event)" ondrop="handleColumnDrop(event)">
                       <tr>
                         <th class="column-title">
-                          <p editable-textarea="project.columns[col].title" onaftersave="updateColTitle(project.columns[col], project.columns[col])">{{project.columns[col].title || 'empty'}}</p>
+                          <p editable-textarea="project.columns[col].title" onaftersave="updateColTitle(project.columns[col], project.columns[col].title)">{{project.columns[col].title || 'empty'}}</p>
                         </th>
                       </tr>
                       <tr>
