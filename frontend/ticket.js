@@ -56,6 +56,8 @@ function Ticket(ticket_id) {
 
   this.updateProgress = function() {
 
+    console.log("updating");
+
     let endtime = this.deadline.getTime();
     let starttime = this.startdate.getTime();
 
@@ -79,5 +81,8 @@ function Ticket(ticket_id) {
       this.progress = 0;
       this.deadlineActive = 0;
     }
+
+    console.log("progress is " + this.progress);
+
   };
 }
