@@ -32,7 +32,7 @@ CREATE TABLE project_table (
     PRIMARY KEY (project_id)
 );
 
-CREATE TABLE columns_0 (
+CREATE TABLE columns_1 (
     project_id integer,
     column_id integer,
     column_title varchar(255) not null,
@@ -40,12 +40,12 @@ CREATE TABLE columns_0 (
     PRIMARY KEY (project_id, column_id)
 );
 
-CREATE TABLE tickets_0 (
+CREATE TABLE tickets_1 (
     ticket_id integer,
     column_id integer,
     project_id integer,
     ticket_description varchar(255),
-    deadline timestamp,
+    deadline varchar(30),
     PRIMARY KEY (project_id, ticket_id)
 );
 
@@ -59,7 +59,7 @@ CREATE TABLE user_tickets (
 CREATE TABLE users (
   username varchar(20),
   project_id integer,
-  PRIMARY KEY username
+  PRIMARY KEY (username, project_id)
 );
 
 --------------------------------------------------------------------------------------------------

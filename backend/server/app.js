@@ -52,6 +52,16 @@ function App (db) {
   };
 
   this.handleConnection = function (socket) {
+    socket.on('joinroom', function (room) {
+      socket.join(room);
+      console.log("Socket joined room " + room);
+    });
+
+    socket.on('leaveroom', function (room) {
+      socket.leave(room);
+      console.log("Socket left room " + room);
+    });
+
     socket.on('request', function (data) {
       console.log('Received request');
       _this.handleRequest(JSON.parse(data), function (response) {
@@ -62,19 +72,21 @@ function App (db) {
 
     socket.on('store', function (data) {
       console.log('Received Store');
-      _this.handleStore(JSON.parse(data), function (response) {
-        socket.emit('storereply', JSON.stringify(response));
-        socket.broadcast.emit('storereply', JSON.stringify(response));
+      _this.handleStore(JSON.parse(data), function (response, pid) {
+        if (pid === null) {
+          socket.emit('storereply', JSON.stringify(response));
+        } else {
+          socket.to(pid).emit('storereply', JSON.stringify(response));
+        }
         console.log('Replied to store');
       });
     });
 
     socket.on('update', function(data) {
       console.log('Received Update');
-      _this.handleUpdate(JSON.parse(data), function (response, success) {
+      _this.handleUpdate(JSON.parse(data), function (response, success, pid) {
         if (success) {
-          socket.emit('updatereply', JSON.stringify(response));
-          socket.broadcast.emit('updatereply', JSON.stringify(response));
+          socket.to(pid).emit('updatereply', JSON.stringify(response));
           console.log('Replied to update');
         }
       });
@@ -82,9 +94,8 @@ function App (db) {
 
     socket.on('remove', function (data) {
       console.log('Received Remove');
-      _this.handleRemove(JSON.parse(data), function (response) {
-        socket.emit('removereply', JSON.stringify(response));
-        socket.broadcast.emit('removereply', JSON.stringify(response));
+      _this.handleRemove(JSON.parse(data), function (response, pid) {
+        socket.to(pid).emit('removereply', JSON.stringify(response));
         console.log('Replied to delete');
       });
     });
@@ -142,17 +153,18 @@ function App (db) {
       case 'ticket_new':
         //Returns the new ticket id
         db.newTicket(store['pid'], store['column_id'], function (tid) {
-            callback({type:'ticket_new', object: {tid : tid, column_id: store['column_id'], pid:store['pid']}});
+            callback({type:'ticket_new', object: {tid : tid, column_id: store['column_id'], pid:store['pid']}},
+                store["pid"]);
         });
         break;
       case 'project_new':
         db.newProject(store["project_name"], function (pid) {
-          callback({type:'project_new', object:pid});
+          callback({type:'project_new', object:pid}, null);
         });
         break;
       case 'column_new':
         db.newColumn(store["pid"], store["column_name"], store["position"], function (cid, column_name, position) {
-          callback({type:'column_new',object: {cid:cid, column_name:column_name, position:position}});
+          callback({type:'column_new',object: {cid:cid, column_name:column_name, position:position}}, store['pid']);
         });
         break;
       default:
@@ -173,9 +185,9 @@ function App (db) {
               to_col: update.to,
               from_col: update.from,
               ticket_id: update.ticket.ticket_id
-            }, success);
+            }, success, update.pid);
           } else {
-            callback({}, success);
+            callback({}, success, update.pid);
           }
         });
         break;
@@ -183,27 +195,27 @@ function App (db) {
       case 'ticket_info':
         db.updateTicketDesc(update['pid'], update['ticket'], update['new_description'], function (info) {
           callback({type:'ticket_info', ticket_id:update.ticket.ticket_id, desc:update.new_description, col:update.ticket.col} ,
-          true);
+          true, update.pid);
         });
         break;
 
       case 'column_title':
         db.updateColumnTitle(update['cid'], update['pid'], update['new_title'], function (info) {
           callback({type:'column_title', cid:update.cid, pid:update.pid, title:update.new_title},
-              true);
+              true, update.pid);
         });
         break;
 
       case 'ticket_deadline':
         db.updateTicketDeadline(update['pid'], update['ticket'], update['deadline'], function (info) {
           callback({type:'ticket_deadline', ticket_id:update.ticket.ticket_id, deadline:update.deadline, col:update.ticket.col} ,
-              true);
+              true, update.pid);
         });
         break;
       case 'column_moved' :
         db.moveColumn(update['pid'], update['cid'], update['to'], update['from'], function (info) {
           db.getKanban(request['pid'], function (kanban) {
-            callback({type:'column_moved', object:kanban});
+            callback({type:'column_moved', object:kanban}, update.pid);
           });
         });
 
@@ -219,7 +231,7 @@ function App (db) {
     switch (remove['type']) {
       case 'ticket_remove':
         db.deleteTicket(remove.pid, remove.ticket_id, function (success) {
-              callback({type: 'ticket_remove', pid: remove.pid, ticket_id: remove.ticket_id});
+              callback({type: 'ticket_remove', pid: remove.pid, ticket_id: remove.ticket_id}, remove.pid);
             }
         );
         break;
@@ -227,13 +239,13 @@ function App (db) {
         db.deleteColumn(remove.pid, remove.column_id, remove.column_position, function (success) {
           console.log("Delete column success: " + success);
           db.getKanban(remove['pid'], function (kanban) {
-            callback({type:'column_remove', object:kanban});
+            callback({type:'column_remove', object:kanban}, remove.pid);
           });
         });
         break;
       case 'project_remove':
         db.deleteProject(remove.pid, function (success) {
-              callback({type: 'project_remove', pid: remove.pid});
+              callback({type: 'project_remove', pid: remove.pid}, remove.pid);
             }
         );
         break;

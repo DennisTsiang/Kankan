@@ -139,22 +139,28 @@ function Database(pool) {
 
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_id, project_name, column_id, column_title FROM project_table NATURAL JOIN columns_' + pid +
-          ' ORDER BY column_position ASC', [], function(res) {
+      pool.query('SELECT project_id, project_name FROM project_table WHERE project_id = $1::int', [pid], function(res) {
+        if (res.rows.length === 1) {
+          pool.query('SELECT column_id, column_title FROM columns_' + pid +
+              ' WHERE project_id = $1::int ORDER BY column_position ASC', [pid], function (res2) {
+            if (res2.rows.length > 0) {
+              var columns = [];
+              res2.rows.forEach(function (row) {
+                //Get column ordering
+                var c = new column.Column(row["column_id"], row["column_title"]);
+                columns.push(c);
+              });
 
-        var columns = [];
-        var project_name = null;
-        var project_id = null;
-        res.rows.forEach(function (row) {
-          //Get column ordering
-          var c = new column.Column(row["column_id"], row["column_title"]);
-          columns.push(c);
-          project_name = row["project_name"];
-          project_id = row["project_id"];
-        });
-
-        rwlock.unlock();
-        callback(new kanban.Kanban(project_id, project_name, columns));
+              rwlock.unlock();
+              callback(new kanban.Kanban(res.rows[0].project_id, res.rows[0].project_name, columns));
+            } else {
+              rwlock.unlock();
+              callback(new kanban.Kanban(res.rows[0].project_id, res.rows[0].project_name, []));
+            }
+          });
+        } else {
+          rwlock.unlock();
+        }
       });
     });
   };

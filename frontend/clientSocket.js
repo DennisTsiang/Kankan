@@ -32,6 +32,13 @@ function setOnEvents() {
   printSocketStatus();
 }
 
+function sendKanbanRequest(pid) {
+  socket.emit('leaveroom', get_kanban_scope().pid);
+  socket.emit('joinroom', pid);
+  sendKanbanRequestHelper(pid);
+}
+
+
 function printSocketStatus(){
   if (!socket.connected) {
     console.log("Not connected");
@@ -45,7 +52,7 @@ function isSocketConnected() {
   return socket.connected;
 }
 
-function sendKanbanRequest(pid) {
+function sendKanbanRequestHelper(pid) {
   var ticketObj = {type : "kanban", pid : pid};
   socket.emit("request", JSON.stringify(ticketObj));
 }
@@ -119,8 +126,8 @@ function removeTicket(pid, ticket_id) {
   socket.emit("remove", JSON.stringify(jsonString));
 }
 
-function getUserProjects(username) {
-  var jsonString = {type:'user_projects', username : username};
+function getUserProjects(username, pid) {
+  var jsonString = {type:'user_projects', username : username, pid : pid};
   socket.emit("request", JSON.stringify(jsonString));
 }
 
