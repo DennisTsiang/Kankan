@@ -220,7 +220,13 @@ function App (db) {
             callback({type:'column_moved', object:kanban}, success, update.pid);
           });
         });
-      break;
+        break;
+      case 'column_limit' :
+        db.updateColumnLimit(update['pid'], update['cid'], update['limit'], function (success) {
+          if (success) {
+            callback({type: 'column_limit', pid: update['pid'], cid: update['cid'], limit: update['limit']});
+          }
+        });
       default:
         //TODO: Handle unknown update.
         break;

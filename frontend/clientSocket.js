@@ -74,6 +74,12 @@ function sendColumnUpdateMoved(pid, cid, to, from) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
+function sendColumnUpdateLimit(pid, cid, newlimit) {
+  var jsonString = {type: 'column_limit', pid : pid, cid: cid,
+    limit : newlimit};
+  socket.emit("update", JSON.stringify(jsonString));
+}
+
 //TODO: Will change this and update handler to support deadline when backend has support
 function sendTicketUpdateDesc(ticket, pid, desc) {
   var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
@@ -258,6 +264,11 @@ function updateHandler(reply) {
       var title = reply.title;
       get_kanban_scope().project.columns[cid].title = title;
       get_kanban_scope().$apply();
+    }
+    case "column_limit" : {
+      var cid = reply.cid;
+      var pid = reply.pid;
+      var limit = reply.limit;
     }
   }
 
