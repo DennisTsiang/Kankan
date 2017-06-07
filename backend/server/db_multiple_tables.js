@@ -176,7 +176,7 @@ function Database(pool) {
         } else {
           tid = res.rows[0].max + 1;
         }
-        pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, \'\', NULL)',
+        pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, \'New Ticket\', NULL)',
             [tid, column_id, pid],
             function (insertion) {
               rwlock.unlock();

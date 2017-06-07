@@ -91,8 +91,8 @@ function sendTicketUpdateDeadline(ticket, pid, month, year, day, hour, minute) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-function sendStoreTicket(type, pid, col_id) {
-  let jsonString = {type:type, pid : pid, column_id: col_id};
+function sendStoreTicket(pid, col_id) {
+  let jsonString = {type:'ticket_new', pid : pid, column_id: col_id};
   socket.emit("store", JSON.stringify(jsonString));
 }
 

@@ -6,7 +6,7 @@ function addBTN(event) {
   let k_scope = get_kanban_scope();
   let columns = k_scope.project.columns;
   //Get column in position 0
-  sendStoreTicket('ticket_new', k_scope.pid, k_scope.project.column_order[0]);
+  sendStoreTicket(k_scope.pid, k_scope.project.column_order[0]);
 }
 
 function enableDnDColumns() {
