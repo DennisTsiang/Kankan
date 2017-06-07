@@ -97,20 +97,20 @@ function Database(pool) {
       pool.query('SELECT column_position FROM columns_' + pid + ' WHERE column_id = $1::int', [cid], function (res) {
         if (res.rows[0].column_position !== fromPos) {
           console.error("Error moving column. FromPos: " + fromPos +
-              "But column_position: " + res.rows[0].column_position);
+              " But column_position: " + res.rows[0].column_position);
         } else {
-          pool.query('UPDATE columns_' + pid + ' SET column_position = toPos' +
-              ' WHERE column_id = $1::int', [cid], function (res2) {
+          pool.query('UPDATE columns_' + pid + ' SET column_position = $2::int' +
+              ' WHERE column_id = $1::int', [cid, toPos], function (res2) {
             if (toPos < fromPos) {
               pool.query('UPDATE columns_' + pid + ' SET column_position = column_position + 1' +
-                  'WHERE column_id != $1::int AND column_position < $2:int AND column_position > $3::int',
+                  ' WHERE column_id != $1::int AND column_position < $2::int AND column_position >= $3::int',
                   [cid, fromPos, toPos], function (res3) {
                     rwlock.unlock();
                     callback(true);
                   });
             } else {
               pool.query('UPDATE columns_' + pid + ' SET column_position = column_position - 1' +
-                  'WHERE column_id != $1::int AND column_position > $2:int AND column_position < $3::int',
+                  ' WHERE column_id != $1::int AND column_position > $2::int AND column_position <= $3::int',
                   [cid, fromPos, toPos], function (res3) {
                     rwlock.unlock();
                     callback(true);
@@ -252,7 +252,7 @@ function Database(pool) {
     });
   };
 
-  this.updateTicketDeadline = function (pid, ticket, datetime, callback) {
+   this.updateTicketDeadline = function (pid, ticket, datetime, callback) {
     rwlock.writeLock(function () {
       pool.query('SELECT ticket_id FROM tickets_' + pid + ' WHERE  ticket_id = $1::int',
           [ticket.ticket_id], function (res) {
