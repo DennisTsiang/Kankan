@@ -12,36 +12,35 @@
           <p editable-textarea="desc" onaftersave="saveEditDesc(desc)">{{desc || 'empty'}}</p>
 
 
-          <h2> Submit a new deadline for this task</h2>
+          <h3> Submit a new deadline for this task</h3>
           <div class="row">
             <div class="col-xs-1"></div>
 
             <div class="col-xs-2">
               <p>Day</p>
-              <select ng-model="selectedDay" ng-options="day for day in days">
+              <select ng-model="selectedDay" ng-options="day for day in days" ng-change="saveEditDeadline()">
               </select>
             </div>
 
             <div class="col-xs-2">
 
               <p>Month</p>
-              <select ng-model="selectedMonth" ng-options="month for month in months">
+              <select ng-model="selectedMonth" ng-options="month for month in months" ng-change="saveEditDeadline()">
               </select>
             </div>
 
             <div class="col-xs-2">
-              <p>Year
-              <p>
-                <select ng-model="selectedYear" ng-options="year for year in years">
+              <p>Year</p>
+                <select ng-model="selectedYear" ng-options="year for year in years" ng-change="saveEditDeadline()">
                 </select>
             </div>
 
             <div class="col-xs-4">
-              <p> Time in the day</p>
+              <p>Time of day</p>
 
-              <select ng-model="selectedHour" ng-options="hour for hour in hours">
+              <select ng-model="selectedHour" ng-options="hour for hour in hours" ng-change="saveEditDeadline()">
               </select>
-              <select ng-model="selectedMinute" ng-options="minute for minute in minutes">
+              <select ng-model="selectedMinute" ng-options="minute for minute in minutes" ng-change="saveEditDeadline()">
               </select>
 
             </div>
@@ -49,6 +48,7 @@
             <div class="col-xs-1"></div>
 
           </div>
+          <!--
           <div class="row">
 
             <button type="button" ng-click="saveEditDeadline()" class="btn btn-primary">Save Deadline</button>
@@ -57,18 +57,23 @@
 
             <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
 
+          -->
 
-            <div ng-controller="deleteTicketCtrl">
-              <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-sm btn-warning">
-                Remove ticket
-              </button>
-            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default" ng-click="$ctrl.close()">Close</button>
+    <div ng-controller="deleteTicketCtrl" class="modal-footer center-align-text" style="">
+      <div class="container-fluid">
+        <div class="col-xs-6" style="text-align: left">
+          <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-sm btn-warning">
+            Remove ticket
+          </button>
+        </div>
+        <div class="col-xs-6" style="text-align: right">
+          <button type="button" class="btn btn-default" style="" ng-click="$ctrl.close()">Close</button>
+        </div>
+      </div>
     </div>
   </script>
 
