@@ -279,7 +279,12 @@ function storeHandler(reply) {
   switch (type) {
     case "ticket_new" : {
       let ticket_info = reply.object;
-      addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
+      if (ticket_info.tid !== "Maxticketlimitreached") {
+        addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
+      } else {
+        //TODO: something else
+        console.log("Max ticket limit reached for this column");
+      }
       break;
     }
 

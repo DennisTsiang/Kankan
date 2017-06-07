@@ -156,6 +156,9 @@ function App (db) {
           if (tid !== -1) {
             callback({type: 'ticket_new', object: {tid: tid, column_id: store['column_id'], pid: store['pid']}},
                 store["pid"]);
+          } else {
+            callback({type: 'ticket_new', object: {tid: "Maxticketlimitreached", column_id: store['column_id'], pid: store['pid']}},
+                store["pid"]);
           }
         });
         break;
@@ -223,9 +226,8 @@ function App (db) {
         break;
       case 'column_limit' :
         db.updateColumnLimit(update['pid'], update['cid'], update['limit'], function (success) {
-          if (success) {
-            callback({type: 'column_limit', pid: update['pid'], cid: update['cid'], limit: update['limit']});
-          }
+            callback({type: 'column_limit', pid: update['pid'], cid: update['cid'], limit: update['limit']},
+                success, update.pid);
         });
       default:
         //TODO: Handle unknown update.
