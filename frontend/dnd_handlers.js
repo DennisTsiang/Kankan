@@ -64,13 +64,3 @@ function handleColumnDrop(event) {
   let columns = get_kanban_scope().project.columns;
   sendColumnUpdateMoved(get_kanban_scope().pid, start_column_id, columns[end_column_id].position, columns[start_column_id].position);
 }
-
-function swapColumns(col1, col2) {
-  let columns = get_kanban_scope().project.columns;
-  let tempPos = columns[col1].position;
-  columns[col1].position = columns[col2].position;
-  columns[col2].position = tempPos;
-  console.log("swapped");
-  get_kanban_scope().$apply();
-  sendColumnUpdateMoved(get_kanban_scope().pid, start_column_id, columns[col2].position, tempPos);
-}
