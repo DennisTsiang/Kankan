@@ -300,6 +300,10 @@ function storeHandler(reply) {
     case "project_new": {
       var pid = reply.object;
       addUserToProject(get_kanban_scope().username, pid);
+      break;
+    }
+    case "user_new" : {
+      var success = reply.success;
     }
   }
 }
