@@ -13,6 +13,10 @@ app.config(function ($routeProvider) {
   .when('/kanban', {
     templateUrl: 'kanban.html',
   })
+  .when('/home', {
+    templateUrl: 'home.html',
+    controller: 'HomeController'
+  })
   .otherwise({
     redirectTo: '/login'
   });
@@ -26,17 +30,44 @@ app.controller('ApplicationCtrl', function($scope) {
   initiateConnection();
 });
 
+app.controller('HomeController', function($scope, $location) {
+  if (get_kanban_scope().username === undefined) {
+    $location.path('/login');
+  } else {
+    $scope.username = get_kanban_scope().username;
+
+    getUserProjects($scope.username);
+    $scope.a_k = get_kanban_scope();
+
+    $scope.chooseProject = function (proj_id) {
+      get_kanban_scope().pid = proj_id;
+      $location.path('/kanban');
+    };
+  }
+});
+
+app.controller('PopoverDemoCtrl', function ($scope, $sce) {
+  $scope.dynamicPopover = {
+    templateUrl: 'myPopoverTemplate.html',
+    title: 'Enter Here'
+  };
+  $scope.newProject = function (project_name) {
+    sendStoreProject(project_name);
+  }
+});
+
 app.controller('LoginController', function ($scope, $location) {
   $scope.a_k = get_kanban_scope();
 
-  $scope.getProjects = function(name) {
-    getUserProjects(name);
+  $scope.login = function(name) {
+    get_kanban_scope().username = name;
+    $location.path('/home');
   };
 
-  $scope.chooseProject = function (proj_id) {
-    get_kanban_scope().pid = proj_id;
-    $location.path('/kanban')
-  };
+  $scope.newUser = function (username) {
+    addUserToProject(username, 0);
+    $location.path('/home');
+  }
 });
 
 app.controller('KanbanCtrl', function($scope, $location) {
@@ -131,7 +162,7 @@ app.controller('editTicketCtrl', function($scope) {
     $scope.selectedMinute = $scope.deadline.getMinutes().toString();
 
 
-  }
+  };
 
 
   function getTicket(id) {

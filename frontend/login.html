@@ -6,22 +6,11 @@
         <label class="username-title" for="usr">Enter username</label>
         <input type="text" class="form-control username" placeholder="Username" id="usr" ng-model="username">
         <br />
-        <button type=submit class="btn btn-default" ng-click="getProjects(username)">Get projects</button>
+        <button type=submit class="btn btn-default" ng-click="login(username)">Login</button>
+        <button type=submit class="btn btn-default" ng-click="newUser(username)">Sign Up</button>
       </form>
     </div>
     <div class="col-xs-3"></div>
-  </div
-
-  <div class="row">
-    <div class="col-xs-4"></div>
-    <div class="col-xs-4">
-      <ul class="list-group">
-        <a class="list-group-item username" ng-repeat="proj in a_k.projects" ng-click="chooseProject(proj.project_id)">
-          {{proj.title}}
-        </a>
-      </ul>
-    </div>
-    <div class="col-xs-4"></div>
   </div>
   <p class="center-align-text">Dev note: Only user "harry" currently exists. <b>Login using username "harry".</b></p>
 </div>

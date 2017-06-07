@@ -97,13 +97,8 @@ function sendTicketUpdateDeadline(ticket, pid, month, year, day, hour, minute) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-function sendStoreTicket(type, pid, col_id) {
-  let jsonString = {type:type, pid : pid, column_id: col_id};
-  socket.emit("store", JSON.stringify(jsonString));
-}
-
-function sendNewTicket(pid, col_id) {
-  var jsonString = {type:'ticket_new', pid : pid, column_id: col_id};
+function sendStoreTicket(pid, col_id) {
+  let jsonString = {type:'ticket_new', pid : pid, column_id: col_id};
   socket.emit("store", JSON.stringify(jsonString));
 }
 
@@ -138,7 +133,7 @@ function getUserProjects(username, pid) {
 }
 
 function addUserToProject(username, pid) {
-  var jsonString = {type:'user_projects', username : username, pid : pid};
+  var jsonString = {type:'new_user_project', username : username, pid : pid};
   socket.emit("request", JSON.stringify(jsonString));
 }
 
@@ -177,10 +172,11 @@ function requestHandler(reply) {
       let projects = reply.object;
       //Generates/updates projects and other_projects variables.
       generate_user_kanbans(projects);
+
       break;
     }
     case "new_user_project": {
-
+      getUserProjects(get_kanban_scope().username);
       break;
     }
     case "user_tickets": {
@@ -294,5 +290,9 @@ function storeHandler(reply) {
       break;
     }
 
+    case "project_new": {
+      var pid = reply.object;
+      addUserToProject(get_kanban_scope().username, pid);
+    }
   }
 }
