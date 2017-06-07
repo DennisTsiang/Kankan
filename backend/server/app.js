@@ -76,7 +76,7 @@ function App (db) {
         if (pid === null) {
           socket.emit('storereply', JSON.stringify(response));
         } else {
-          socket.broadcast.to(pid).emit('storereply', JSON.stringify(response));
+          io.sockets.in(pid).emit('storereply', JSON.stringify(response));
         }
         console.log('Replied to store');
       });
@@ -86,7 +86,7 @@ function App (db) {
       console.log('Received Update');
       _this.handleUpdate(JSON.parse(data), function (response, success, pid) {
         if (success) {
-          socket.broadcast.to(pid).emit('updatereply', JSON.stringify(response));
+          io.sockets.in(pid).emit('updatereply', JSON.stringify(response));
           console.log('Replied to update');
         }
       });
@@ -95,7 +95,7 @@ function App (db) {
     socket.on('remove', function (data) {
       console.log('Received Remove');
       _this.handleRemove(JSON.parse(data), function (response, pid) {
-        socket.broadcast.to(pid).emit('removereply', JSON.stringify(response));
+        io.sockets.in(pid).emit('removereply', JSON.stringify(response));
         console.log('Replied to delete');
       });
     });

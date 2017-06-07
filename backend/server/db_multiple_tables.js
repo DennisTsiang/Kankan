@@ -96,6 +96,7 @@ function Database(pool) {
     rwlock.writeLock(function () {
       pool.query('SELECT column_position FROM columns_' + pid + ' WHERE column_id = $1::int', [cid], function (res) {
         if (res.rows[0].column_position !== fromPos) {
+          rwlock.unlock();
           console.error("Error moving column. FromPos: " + fromPos +
               " But column_position: " + res.rows[0].column_position);
         } else {
@@ -142,12 +143,12 @@ function Database(pool) {
       pool.query('SELECT project_id, project_name FROM project_table WHERE project_id = $1::int', [pid], function(res) {
         if (res.rows.length === 1) {
           pool.query('SELECT column_id, column_title, column_position FROM columns_' + pid +
-              ' WHERE project_id = $1::int ORDER BY column_position ASC', [pid], function (res2) {
+              ' WHERE project_id = $1::int', [pid], function (res2) {
             if (res2.rows.length > 0) {
               var columns = [];
               res2.rows.forEach(function (row) {
                 //Get column ordering
-                var c = new column.Column(row["column_id"], row["column_title"], row["position"]);
+                var c = new column.Column(row["column_id"], row["column_title"], row["column_position"]);
                 columns.push(c);
               });
 
