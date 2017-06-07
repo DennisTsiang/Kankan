@@ -99,6 +99,7 @@ function Database(pool) {
           rwlock.unlock();
           console.error("Error moving column. FromPos: " + fromPos +
               " But column_position: " + res.rows[0].column_position);
+          callback(false);
         } else {
           pool.query('UPDATE columns_' + pid + ' SET column_position = $2::int' +
               ' WHERE column_id = $1::int', [cid, toPos], function (res2) {
