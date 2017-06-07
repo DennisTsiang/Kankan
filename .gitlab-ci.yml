@@ -51,4 +51,3 @@ deploy_server:
   only:
     - master
   environment: staging
-
