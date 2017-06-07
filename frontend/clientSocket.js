@@ -283,7 +283,7 @@ function storeHandler(reply) {
         addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
       } else {
         //TODO: something else
-        console.log("Max ticket limit reached for this column");
+        console.log("Max ticket limit reached for this column ");
       }
       break;
     }
