@@ -127,46 +127,34 @@
 
 
     <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-xs-11">
-            <ul class="nav navbar-nav vertical-align">
-              <!-- Add buttons -->
-              <li><button class="btn btn-primary btn-lg" onclick="addBTN()">Add ticket</button></li>
+      <ul class="nav navbar-nav navbar-left vertical-align">
+        <!-- Add buttons -->
+        <li><button class="btn btn-primary btn-lg" style="margin-left: 15px" onclick="addBTN()">Add ticket</button></li>
 
-              <!-- Button for user to return to home page - select other project from there. -->
-              <li>
-                <div class="btn-group btn-lg" uib-dropdown=>
-                  <button type="button" class="btn btn-link btn-md">Home</button>
-                  <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
-                    <li role="menuitem">
-                      <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
-                    </li>
-
-                    <!-- Go to other projects -->
-                    <li class="divider" ng-repeat-start="proj in other_projects"></li>
-                    <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
-                  </ul>
-                </div>
+        <!-- Button for user to return to home page - select other project from there. -->
+        <li>
+          <div class="btn-group btn-lg" uib-dropdown=>
+            <button type="button" class="btn btn-link btn-md">Home</button>
+            <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+              <li role="menuitem">
+                <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
               </li>
-              <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
+
+              <!-- Go to other projects -->
+              <li class="divider" ng-repeat-start="proj in other_projects"></li>
+              <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
             </ul>
           </div>
-          <div class="col-xs-1">
-            <ul class="nav navbar-nav">
-              <li>
-                <a id="project_title" class="project-title">
-                  <!-- Project title -->
-                  {{project.title}}
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+        </li>
+        <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
+      </ul>
+      <a class="navbar-brand navbar-right project-title" id="project_title">
+            <!-- Project title -->
+            {{project.title}}
+      </a>
     </nav>
 
     <div class="offset-navbar-height container-fluid">
