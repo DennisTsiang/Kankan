@@ -219,6 +219,26 @@ app.controller('editTicketCtrl', function($scope) {
     title: 'Title'
   };
 
+  $scope.getProjectMembers = function() {
+    //TODO: Get project members
+    //return get_kanban_scope().project_members;
+    return getTicket(getTid()).members;
+  };
+
+  $scope.isMemberAddedToTicket = function (member) {
+    return getTicket(getTid()).members.includes(member);
+  };
+
+  $scope.toggleMemberToTicket = function (member) {
+    if ($scope.isMemberAddedToTicket(member)) {
+      //remove member
+      //TODO: Remove member from ticket
+    } else {
+      //add member
+      addUserToTicket(member, get_kanban_scope().pid, getTid());
+    }
+  };
+
   $scope.addUser = function (username) {
     console.log(username);
     addUserToTicket(username, get_kanban_scope().pid, $scope.tid);
