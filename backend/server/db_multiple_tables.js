@@ -301,7 +301,7 @@ function Database(pool) {
 
   this.getUsersProjects = function (username, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_id, project_name FROM users NATURAL JOIN project_table ' +
+      pool.query('SELECT project_id, project_name FROM user_projects NATURAL JOIN project_table ' +
           'WHERE username = $1::text', [username], function (res) {
         if (res.rows.length > 0) {
           var array = [];
@@ -320,10 +320,10 @@ function Database(pool) {
 
   this.addUserToProject = function (username, pid, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT username FROM users WHERE username = $1::text AND project_id = $2::int',
+      pool.query('SELECT username FROM user_projects WHERE username = $1::text AND project_id = $2::int',
           [username, pid], function (checkRes) {
         if (checkRes.rows.length === 0 ) {
-          pool.query('INSERT INTO users VALUES($1::text, $2::int)', [username, pid], function (res) {
+          pool.query('INSERT INTO user_projects VALUES($1::text, $2::int)', [username, pid], function (res) {
             rwlock.unlock();
             callback(true);
           });
@@ -366,7 +366,7 @@ function Database(pool) {
           callback(array);
         } else {
           rwlock.unlock();
-          console.error("User does not exist in db");
+          console.error("User does not have any tickets assigned to it with pid: " + pid);
         }
       });
     });

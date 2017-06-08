@@ -65,7 +65,7 @@ CREATE TABLE users (
 CREATE TABLE user_projects (
   username varchar(20),
   project_id integer,
-  PRIMARY KEY (username, project_idj)
+  PRIMARY KEY (username, project_id)
 );
 
 --------------------------------------------------------------------------------------------------
