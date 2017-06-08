@@ -307,7 +307,7 @@ app.controller('editTicketCtrl', function($scope) {
 
   $scope.format = 'yyyy-MMMM-dd';
   $scope.today();
-  $scope.dt = new Date();
+  $scope.dt = $scope.ticket.deadline;
   $scope.hstep = 1;
   $scope.mstep = 1;
   $scope.options = {
