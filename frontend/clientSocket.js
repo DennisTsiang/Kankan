@@ -74,6 +74,12 @@ function sendColumnUpdateMoved(pid, cid, to, from) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
+function sendColumnUpdateLimit(pid, cid, newlimit) {
+  var jsonString = {type: 'column_limit', pid : pid, cid: cid,
+    limit : newlimit};
+  socket.emit("update", JSON.stringify(jsonString));
+}
+
 //TODO: Will change this and update handler to support deadline when backend has support
 function sendTicketUpdateDesc(ticket, pid, desc) {
   var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
@@ -103,6 +109,11 @@ function sendStoreProject(project_name) {
 
 function sendStoreColumn(pid, column_name, position) {
   var jsonString = {type:'column_new', pid:pid, column_name:column_name, position:position};
+  socket.emit("store", JSON.stringify(jsonString));
+}
+
+function storeNewUser(username) {
+  var jsonString = {type: 'user_new', username:username};
   socket.emit("store", JSON.stringify(jsonString));
 }
 
@@ -145,6 +156,8 @@ function getUserTickets(username, pid) {
   var jsonString = {type:'user_tickets', pid : pid, username : username};
   socket.emit("request", JSON.stringify(jsonString));
 }
+
+
 
 
 function requestHandler(reply) {
@@ -258,6 +271,11 @@ function updateHandler(reply) {
       get_kanban_scope().project.columns[cid].title = title;
       get_kanban_scope().$apply();
     }
+    case "column_limit" : {
+      var cid = reply.cid;
+      var pid = reply.pid;
+      var limit = reply.limit;
+    }
   }
 
 }
@@ -267,7 +285,12 @@ function storeHandler(reply) {
   switch (type) {
     case "ticket_new" : {
       let ticket_info = reply.object;
-      addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
+      if (ticket_info.tid !== "Maxticketlimitreached") {
+        addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
+      } else {
+        //TODO: something else
+        console.log("Max ticket limit reached for this column ");
+      }
       break;
     }
 
@@ -280,6 +303,10 @@ function storeHandler(reply) {
     case "project_new": {
       var pid = reply.object;
       addUserToProject(get_kanban_scope().username, pid);
+      break;
+    }
+    case "user_new" : {
+      var success = reply.success;
     }
   }
 }

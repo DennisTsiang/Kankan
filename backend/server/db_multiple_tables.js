@@ -24,6 +24,7 @@ function Database(pool) {
               'column_id integer, ' +
               'column_title varchar(255) not null, ' +
               'column_position integer not null, ' +
+              'column_limit integer, ' +
               'PRIMARY KEY (project_id, column_id) )',
               [], function (create) {
                 pool.query('CREATE TABLE tickets_' + pid + ' (' +
@@ -69,9 +70,11 @@ function Database(pool) {
       pool.query('DROP TABLE columns_' + pid, [], function (err, res) {
         pool.query('DELETE FROM project_table WHERE project_id = $1::int', [pid], function (err, res2) {
           pool.query('DROP TABLE tickets_' + pid, [], function (err, res3) {
-            console.log('Deleted project ' + pid);
-            rwlock.unlock();
-            callback(true);
+            pool.query('DELETE FROM user_projects WHERE project_id = $1::int', [pid], function(res4) {
+              console.log('Deleted project ' + pid);
+              rwlock.unlock();
+              callback(true);
+            });
           });
         });
       });
@@ -167,21 +170,40 @@ function Database(pool) {
     });
   };
 
+  function newTicketHelper(pid, column_id, callback) {
+    pool.query('SELECT Max(ticket_id) FROM tickets_' + pid, [], function (res) {
+      var tid;
+      if (res.rows[0].max === null) {
+        tid = 0;
+      } else {
+        tid = res.rows[0].max + 1;
+      }
+      pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, \'New Ticket\', NULL)',
+          [tid, column_id, pid],
+          function (insertion) {
+            rwlock.unlock();
+            callback(tid);
+          });
+    });
+  };
+
   this.newTicket = function (pid, column_id, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT Max(ticket_id) FROM tickets_' + pid, [], function (res) {
-        var tid;
-        if (res.rows[0].max === null) {
-          tid = 0;
-        } else {
-          tid = res.rows[0].max + 1;
-        }
-        pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, \'New Ticket\', NULL)',
-            [tid, column_id, pid],
-            function (insertion) {
+      pool.query('SELECT column_limit FROM columns_' + pid + ' WHERE column_id = $1::int', [column_id], function (res1) {
+        if (res1.rows[0].column_limit !== null) {
+          var column_limit = res1.rows[0].column_limit;
+          pool.query('SELECT COUNT(ticket_id) as numberOfTickets FROM tickets_' + pid, [], function (res2) {
+            if (res2.rows[0].numberoftickets >= column_limit) {
               rwlock.unlock();
-              callback(tid);
-            });
+              console.log("Reached maximum ticket limit for column_id: " + column_id);
+              callback(-1); //-1 denotes invalid tid
+            } else {
+              newTicketHelper(pid, column_id, callback);
+            }
+          });
+        } else {
+          newTicketHelper(pid, column_id, callback);
+        }
       });
     });
   };
@@ -281,7 +303,7 @@ function Database(pool) {
 
   this.getUsersProjects = function (username, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_id, project_name FROM users NATURAL JOIN project_table ' +
+      pool.query('SELECT project_id, project_name FROM user_projects NATURAL JOIN project_table ' +
           'WHERE username = $1::text', [username], function (res) {
         if (res.rows.length > 0) {
           var array = [];
@@ -300,10 +322,10 @@ function Database(pool) {
 
   this.addUserToProject = function (username, pid, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT username FROM users WHERE username = $1::text AND project_id = $2::int',
+      pool.query('SELECT username FROM user_projects WHERE username = $1::text AND project_id = $2::int',
           [username, pid], function (checkRes) {
         if (checkRes.rows.length === 0 ) {
-          pool.query('INSERT INTO users VALUES($1::text, $2::int)', [username, pid], function (res) {
+          pool.query('INSERT INTO user_projects VALUES($1::text, $2::int)', [username, pid], function (res) {
             rwlock.unlock();
             callback(true);
           });
@@ -346,7 +368,7 @@ function Database(pool) {
           callback(array);
         } else {
           rwlock.unlock();
-          console.error("User does not exist in db");
+          console.error("User does not have any tickets assigned to it with pid: " + pid);
         }
       });
     });
@@ -370,6 +392,22 @@ function Database(pool) {
       });
     });
   };
+
+  this.addNewUser = function (username, callback) {
+    rwlock.writeLock();
+    pool.query('SELECT username FROM users WHERE username = $1::text', [username], function (res) {
+      if (res.rows[0].length > 0) {
+        console.log("Username already taken.");
+        rwlock.unlock();
+        callback(false);
+      } else {
+        pool.query('INSERT INTO users VALUES($1::text)', [username], function (res2) {
+          rwlock.unlock();
+          callback(true);
+        });
+      }
+    });
+  }
 }
 
 module.exports.Database = Database;
