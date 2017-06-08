@@ -114,7 +114,7 @@ function sendStoreColumn(pid, column_name, position) {
 
 function storeNewUser(username) {
   var jsonString = {type: 'user_new', username:username};
-  socket.emit("store", JSON.stringify(jsonString));
+  socket.emit("request", JSON.stringify(jsonString));
 }
 
 function removeProject(pid) {
@@ -198,6 +198,9 @@ function requestHandler(reply) {
     case "add_user_to_ticket": {
 
       break;
+    }
+    case "user_new" : {
+      var success = reply.success;
     }
   }
 }
@@ -302,8 +305,6 @@ function storeHandler(reply) {
       addUserToProject(get_kanban_scope().username, pid);
       break;
     }
-    case "user_new" : {
-      var success = reply.success;
-    }
+
   }
 }
