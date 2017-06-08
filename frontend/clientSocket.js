@@ -156,9 +156,6 @@ function getUserTickets(username, pid) {
   socket.emit("request", JSON.stringify(jsonString));
 }
 
-
-
-
 function requestHandler(reply) {
   var type = reply.type;
   var request_data = reply.object;
@@ -169,16 +166,15 @@ function requestHandler(reply) {
     }
     case "kanban" : {
       generate_kanban(request_data);
-
       //Send for tickets, once received kanban.
       sendTicketsRequest(get_kanban_scope().pid);
+      generate_other_user_kanbans();
       break;
     }
     case "user_projects" : {
       let projects = reply.object;
       //Generates/updates projects and other_projects variables.
       generate_user_kanbans(projects);
-
       break;
     }
     case "new_user_project": {
@@ -192,7 +188,6 @@ function requestHandler(reply) {
     case "ticket_users": {
       let users = reply.object.users;
       let tid = reply.object.tid;
-      console.log(reply);
       get_kanban_scope().project.tickets[tid].members = users;
       get_kanban_scope().$apply();
       break;

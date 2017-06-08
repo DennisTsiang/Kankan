@@ -132,7 +132,9 @@ function App (db) {
         break;
       case 'add_user_to_ticket':
         db.addUserToTicket(request["username"], request["tid"], request["pid"], function(success) {
-          callback({type:'add_user_to_project'});
+          db.getTicketUsers(request['pid'], request['tid'], function(tid, users) {
+            callback({type:'ticket_users', object:{tid: tid, users: users}});
+          })
         });
         break;
       case 'user_tickets':
@@ -142,7 +144,7 @@ function App (db) {
         break;
       case 'ticket_users':
         db.getTicketUsers(request["pid"], request["tid"], function (tid, users) {
-          callback({type:'user_tickets', object:{tid: tid, users: users}});
+          callback({type:'ticket_users', object:{tid: tid, users: users}});
         });
         break;
       case 'user_new' :
