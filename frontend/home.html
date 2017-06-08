@@ -16,8 +16,8 @@
                                     <span class="sr-only">Toggle Dropdown</span>
                                 </button>
                                 <ul class="dropdown-menu pull-right">
-                                    <li><a href="#">Add Users</a></li>
-                                    <li><a href="#">Delete Project</a></li>
+                                    <li><a>Add Users</a></li>
+                                    <li><a ng-click="deleteProject(proj.project_id)">Delete Project</a></li>
                                 </ul>
                             </div>
                             <br />
@@ -39,6 +39,7 @@
     <div class="form-group">
         <label>Enter Your New Project Title:</label>
         <input type="text" placeholder = "Enter here" ng-model="dynamicPopover.content" class="form-control username">
+        <br />
         <button type="submit" class="btn btn-primary" ng-click="newProject(dynamicPopover.content)">Create</button>
     </div>
 </script>

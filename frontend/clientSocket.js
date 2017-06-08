@@ -211,8 +211,14 @@ function removeHandler(reply) {
   let type = reply.type;
   switch (type) {
     case "project_remove" : {
-      //TODO: Implement project deletion
       //Kick out of kanban view, take back to home page?
+      console.log("Deleting project_" + reply.pid);
+      console.log(get_kanban_scope().projects);
+      var pid = reply.pid;
+      delete get_kanban_scope().projects[pid];
+      console.log("Deleted project_" + reply.pid);
+      console.log(get_kanban_scope().projects);
+      get_kanban_scope().$apply();
       break;
     }
     case "column_remove" : {
