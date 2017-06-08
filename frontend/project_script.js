@@ -24,7 +24,7 @@ function addTicket(col_id, ticket_id, desc, deadline) {
   let ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
-  ticket.setDeadlineFlat(deadline);
+  ticket.setDeadline(deadline);
 
   let s = get_kanban_scope();
   s.project.tickets[ticket_id] = ticket;
@@ -110,6 +110,7 @@ function generate_user_kanbans(projects) {
   get_kanban_scope().$apply();
 }
 
+/*
 function generateArray(start, end) {
   let returnArray = [];
 
@@ -118,6 +119,7 @@ function generateArray(start, end) {
   }
   return returnArray;
 }
+*/
 
 function updateProgressTickets() {
   setInterval(updateProgressBars, 10000);
@@ -126,7 +128,6 @@ function updateProgressTickets() {
 
 
 function updateProgressBars() {
-  //alert("hi");
   let s = get_kanban_scope();
   for (let ticket in s.project.tickets) {
     let tick = s.project.tickets[ticket];
