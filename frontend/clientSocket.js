@@ -227,7 +227,12 @@ function requestHandler(reply) {
       break;
     }
     case "user_check" : {
-      var taken = reply.result;
+      if (reply.result) {
+        get_kanban_scope().l.path('/home');
+        get_kanban_scope().$apply();
+      } else {
+        get_kanban_scope().l.path('/login');
+      }
       break;
     }
     case "project_users" : {

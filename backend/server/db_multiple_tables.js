@@ -338,7 +338,7 @@ function Database(pool) {
           callback(array);
         } else {
           rwlock.unlock();
-          console.error("User does not exist in db");
+          callback([]);
         }
       });
     });

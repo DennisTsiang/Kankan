@@ -49,6 +49,11 @@ app.controller('HomeController', function($scope, $location) {
     $scope.deleteProject = function(proj_id) {
       removeProject(proj_id)
     }
+
+    $scope.logOut = function() {
+      $location.path('/login')
+      //$scope.a_k = get_kanban_scope();
+    }
   }
 });
 
@@ -70,12 +75,12 @@ app.controller('LoginController', function($scope, $location) {
 
   $scope.login = function(name) {
     get_kanban_scope().username = name;
-    $location.path('/home');
+    sendUsernameCheck(name);
   };
 
   $scope.newUser = function(username) {
-    storeNewUser(username);
     get_kanban_scope().username = username;
+    storeNewUser(username);
     //$location.path('/home');
   }
 });
