@@ -194,6 +194,7 @@ function requestHandler(reply) {
       //Send for tickets, once received kanban.
       sendTicketsRequest(get_kanban_scope().pid);
       generate_other_user_kanbans();
+      getProjectUsers(get_kanban_scope().pid);
       break;
     }
     case "user_projects" : {
@@ -236,7 +237,10 @@ function requestHandler(reply) {
       break;
     }
     case "project_users" : {
-      var users = reply.object;
+      let users = reply.object;
+      console.log(reply);
+      get_kanban_scope().project.members = users;
+      get_kanban_scope().$apply();
       break;
     }
   }
