@@ -84,11 +84,13 @@
                   </div>
                 </div>
               </div>
+              <!--
               <div class="list-group">
                 <a class="list-group-item username" ng-repeat="user in ticket.members">
                     {{user}}
                 </a>
               </div>
+              -->
           </div>
           </div>
         </div>
@@ -133,12 +135,19 @@
 
   <!-- Add user popup -->
   <script type="text/ng-template" id="addUser.html">
+    <div class="list-group" style="max-height: 300px; overflow-y: scroll">
+      <a ng-repeat="member in getProjectMembers()" ng-click="toggleMemberToTicket(member)"
+         ng-class="{'list-group-item':true, 'active':isMemberAddedToTicket(member)}">{{member}}</a>
+    </div>
+
+    <!--
     <form class="form-group center-align-text">
       <label for="usr">User</label>
       <input type="text" class="form-control username" placeholder="Username" id="usr" ng-model="username">
       <br />
       <button type=submit class="btn btn-default" ng-click="addUser(username)">Add</button>
     </form>
+    -->
   </script>
 
   <!-- Code navigator popup -->

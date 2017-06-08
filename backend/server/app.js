@@ -75,6 +75,9 @@ function App (db) {
       _this.handleStore(JSON.parse(data), function (response, pid) {
         if (pid === null) {
           socket.emit('storereply', JSON.stringify(response));
+        } else if (pid === 'all') {
+          socket.emit('storereply', JSON.stringify(response));
+          socket.broadcast.emit('storereply', JSON.stringify(response));
         } else {
           io.sockets.in(pid).emit('storereply', JSON.stringify(response));
         }
@@ -125,11 +128,6 @@ function App (db) {
           callback({type:'user_projects', object:projects});
         });
         break;
-      case 'new_user_project':
-        db.addUserToProject(request["username"], request["pid"], function(success) {
-          callback({type:'new_user_project'});
-        });
-        break;
       case 'add_user_to_ticket':
         db.addUserToTicket(request["username"], request["tid"], request["pid"], function(success) {
           db.getTicketUsers(request['pid'], request['tid'], function(tid, users) {
@@ -149,7 +147,17 @@ function App (db) {
         break;
       case 'user_new' :
         db.addNewUser(request['username'], function (success) {
-          callback( {type: 'user_new', success:success})
+          callback( {type: 'user_new', success:success});
+        });
+        break;
+      case 'user_check' :
+        db.checkUserExists(request['username'], function(result){
+          callback({type : 'user_check', result : result});
+        });
+        break;
+      case 'project_users' :
+        db.getProjectUsers(request['pid'], function (users) {
+          callback({type: 'project_users', object:users});
         });
         break;
       default:
@@ -184,7 +192,11 @@ function App (db) {
           callback({type:'column_new',object: {cid:cid, column_name:column_name, position:position}}, store['pid']);
         });
         break;
-
+      case 'new_user_project':
+        db.addUserToProject(store["username"], store["pid"], function(success) {
+          callback({type:'new_user_project'}, 'all');
+        });
+        break;
       default:
         //TODO: Handle unknown store.
         break;
@@ -269,6 +281,27 @@ function App (db) {
       case 'project_remove':
         db.deleteProject(remove.pid, function (success) {
           callback({type:'project_remove', pid:remove.pid}, null);
+        });
+        break;
+      case 'user_remove' :
+        db.removeUser(remove.pid, remove.username, function(success) {
+          db.getKanban(remove['pid'], function (kanban) {
+            callback({type:'user_remove', object:kanban}, remove.pid);
+          });
+        });
+        break;
+      case "userOfProject_remove" :
+        db.removeUserFromProject(remove.username, remove.pid, function (success) {
+          db.getKanban(remove['pid'], function (kanban) {
+            callback({type: 'userOfProject_remove', object: kanban}, remove.pid);
+          });
+        });
+        break;
+      case "userOfTicket_remove" :
+        db.removeUserFromTicket(remove.username, remove.pid, remove.tid, function(success) {
+          db.getKanban(remove['pid'], function (kanban) {
+            callback({type:'userOfTicket_remove', object:kanban}, remove.pid);
+          });
         });
         break;
       default:

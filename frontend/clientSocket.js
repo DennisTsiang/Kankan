@@ -131,6 +131,21 @@ function removeTicket(pid, ticket_id) {
   socket.emit("remove", JSON.stringify(jsonString));
 }
 
+function removeUser(pid, username) {
+  var jsonString = {type : 'user_remove', pid:pid, username:username};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
+function removeUserFromProject(pid, username) {
+  var jsonString = {type : 'userOfProject_remove', pid:pid, username:username};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
+function removeUserFromTicket(pid, username, tid) {
+  var jsonString = {type : 'userOfTicket_remove', pid:pid, username:username, tid:tid};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
 function getUserProjects(username, pid) {
   var jsonString = {type:'user_projects', username : username, pid : pid};
   socket.emit("request", JSON.stringify(jsonString));
@@ -138,7 +153,7 @@ function getUserProjects(username, pid) {
 
 function addUserToProject(username, pid) {
   var jsonString = {type:'new_user_project', username : username, pid : pid};
-  socket.emit("request", JSON.stringify(jsonString));
+  socket.emit("store", JSON.stringify(jsonString));
 }
 
 function addUserToTicket(username, pid, tid) {
@@ -153,6 +168,16 @@ function getTicketUsers(pid, tid) {
 
 function getUserTickets(username, pid) {
   var jsonString = {type:'user_tickets', pid : pid, username : username};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+function sendUsernameCheck(username) {
+  var jsonString = {type: 'user_check', username : username};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+function getProjectUsers(pid) {
+  var jsonString = {type : 'project_users', pid:pid};
   socket.emit("request", JSON.stringify(jsonString));
 }
 
@@ -177,10 +202,6 @@ function requestHandler(reply) {
       generate_user_kanbans(projects);
       break;
     }
-    case "new_user_project": {
-      getUserProjects(get_kanban_scope().username);
-      break;
-    }
     case "user_tickets": {
       var tickets = reply.object;
       break;
@@ -197,7 +218,21 @@ function requestHandler(reply) {
       break;
     }
     case "user_new" : {
-
+      if (reply.success) {
+        get_kanban_scope().l.path('/home');
+        get_kanban_scope().$apply();
+      } else {
+        get_kanban_scope().l.path('/login');
+      }
+      break;
+    }
+    case "user_check" : {
+      var taken = reply.result;
+      break;
+    }
+    case "project_users" : {
+      var users = reply.object;
+      break;
     }
   }
 }
@@ -227,6 +262,17 @@ function removeHandler(reply) {
       } else {
         console.error("Getting deletion info for different project.")
       }
+      break;
+    }
+    case "user_remove" : {
+
+      break;
+    }
+    case "userOfTicket_remove" : {
+      //remove a user from a ticket
+      break;
+    }
+    case "userOfProject_remove" : {
       break;
     }
   }
@@ -287,6 +333,7 @@ function storeHandler(reply) {
         addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
       } else {
         //TODO: something else
+
         console.log("Max ticket limit reached for this column ");
       }
       break;
@@ -301,6 +348,10 @@ function storeHandler(reply) {
     case "project_new": {
       var pid = reply.object;
       addUserToProject(get_kanban_scope().username, pid);
+      break;
+    }
+    case "new_user_project": {
+      getUserProjects(get_kanban_scope().username);
       break;
     }
 

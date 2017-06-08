@@ -3,7 +3,6 @@
  */
 
 let app = angular.module('Kankan', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select', "ngRoute"]);
-var location;
 
 app.config(function($routeProvider) {
   $routeProvider
@@ -23,10 +22,12 @@ app.config(function($routeProvider) {
     });
 });
 
-app.controller('ApplicationCtrl', function($scope) {
+app.controller('ApplicationCtrl', function($scope, $location) {
   $scope.projects = [];
   $scope.project = undefined;
   $scope.pid = undefined;
+
+  $scope.l = $location;
 
   initiateConnection();
 });
@@ -75,7 +76,7 @@ app.controller('LoginController', function($scope, $location) {
   $scope.newUser = function(username) {
     storeNewUser(username);
     get_kanban_scope().username = username;
-    $location.path('/home');
+    //$location.path('/home');
   }
 });
 
@@ -214,12 +215,67 @@ app.controller('editColumnCtrl', function($scope) {
 app.controller('DeadlineCtrl', function ($scope) {
 });
 
+app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
+  var $ctrl = this;
+  $ctrl.animationsEnabled = true;
+
+  $ctrl.open = function (size, project) {
+    var modalInstance = $uibModal.open({
+      animation: $ctrl.animationsEnabled,
+      ariaLabelledBy: 'modal-title',
+      ariaDescribedBy: 'modal-body',
+      templateUrl: 'AddUsersModal.html',
+      controller: 'AddUsersInstanceCtrl',
+      controllerAs: '$ctrl',
+      size: size,
+      resolve: {
+        items: function () {
+          return project;
+        }
+      }
+    });
+  };
+});
+
+app.controller('AddUsersInstanceCtrl', function ($uibModalInstance, items) {
+  var $ctrl = this;
+  $ctrl.title = items.title;
+
+  $ctrl.ok = function () {
+    $uibModalInstance.close();
+  };
+
+  $ctrl.addUser = function (username) {
+    addUserToProject(username, items.project_id);
+  }
+});
+
 app.controller('editTicketCtrl', function($scope) {
 
   $scope.dynamicPopover = {
     content: 'Hello world!',
     templateUrl: 'addUser.html',
     title: 'Title'
+  };
+
+  $scope.getProjectMembers = function() {
+    //TODO: Get project members
+    //return get_kanban_scope().project_members;
+    return getTicket(getTid()).members;
+  };
+
+  $scope.isMemberAddedToTicket = function (member) {
+    return getTicket(getTid()).members.includes(member);
+  };
+
+  $scope.toggleMemberToTicket = function (member) {
+    if ($scope.isMemberAddedToTicket(member)) {
+      //remove member
+      //TODO: Remove member from ticket
+    } else {
+      //add member
+      addUserToTicket(member, get_kanban_scope().pid, getTid());
+    }
   };
 
   $scope.addUser = function (username) {
