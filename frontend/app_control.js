@@ -83,7 +83,9 @@ app.controller('KanbanCtrl', function($scope, $location) {
     //Enable popovers
     $('[data-toggle="popover"]').popover();
 
+
     sendKanbanRequest(get_kanban_scope().pid);
+
 
     $scope.sendKanbanRequest = function(pid) {
       sendKanbanRequest(pid);
@@ -91,6 +93,9 @@ app.controller('KanbanCtrl', function($scope, $location) {
   }
 
   updateProgressTickets();
+  $scope.goHome = function () {
+    $location.path('/home');
+  };
 
   $scope.getBorderColour = function(progress, deadlineActive) {
     let css;

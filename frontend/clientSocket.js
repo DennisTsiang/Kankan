@@ -166,16 +166,15 @@ function requestHandler(reply) {
     }
     case "kanban" : {
       generate_kanban(request_data);
-
       //Send for tickets, once received kanban.
       sendTicketsRequest(get_kanban_scope().pid);
+      generate_other_user_kanbans();
       break;
     }
     case "user_projects" : {
       let projects = reply.object;
       //Generates/updates projects and other_projects variables.
       generate_user_kanbans(projects);
-
       break;
     }
     case "new_user_project": {
