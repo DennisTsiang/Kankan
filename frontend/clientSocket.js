@@ -80,7 +80,6 @@ function sendColumnUpdateLimit(pid, cid, newlimit) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-//TODO: Will change this and update handler to support deadline when backend has support
 function sendTicketUpdateDesc(ticket, pid, desc) {
   var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
   socket.emit("update", JSON.stringify(jsonString));
@@ -238,7 +237,6 @@ function requestHandler(reply) {
     }
     case "project_users" : {
       let users = reply.object;
-      console.log(reply);
       get_kanban_scope().project.members = users;
       get_kanban_scope().$apply();
       break;
@@ -303,8 +301,6 @@ function updateHandler(reply) {
       break;
     }
     case "ticket_deadline" : {
-      console.log("reply now is " + JSON.stringify(reply));
-      console.log(reply.deadline);
       let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
       ticket.setDeadline(reply.deadline);
       scope.$apply();
@@ -318,16 +314,19 @@ function updateHandler(reply) {
       break;
     }
     case "column_title" : {
-      var pid = reply.pid;
-      var cid = reply.cid;
-      var title = reply.title;
+      let pid = reply.pid;
+      let cid = reply.cid;
+      let title = reply.title;
       get_kanban_scope().project.columns[cid].title = title;
       get_kanban_scope().$apply();
     }
     case "column_limit" : {
-      var cid = reply.cid;
-      var pid = reply.pid;
-      var limit = reply.limit;
+      let cid = reply.cid;
+      let pid = reply.pid;
+      let limit = reply.limit;
+      let column = get_kanban_scope().project.columns[cid];
+      column.limit = limit;
+      get_kanban_scope().$apply();
     }
   }
 
@@ -341,8 +340,6 @@ function storeHandler(reply) {
       if (ticket_info.tid !== "Maxticketlimitreached") {
         addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
       } else {
-        //TODO: something else
-
         console.log("Max ticket limit reached for this column ");
       }
       break;

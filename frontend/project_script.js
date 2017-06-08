@@ -48,12 +48,31 @@ function addColumn(title, position, id) {
   enableDnDColumns();
 }
 
+updateColLimitEvent = function (event) {
+  let colId = event.srcElement.attributes['cid'];
+  let limit = event.srcElement.value;
+  if (isNaN(limit)) {
+    alert("Ticket limit must be a number");
+  } else {
+    sendColumnUpdateLimit(get_kanban_scope().pid, colId, limit);
+  }
+};
+
 function move_tickets(to_col_id, from_col_id, tid) {
   let scope = get_kanban_scope();
-  scope.project.tickets[tid].setColumn(to_col_id);
-  delete scope.project.columns[from_col_id].tickets[tid];
-  scope.project.columns[to_col_id].tickets[tid] = scope.project.tickets[tid];
-  scope.$apply();
+  let toColumn = scope.project.columns[to_col_id];
+  let fromColumn = scope.project.columns[from_col_id];
+
+  let column_limit = toColumn.limit;
+  let to_ticket_number = toColumn.tickets.length;
+  if (to_ticket_number < column_limit) {
+    scope.project.tickets[tid].setColumn(to_col_id);
+    delete fromColumn.tickets[tid];
+    toColumn.tickets[tid] = scope.project.tickets[tid];
+    scope.$apply();
+  } else {
+    alert("Cannot move ticket. Ticket limit reached.")
+  }
 }
 
 function delete_ticket(ticket_id, update) {

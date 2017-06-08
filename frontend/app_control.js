@@ -108,7 +108,6 @@ app.controller('KanbanCtrl', function($scope, $location) {
     let css;
 
     if (deadlineActive) {
-      console.log("active");
       if (timeLeft > 5) {
         css = {
           'border': '2px solid #26292e'
@@ -130,7 +129,6 @@ app.controller('KanbanCtrl', function($scope, $location) {
         };
 
       }else if(timeLeft > 0){
-        console.log("value is  " + timeLeft);
         css = {
           'border': '2px solid #ff0000'
         };
@@ -142,7 +140,6 @@ app.controller('KanbanCtrl', function($scope, $location) {
 
       }
     } else {
-      console.log("notactive");
       css = {
         'border': '2px solid #26292e'
 
@@ -216,7 +213,7 @@ app.controller('editColumnCtrl', function($scope) {
 
   $scope.updateColTitle = function(col, title) {
     updateColumnTitle(col.column_id, get_kanban_scope().pid, title);
-  }
+  };
 });
 
 app.controller('DeadlineCtrl', function ($scope) {
@@ -284,7 +281,6 @@ app.controller('editTicketCtrl', function($scope) {
   };
 
   $scope.addUser = function (username) {
-    console.log(username);
     addUserToTicket(username, get_kanban_scope().pid, $scope.tid);
   };
 
@@ -301,7 +297,6 @@ app.controller('editTicketCtrl', function($scope) {
   $scope.saveEditDeadline = function(deadline) {
     let ticket = getTicket($scope.tid);
     ticket.deadline = deadline;
-    console.log(deadline);
     sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, deadline);
     updateTicketTimes()
 

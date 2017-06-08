@@ -189,6 +189,14 @@
                         </th>
                       </tr>
                       <tr>
+                        <td class="column-title" style="text-align: center;">
+                          <div class="form-group">
+                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" value="{{project.columns[col].limit}}" placeholder="Ticket limit" onchange="updateColLimitEvent(event)">
+                            <!--<input type="text" class="form-control" id="limit" editable-textarea="project.columns[col].limit" onaftersave="updateColLimit(col, project.columns[col].limit)">{{project.columns[col].limit ? 'Limit: ' : ''}}{{project.columns[col].limit || 'No limit'}}</input>-->
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
                         <td class="center-align-text">
                           <button type="button" class="btn btn-warning" ng-click="removeColumn(project.columns[col])">Remove</button>
                         </td>
