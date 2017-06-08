@@ -199,7 +199,6 @@ app.controller('editTicketCtrl', function($scope) {
   };
 
   $scope.addUser = function (username) {
-    console.log(username);
     addUserToTicket(username, get_kanban_scope().pid, $scope.tid);
   };
 

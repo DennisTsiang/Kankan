@@ -156,9 +156,6 @@ function getUserTickets(username, pid) {
   socket.emit("request", JSON.stringify(jsonString));
 }
 
-
-
-
 function requestHandler(reply) {
   var type = reply.type;
   var request_data = reply.object;
@@ -192,7 +189,6 @@ function requestHandler(reply) {
     case "ticket_users": {
       let users = reply.object.users;
       let tid = reply.object.tid;
-      console.log(reply);
       get_kanban_scope().project.tickets[tid].members = users;
       get_kanban_scope().$apply();
       break;
