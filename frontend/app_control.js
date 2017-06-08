@@ -84,37 +84,48 @@ app.controller('KanbanCtrl', function($scope, $location) {
     }
   }
 
-  updateProgressTickets();
+  //updateTickets();
 
-  $scope.getBorderColour = function(progress, deadlineActive) {
+  $scope.getBorderColour = function(millisecondsLeft, deadlineActive) {
     let css;
+    let timeLeft = millisecondsLeft/(1000 * 60 * 60)
 
     if (deadlineActive) {
       console.log("active");
-      if (progress < 20) {
+      if (timeLeft > 5) {
         css = {
           'border': '2px solid #26292e'
 
         };
-      } else if( progress < 50) {
+      } else if(timeLeft > 2) {
         css = {
           'border': '2px solid #0000ff'
         };
 
-      }else if(progress < 80){
+      }else if(timeLeft > 1){
         css = {
-          'border': '2px solid #ffb602'
+          'border': '2px solid #ff9902'
         };
 
-      }else{
+      }else if(timeLeft > 0.5){
+        css = {
+          'border': '2px solid #ff3300'
+        };
+
+      }else if(timeLeft > 0){
+        console.log("value is  " + timeLeft);
         css = {
           'border': '2px solid #ff0000'
         };
+      }else{
 
       }
     } else {
       console.log("notactive");
+      css = {
+        'border': '2px solid #26292e'
 
+      };
     }
     return css;
 
@@ -217,8 +228,9 @@ app.controller('editTicketCtrl', function($scope) {
     let ticket = getTicket($scope.tid);
     ticket.deadline = deadline;
     console.log(deadline);
-
     sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, deadline);
+    updateTicketTimes()
+
   };
 
   $scope.resetDeadline = function() {
@@ -235,9 +247,9 @@ app.controller('editTicketCtrl', function($scope) {
     }
   };
 
-  $scope.updateProgress = function() {
+  $scope.updateTimeLeft = function() {
     let ticket = getTicket($scope.tid);
-    ticket.updateProgress();
+    ticket.updateTimeLeft();
   };
 
   $scope.today = function() {

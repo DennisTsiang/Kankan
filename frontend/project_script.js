@@ -69,6 +69,9 @@ function generateTickets(ticket_info_list) {
   for (let ticket_info of ticket_info_list) {
     addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime);
   }
+  updateTicketTimes()
+  updateTickets();
+
 }
 
 function generate_kanban(received_project) {
@@ -121,18 +124,18 @@ function generateArray(start, end) {
 }
 */
 
-function updateProgressTickets() {
-  setInterval(updateProgressBars, 10000);
+function updateTickets() {
+  setInterval(updateTicketTimes, 10000);
   //updateProgressBars();
 }
 
 
-function updateProgressBars() {
+function updateTicketTimes() {
   let s = get_kanban_scope();
   for (let ticket in s.project.tickets) {
     let tick = s.project.tickets[ticket];
     if (tick.deadlineActive) {
-      tick.updateProgress();
+      tick.updateTimeLeft();
     }
   }
   s.$apply();

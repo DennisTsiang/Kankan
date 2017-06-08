@@ -6,8 +6,9 @@ function Ticket(ticket_id) {
   this.col = -1;
   this.deadline = null;
   this.startdate = null;
-  this.progress = 0;
+  //this.progress = 0;
   this.deadlineActive = false;
+  this.timeLeft = 0;
 
   this.addMembersToTicket = function(array) {
     for (let i = 0; i < array.length; i++) {
@@ -36,6 +37,7 @@ function Ticket(ticket_id) {
   this.setDeadline = function(deadline) {
    this.deadline = new Date(deadline);
    this.startdate = new Date();
+   this.timeleft = 0;
    this.deadlineActive = true;
   };
 
@@ -58,19 +60,21 @@ function Ticket(ticket_id) {
     this.startdate = new Date();
     this.deadline = new Date();
     this.deadlineActive = false;
-    this.progress = 0;
+    this.timeLeft = 0;
 
   };
 
 
-  this.updateProgress = function() {
+  this.updateTimeLeft = function() {
 
     let endtime = this.deadline;
-    let starttime = this.startdate;
+    //let starttime = this.startdate;
 
     let currentDate = new Date();
 
-    let timeWidth = endtime - starttime;
+    this.timeLeft= endtime - currentDate;
+
+    /*
 
     if (timeWidth > 0) {
 
@@ -88,6 +92,14 @@ function Ticket(ticket_id) {
       this.progress = 0;
       this.deadlineActive = 0;
     }
+
+    */
+
+    console.log("time left is " + this.timeLeft);
+  //  console.log("starttime " + starttime);
+  //  console.log("endtime is " + endtime);
+
+    //console.log("startdate is " + this.startdate);
 
   };
 }

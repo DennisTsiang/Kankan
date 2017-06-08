@@ -253,7 +253,7 @@
               <td ng-repeat="col in project.column_order" class="ticket-column" cid="{{project.columns[col].column_id}}">
                 <!-- Tickets -->
                 <div ng-repeat="ticket in project.columns[col].tickets" ng-click="$ctrl.open_ticket_editor(ticket.ticket_id)"
-                ng-style="border = getBorderColour(ticket.progress, ticket.deadlineActive)"
+                ng-style="border = getBorderColour(ticket.timeLeft, ticket.deadlineActive)"
                  draggable="true" id="{{ticket.ticket_id}}" ondragstart="handleTicketDragStart(event)" class="ticket">
                   {{ticket.desc}}
 
