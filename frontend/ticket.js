@@ -74,7 +74,12 @@ function Ticket(ticket_id) {
 
     let currentDate = new Date();
 
-    this.timeLeft= (endtime - currentDate)/(1000 * 3600);
+    this.timeLeft = (endtime - currentDate)/(1000 * 3600);
+    if(this.timeLeft < 0){
+      this.deadlineActive = false;
+      this.timeLeft = 0;
+
+    }
 
     console.log("time left is " + this.timeLeft);
 

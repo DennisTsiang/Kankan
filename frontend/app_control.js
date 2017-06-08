@@ -98,7 +98,7 @@ app.controller('KanbanCtrl', function($scope, $location) {
 
   $scope.getBorderColour = function(timeLeft, deadlineActive) {
     let css;
-    
+
     if (deadlineActive) {
       console.log("active");
       if (timeLeft > 5) {
@@ -127,6 +127,10 @@ app.controller('KanbanCtrl', function($scope, $location) {
           'border': '2px solid #ff0000'
         };
       }else{
+        css = {
+          'border': '2px solid #26292e'
+
+        };
 
       }
     } else {
