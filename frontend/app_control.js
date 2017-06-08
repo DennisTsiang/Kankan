@@ -76,7 +76,6 @@ app.controller('LoginController', function($scope, $location) {
   $scope.newUser = function(username) {
     storeNewUser(username);
     get_kanban_scope().username = username;
-    //$location.path('/home');
   }
 });
 
@@ -92,10 +91,13 @@ app.controller('KanbanCtrl', function($scope, $location) {
 
     $scope.sendKanbanRequest = function(pid) {
       sendKanbanRequest(pid);
-    }
+    };
   }
 
-  //updateTickets();
+
+  $scope.goHome = function () {
+    $location.path('/home');
+  };
 
   $scope.getBorderColour = function(timeLeft, deadlineActive) {
     let css;
@@ -259,9 +261,7 @@ app.controller('editTicketCtrl', function($scope) {
   };
 
   $scope.getProjectMembers = function() {
-    //TODO: Get project members
-    //return get_kanban_scope().project_members;
-    return getTicket(getTid()).members;
+    return get_kanban_scope().project.members;
   };
 
   $scope.isMemberAddedToTicket = function (member) {
@@ -271,7 +271,7 @@ app.controller('editTicketCtrl', function($scope) {
   $scope.toggleMemberToTicket = function (member) {
     if ($scope.isMemberAddedToTicket(member)) {
       //remove member
-      //TODO: Remove member from ticket
+      removeUserFromTicket(get_kanban_scope().pid, member, getTid());
     } else {
       //add member
       addUserToTicket(member, get_kanban_scope().pid, getTid());
