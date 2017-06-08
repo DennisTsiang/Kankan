@@ -25,26 +25,27 @@ function App (db) {
     frontend = frontend.substring(0, frontend.length - 14);
     if (request.originalUrl === "/") {
       response.sendFile(frontend + 'frontend/kankan.html');
-    } else if (request.originalUrl === "/ResetTable") {
+    } else if (request.originalUrl.match(/DeleteTable\/(\d)/)) {
       resetLock.lock(function () {
-        db.deleteProject(0, function (successful) {
-          db.newProject("Kanban", function (newPid) {
-            if (newPid === 0) {
-              db.newColumn(newPid, "To Do", 0, function (res1) {
-                db.newColumn(newPid, "In Progess", 1, function (res2) {
-                  db.newColumn(newPid, "Done", 2, function (res3) {
+        var pid = parseInt(request.originalUrl.substring(request.originalUrl.length-1));
+        db.deleteProject(pid, function (successful) {
+          // db.newProject("Kanban", function (newPid) {
+          //   if (newPid === 0) {
+          //     db.newColumn(newPid, "To Do", 0, function (res1) {
+          //       db.newColumn(newPid, "In Progess", 1, function (res2) {
+          //         db.newColumn(newPid, "Done", 2, function (res3) {
                     resetLock.unlock();
-                    console.log("Finished Setup");
+                    console.log("Deleted project " + pid);
                     response.sendFile(frontend + 'frontend/kankan.html');
-                  });
-                });
+                //   });
+                // });
               });
-            } else {
-              resetLock.unlock();
-              console.error("Wrong pid!");
-            }
-          });
-        });
+            // } else {
+            //   resetLock.unlock();
+            //   console.error("Wrong pid!");
+            // }
+        //   });
+        // });
       });
     } else {
       response.sendFile(frontend + 'frontend' + request.originalUrl);
@@ -153,8 +154,13 @@ function App (db) {
       case 'ticket_new':
         //Returns the new ticket id
         db.newTicket(store['pid'], store['column_id'], function (tid) {
-            callback({type:'ticket_new', object: {tid : tid, column_id: store['column_id'], pid:store['pid']}},
+          if (tid !== -1) {
+            callback({type: 'ticket_new', object: {tid: tid, column_id: store['column_id'], pid: store['pid']}},
                 store["pid"]);
+          } else {
+            callback({type: 'ticket_new', object: {tid: "Maxticketlimitreached", column_id: store['column_id'], pid: store['pid']}},
+                store["pid"]);
+          }
         });
         break;
       case 'project_new':
@@ -165,6 +171,11 @@ function App (db) {
       case 'column_new':
         db.newColumn(store["pid"], store["column_name"], store["position"], function (cid, column_name, position) {
           callback({type:'column_new',object: {cid:cid, column_name:column_name, position:position}}, store['pid']);
+        });
+        break;
+      case 'user_new' :
+        db.addNewUser(store['username'], function (success) {
+          callback( {type: 'user_new', success:success})
         });
         break;
       default:
@@ -218,7 +229,12 @@ function App (db) {
             callback({type:'column_moved', object:kanban}, success, update.pid);
           });
         });
-      break;
+        break;
+      case 'column_limit' :
+        db.updateColumnLimit(update['pid'], update['cid'], update['limit'], function (success) {
+            callback({type: 'column_limit', pid: update['pid'], cid: update['cid'], limit: update['limit']},
+                success, update.pid);
+        });
       default:
         //TODO: Handle unknown update.
         break;
