@@ -65,7 +65,7 @@ function move_tickets(to_col_id, from_col_id, tid) {
 
   let column_limit = toColumn.limit;
   let to_ticket_number = toColumn.tickets.length;
-  if (to_ticket_number < column_limit) {
+  if (column_limit === undefined || to_ticket_number < column_limit) {
     scope.project.tickets[tid].setColumn(to_col_id);
     delete fromColumn.tickets[tid];
     toColumn.tickets[tid] = scope.project.tickets[tid];
