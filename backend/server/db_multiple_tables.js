@@ -384,7 +384,7 @@ function Database(pool) {
             array.push(row.username);
           }
           rwlock.unlock();
-          callback(array);
+          callback(tid, array);
         } else {
           rwlock.unlock();
           console.error("Ticket does not exist in db");

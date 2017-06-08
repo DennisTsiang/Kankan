@@ -4,22 +4,22 @@
 
 let app = angular.module('Kankan', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select', "ngRoute"]);
 
-app.config(function ($routeProvider) {
+app.config(function($routeProvider) {
   $routeProvider
-  .when('/login', {
-    templateUrl: 'login.html',
-    controller: 'LoginController'
-  })
-  .when('/kanban', {
-    templateUrl: 'kanban.html',
-  })
-  .when('/home', {
-    templateUrl: 'home.html',
-    controller: 'HomeController'
-  })
-  .otherwise({
-    redirectTo: '/login'
-  });
+    .when('/login', {
+      templateUrl: 'login.html',
+      controller: 'LoginController'
+    })
+    .when('/kanban', {
+      templateUrl: 'kanban.html',
+    })
+    .when('/home', {
+      templateUrl: 'home.html',
+      controller: 'HomeController'
+    })
+    .otherwise({
+      redirectTo: '/login'
+    });
 });
 
 app.controller('ApplicationCtrl', function($scope) {
@@ -39,24 +39,24 @@ app.controller('HomeController', function($scope, $location) {
     getUserProjects($scope.username);
     $scope.a_k = get_kanban_scope();
 
-    $scope.chooseProject = function (proj_id) {
+    $scope.chooseProject = function(proj_id) {
       get_kanban_scope().pid = proj_id;
       $location.path('/kanban');
     };
   }
 });
 
-app.controller('PopoverDemoCtrl', function ($scope, $sce) {
+app.controller('PopoverDemoCtrl', function($scope, $sce) {
   $scope.dynamicPopover = {
     templateUrl: 'myPopoverTemplate.html',
     title: 'Enter Here'
   };
-  $scope.newProject = function (project_name) {
+  $scope.newProject = function(project_name) {
     sendStoreProject(project_name);
   }
 });
 
-app.controller('LoginController', function ($scope, $location) {
+app.controller('LoginController', function($scope, $location) {
   $scope.a_k = get_kanban_scope();
 
   $scope.login = function(name) {
@@ -64,9 +64,8 @@ app.controller('LoginController', function ($scope, $location) {
     $location.path('/home');
   };
 
-  $scope.newUser = function (username) {
-    addUserToProject(username, 0);
-    $location.path('/home');
+  $scope.newUser = function(username) {
+    storeNewUser(username);
   }
 });
 
@@ -80,9 +79,45 @@ app.controller('KanbanCtrl', function($scope, $location) {
 
     sendKanbanRequest(get_kanban_scope().pid);
 
-    $scope.sendKanbanRequest = function (pid) {
+    $scope.sendKanbanRequest = function(pid) {
       sendKanbanRequest(pid);
     }
+  }
+
+  updateProgressTickets();
+
+  $scope.getBorderColour = function(progress, deadlineActive) {
+    let css;
+
+    if (deadlineActive) {
+      console.log("active");
+      if (progress < 20) {
+        css = {
+          'border': '2px solid #26292e'
+
+        };
+      } else if( progress < 50) {
+        css = {
+          'border': '2px solid #0000ff'
+        };
+
+      }else if(progress < 80){
+        css = {
+          'border': '2px solid #ffb602'
+        };
+
+      }else{
+        css = {
+          'border': '2px solid #ff0000'
+        };
+
+      }
+    } else {
+      console.log("notactive");
+
+    }
+    return css;
+
   }
 });
 
@@ -91,7 +126,7 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
 
   ctrl.animationsEnabled = true;
   $scope.tid = -1;
-  ctrl.open_ticket_description = function(tid) {
+  ctrl.open_ticket_editor = function(tid) {
     $scope.tid = tid;
     let modalInstance = $uibModal.open({
       animation: ctrl.animationsEnabled,
@@ -100,19 +135,21 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
       templateUrl: 'ticket-popup',
       controller: 'ModalInstanceCtrl',
       controllerAs: '$ctrl',
+      windowClass: 'code-navigator-modal',
+      size: 'lg',
       resolve: {
 
       }
     });
   };
 
-  ctrl.open_edit_column = function (){
+  ctrl.open_edit_column = function() {
     let modalInstance = $uibModal.open({
       animation: true,
       templateUrl: 'edit-column-popup',
       controller: 'ModalInstanceCtrl',
       controllerAs: '$ctrl',
-      size:'lg',
+      size: 'lg',
       windowClass: 'edit-columns-popup',
       resolve: {
 
@@ -140,30 +177,31 @@ app.controller('editColumnCtrl', function($scope) {
     sendStoreColumn($scope.project.project_id, "New column", Object.keys($scope.project.columns).length);
   };
 
-  $scope.removeColumn = function (col) {
+  $scope.removeColumn = function(col) {
     removeColumn($scope.project.project_id, col.column_id, col.position);
   };
 
 
-  $scope.updateColTitle = function (col, title) {
+  $scope.updateColTitle = function(col, title) {
     updateColumnTitle(col.column_id, get_kanban_scope().pid, title);
   }
 });
 
+app.controller('DeadlineCtrl', function ($scope) {
+});
+
 app.controller('editTicketCtrl', function($scope) {
 
-  $scope.deadlineUpdate = function() {
-    $scope.deadline = getTicket(getTid()).deadline;
-    $scope.selectedDay = $scope.deadline.getDate().toString();
-    //Account for the fact months are stored as 0-11 in date object
-    $scope.selectedMonth = ($scope.deadline.getMonth() + 1).toString();
-    $scope.selectedYear = $scope.deadline.getFullYear().toString();
-    $scope.selectedHour = $scope.deadline.getHours().toString();
-    $scope.selectedMinute = $scope.deadline.getMinutes().toString();
-
-
+  $scope.dynamicPopover = {
+    content: 'Hello world!',
+    templateUrl: 'addUser.html',
+    title: 'Title'
   };
 
+  $scope.addUser = function (username) {
+    console.log(username);
+    addUserToTicket(username, get_kanban_scope().pid, $scope.tid);
+  };
 
   function getTicket(id) {
     let k_scope = get_kanban_scope();
@@ -175,46 +213,19 @@ app.controller('editTicketCtrl', function($scope) {
     return angular.element(sel).scope().tid;
   }
 
-  //Enables all popovers.
-  $('[data-toggle="popover"]').popover();
-
-  //Initialise arrays for drop down boxes
-  //TODO: Seems bad to do this every time?
-  $scope.days = generateArray(1,31);
-
-  $scope.months = generateArray(1,12);
-  $scope.years = ["2017", "2018"];
-  $scope.hours = generateArray(0,23);
-  $scope.minutes = generateArray(0,59);
-
-  $scope.tid = getTid();
-  $scope.desc = getTicket($scope.tid).desc;
-
-  $scope.deadlineUpdate();
-
-  $scope.saveEditDeadline = function(){
-
+  $scope.saveEditDeadline = function(deadline) {
     let ticket = getTicket($scope.tid);
+    ticket.deadline = deadline;
+    console.log(deadline);
 
-    sendTicketUpdateDeadline(ticket, get_kanban_scope().pid,
-        $scope.selectedMonth,
-        $scope.selectedYear,
-        $scope.selectedDay,
-        $scope.selectedHour,
-        $scope.selectedMinute);
+    sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, deadline);
   };
 
-  $scope.resetDeadline = function () {
+  $scope.resetDeadline = function() {
     let ticket = getTicket($scope.tid);
 
     ticket.resetDeadline();
-    $scope.deadlineUpdate();
-    sendTicketUpdateDeadline(ticket, get_kanban_scope().pid,
-        $scope.selectedMonth,
-        $scope.selectedYear,
-        $scope.selectedDay,
-        $scope.selectedHour,
-        $scope.selectedMinute);
+    sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, ticket.deadline);
   };
 
   $scope.saveEditDesc = function(text) {
@@ -222,18 +233,92 @@ app.controller('editTicketCtrl', function($scope) {
     if (ticket !== undefined) {
       sendTicketUpdateDesc(ticket, get_kanban_scope().pid, text);
     }
-
   };
 
   $scope.updateProgress = function() {
-
     let ticket = getTicket($scope.tid);
     ticket.updateProgress();
+  };
 
+  $scope.today = function() {
+    $scope.dt = new Date();
+  };
+
+  $scope.clear = function() {
+    $scope.dt = null;
+  };
+
+  $scope.inlineOptions = {
+    customClass: getDayClass,
+    minDate: new Date(),
+    showWeeks: true
+  };
+
+  $scope.dateOptions = {
+    formatYear: 'yy',
+    minDate: new Date(),
+    startingDay: 1
+  };
+
+
+  $scope.openCalendar = function() {
+    $scope.popup.opened = true;
+  };
+
+  $scope.setDate = function(year, month, day) {
+    $scope.dt.setFullYear(year, month, day);
+  };
+
+  $scope.popup = {
+    opened: false
+  };
+
+  function getDayClass(data) {
+    var date = data.date,
+        mode = data.mode;
+    if (mode === 'day') {
+      var dayToCheck = new Date(date).setHours(0,0,0,0);
+
+      for (var i = 0; i < $scope.events.length; i++) {
+        var currentDay = new Date($scope.events[i].date).setHours(0,0,0,0);
+
+        if (dayToCheck === currentDay) {
+          return $scope.events[i].status;
+        }
+      }
+    }
+
+    return '';
   }
+
+  $scope.toggleMode = function () {
+    $scope.ismeridian = !$scope.ismeridian;
+  };
+
+  //Enables all popovers.
+  $('[data-toggle="popover"]').popover();
+
+  //Get users for this ticket.
+  getTicketUsers(get_kanban_scope().pid, getTid());
+
+  $scope.tid = getTid();
+  $scope.ticket = getTicket($scope.tid);
+  $scope.desc = $scope.ticket.desc;
+
+  $scope.format = 'yyyy-MMMM-dd';
+  $scope.today();
+  $scope.dt = $scope.ticket.deadline;
+  $scope.hstep = 1;
+  $scope.mstep = 1;
+  $scope.options = {
+    hstep: [1, 2, 3],
+    mstep: [1, 5, 10, 15, 25, 30]
+  };
+
+  $scope.ismeridian = true;
 });
 
-app.controller('deleteTicketCtrl', function ($scope, $sce) {
+app.controller('deleteTicketCtrl', function($scope, $sce) {
   $scope.dynamicPopover = {
     content: 'Hello world!',
     templateUrl: 'yousurebutton.html',
@@ -251,3 +336,6 @@ app.controller('deleteTicketCtrl', function ($scope, $sce) {
   }
 });
 
+app.controller('DeadlineCollapseCtrl', function ($scope) {
+  $scope.isCollapsed = true;
+});

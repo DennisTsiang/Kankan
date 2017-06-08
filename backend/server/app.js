@@ -137,8 +137,8 @@ function App (db) {
         });
         break;
       case 'ticket_users':
-        db.getTicketUsers(request["pid"], request["tid"], function (users) {
-          callback({type:'user_tickets', object:users});
+        db.getTicketUsers(request["pid"], request["tid"], function (tid, users) {
+          callback({type:'user_tickets', object:{tid: tid, users: users}});
         });
         break;
       case 'user_new' :

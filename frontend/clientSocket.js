@@ -91,8 +91,7 @@ function updateColumnTitle(cid, pid, title) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-function sendTicketUpdateDeadline(ticket, pid, month, year, day, hour, minute) {
-  var deadline = year + " " + month + " " + day + " " + hour + " " + minute;
+function sendTicketUpdateDeadline(ticket, pid, deadline) {
   var jsonString = {type: "ticket_deadline", ticket: ticket, pid : pid, deadline : deadline};
   socket.emit("update", JSON.stringify(jsonString));
 }
@@ -191,8 +190,11 @@ function requestHandler(reply) {
       break;
     }
     case "ticket_users": {
-      var users = reply.object;
-
+      let users = reply.object.users;
+      let tid = reply.object.tid;
+      console.log(reply);
+      get_kanban_scope().project.tickets[tid].members = users;
+      get_kanban_scope().$apply();
       break;
     }
     case "add_user_to_ticket": {
@@ -250,10 +252,9 @@ function updateHandler(reply) {
     }
     case "ticket_deadline" : {
       console.log("reply now is " + JSON.stringify(reply));
-      var deadline = reply.deadline.split(" ");
       console.log(reply.deadline);
       let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
-      ticket.setDeadline(deadline[0], deadline[1], deadline[2], deadline[3], deadline[4]);
+      ticket.setDeadline(reply.deadline);
       scope.$apply();
       break;
     }

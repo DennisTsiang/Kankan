@@ -45,15 +45,16 @@ function handleColumnDragStart(event) {
 }
 
 function handleColumnDragOver(event) {
+  event.preventDefault();
   event.dataTransfer.dropEffect = "move";
 
 }
 
 function handleColumnDrop(event) {
+  event.preventDefault();
 
   let cell = $(event.toElement).closest('table');
   let end_column_id = cell[0].getAttribute('column_id');
-  //swapColumns(start_column_id, end_column_id);
 
   let columns = get_kanban_scope().project.columns;
   sendColumnUpdateMoved(get_kanban_scope().pid, start_column_id, columns[end_column_id].position, columns[start_column_id].position);
