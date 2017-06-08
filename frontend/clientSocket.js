@@ -153,7 +153,7 @@ function getUserProjects(username, pid) {
 
 function addUserToProject(username, pid) {
   var jsonString = {type:'new_user_project', username : username, pid : pid};
-  socket.emit("request", JSON.stringify(jsonString));
+  socket.emit("store", JSON.stringify(jsonString));
 }
 
 function addUserToTicket(username, pid, tid) {
@@ -202,10 +202,6 @@ function requestHandler(reply) {
       generate_user_kanbans(projects);
       break;
     }
-    case "new_user_project": {
-      getUserProjects(get_kanban_scope().username);
-      break;
-    }
     case "user_tickets": {
       var tickets = reply.object;
       break;
@@ -222,6 +218,12 @@ function requestHandler(reply) {
       break;
     }
     case "user_new" : {
+      if (reply.success) {
+        get_kanban_scope().l.path('/home');
+        get_kanban_scope().$apply();
+      } else {
+        get_kanban_scope().l.path('/login');
+      }
       break;
     }
     case "user_check" : {
@@ -331,6 +333,7 @@ function storeHandler(reply) {
         addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
       } else {
         //TODO: something else
+
         console.log("Max ticket limit reached for this column ");
       }
       break;
@@ -345,6 +348,10 @@ function storeHandler(reply) {
     case "project_new": {
       var pid = reply.object;
       addUserToProject(get_kanban_scope().username, pid);
+      break;
+    }
+    case "new_user_project": {
+      getUserProjects(get_kanban_scope().username);
       break;
     }
 
