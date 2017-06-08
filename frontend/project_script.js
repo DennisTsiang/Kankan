@@ -24,7 +24,9 @@ function addTicket(col_id, ticket_id, desc, deadline) {
   let ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
+  if(deadline != null){
   ticket.setDeadline(deadline);
+  }
 
   let s = get_kanban_scope();
   s.project.tickets[ticket_id] = ticket;
