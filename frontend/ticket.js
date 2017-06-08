@@ -85,12 +85,14 @@ function Ticket(ticket_id) {
       if (this.deadlineActive == true) {
         console.log("was active");
         this.deadlineActive = false;
-        this.timeLeftFormatted = "Due";
+        this.isTimeLeft = "Due";
         this.timeFormatter = "";
+        this.timeLeftFormatted = "";
       } else {
 
         this.timeLeftFormatted = "";
         this.timeFormatter = "";
+        this.isTimeLeft = "";
 
       }
       this.timeLeft = 0;
