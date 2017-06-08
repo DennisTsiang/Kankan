@@ -57,7 +57,6 @@ app.controller('NewProjectPopoverCtrl', function($scope, $sce) {
     templateUrl: 'NewProjectPopover.html'
   };
   $scope.newProject = function(project_name) {
-    $scope.$parent.$close();
     sendStoreProject(project_name);
   }
 });
