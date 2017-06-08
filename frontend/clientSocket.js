@@ -207,12 +207,8 @@ function removeHandler(reply) {
   switch (type) {
     case "project_remove" : {
       //Kick out of kanban view, take back to home page?
-      console.log("Deleting project_" + reply.pid);
-      console.log(get_kanban_scope().projects);
       var pid = reply.pid;
       delete get_kanban_scope().projects[pid];
-      console.log("Deleted project_" + reply.pid);
-      console.log(get_kanban_scope().projects);
       get_kanban_scope().$apply();
       break;
     }
