@@ -76,7 +76,6 @@ app.controller('LoginController', function($scope, $location) {
   $scope.newUser = function(username) {
     storeNewUser(username);
     get_kanban_scope().username = username;
-    //$location.path('/home');
   }
 });
 
@@ -95,7 +94,10 @@ app.controller('KanbanCtrl', function($scope, $location) {
     };
   }
 
-  //updateTickets();
+
+  $scope.goHome = function () {
+    $location.path('/home');
+  };
 
   $scope.getBorderColour = function(timeLeft, deadlineActive) {
     let css;
