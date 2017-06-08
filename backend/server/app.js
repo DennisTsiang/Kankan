@@ -75,6 +75,9 @@ function App (db) {
       _this.handleStore(JSON.parse(data), function (response, pid) {
         if (pid === null) {
           socket.emit('storereply', JSON.stringify(response));
+        } else if (pid === 'all') {
+          socket.emit('storereply', JSON.stringify(response));
+          socket.broadcast.emit('storereply', JSON.stringify(response));
         } else {
           io.sockets.in(pid).emit('storereply', JSON.stringify(response));
         }
@@ -123,11 +126,6 @@ function App (db) {
       case 'user_projects':
         db.getUsersProjects(request["username"], function (projects) {
           callback({type:'user_projects', object:projects});
-        });
-        break;
-      case 'new_user_project':
-        db.addUserToProject(request["username"], request["pid"], function(success) {
-          callback({type:'new_user_project'});
         });
         break;
       case 'add_user_to_ticket':
@@ -184,7 +182,11 @@ function App (db) {
           callback({type:'column_new',object: {cid:cid, column_name:column_name, position:position}}, store['pid']);
         });
         break;
-
+      case 'new_user_project':
+        db.addUserToProject(store["username"], store["pid"], function(success) {
+          callback({type:'new_user_project'}, 'all');
+        });
+        break;
       default:
         //TODO: Handle unknown store.
         break;

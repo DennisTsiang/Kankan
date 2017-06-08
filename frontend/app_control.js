@@ -205,6 +205,41 @@ app.controller('editColumnCtrl', function($scope) {
 app.controller('DeadlineCtrl', function ($scope) {
 });
 
+app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
+  var $ctrl = this;
+  $ctrl.animationsEnabled = true;
+
+  $ctrl.open = function (size, project) {
+    var modalInstance = $uibModal.open({
+      animation: $ctrl.animationsEnabled,
+      ariaLabelledBy: 'modal-title',
+      ariaDescribedBy: 'modal-body',
+      templateUrl: 'AddUsersModal.html',
+      controller: 'AddUsersInstanceCtrl',
+      controllerAs: '$ctrl',
+      size: size,
+      resolve: {
+        items: function () {
+          return project;
+        }
+      }
+    });
+  };
+});
+
+app.controller('AddUsersInstanceCtrl', function ($uibModalInstance, items) {
+  var $ctrl = this;
+  $ctrl.title = items.title;
+
+  $ctrl.ok = function () {
+    $uibModalInstance.close();
+  };
+
+  $ctrl.addUser = function (username) {
+    addUserToProject(username, items.project_id);
+  }
+});
+
 app.controller('editTicketCtrl', function($scope) {
 
   $scope.dynamicPopover = {
