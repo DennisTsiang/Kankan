@@ -156,6 +156,11 @@ function getUserTickets(username, pid) {
   socket.emit("request", JSON.stringify(jsonString));
 }
 
+function sendUsernameCheck(username) {
+  var jsonString = {type: 'user_check', username : username};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
 function requestHandler(reply) {
   var type = reply.type;
   var request_data = reply.object;
@@ -193,7 +198,17 @@ function requestHandler(reply) {
       break;
     }
     case "user_new" : {
-
+      if (reply.success) {
+        get_kanban_scope().l.path('/home');
+        get_kanban_scope().$apply();
+      } else {
+        get_kanban_scope().l.path('/login');
+      }
+      break;
+    }
+    case "user_check" : {
+      var taken = reply.result;
+      break;
     }
   }
 }
@@ -283,6 +298,7 @@ function storeHandler(reply) {
         addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
       } else {
         //TODO: something else
+
         console.log("Max ticket limit reached for this column ");
       }
       break;

@@ -147,7 +147,12 @@ function App (db) {
         break;
       case 'user_new' :
         db.addNewUser(request['username'], function (success) {
-          callback( {type: 'user_new', success:success})
+          callback( {type: 'user_new', success:success});
+        });
+        break;
+      case 'user_check' :
+        db.checkUserExists(request['username'], function(result){
+          callback({type : 'user_check', result : result});
         });
         break;
       default:

@@ -192,10 +192,10 @@ function Database(pool) {
       pool.query('SELECT column_limit FROM columns_' + pid + ' WHERE column_id = $1::int', [column_id], function (res1) {
         if (res1.rows[0].column_limit !== null) {
           var column_limit = res1.rows[0].column_limit;
-          pool.query('SELECT COUNT(ticket_id) as numberOfTickets FROM tickets_' + pid, [], function (res2) {
+          pool.query('SELECT COUNT(ticket_id) as numberOfTickets FROM tickets_' + pid + ' WHERE column_id = $1::int', [column_id], function (res2) {
             if (res2.rows[0].numberoftickets >= column_limit) {
               rwlock.unlock();
-              console.log("Reached maximum ticket limit for column_id: " + column_id);
+              console.log("Reached maximum ticket limit (" + column_limit + ") for column_id: " + column_id);
               callback(-1); //-1 denotes invalid tid
             } else {
               newTicketHelper(pid, column_id, callback);
@@ -223,16 +223,40 @@ function Database(pool) {
       pool.query('SELECT column_id FROM tickets_' + pid + ' WHERE ticket_id = $1::int',
           [ticket.ticket_id], function (checkResult) {
         if (checkResult.rows.length === 1) {
+          //Check the id of the columns match
           if (checkResult.rows[0]["column_id"] == fromColumn) {
-            pool.query('UPDATE tickets_' + pid + ' SET column_id = $1::int WHERE ticket_id = $2::int',
-                [toColumn, ticket.ticket_id],
-                function (insertion) {
-                  rwlock.unlock();
-                  callback(true);
+            pool.query('SELECT column_limit FROM columns_'+pid + ' WHERE column_id = $1::int', [toColumn], function(res) {
+              if (res.rows[0].column_limit !== null) {
+                var column_limit = res.rows[0].column_limit;
+                pool.query('SELECT COUNT(ticket_id) as numberOfTickets FROM tickets_' + pid +' WHERE column_id = $1::int', [toColumn], function (res2) {
+                  //check column limit hasn't been reached
+                  if (res2.rows[0].numberoftickets >= column_limit) {
+                    rwlock.unlock();
+                    console.error("Reached maximum ticket limit (" + column_limit + ") for column_id: " + toColumn);
+                    callback(false);
+                  } else {
+                    //Update ticket
+                    pool.query('UPDATE tickets_' + pid + ' SET column_id = $1::int WHERE ticket_id = $2::int',
+                        [toColumn, ticket.ticket_id],
+                        function (insertion) {
+                          rwlock.unlock();
+                          callback(true);
+                        });
+                  }
                 });
+              } else {
+                //Continue as normal update ticket
+                pool.query('UPDATE tickets_' + pid + ' SET column_id = $1::int WHERE ticket_id = $2::int',
+                    [toColumn, ticket.ticket_id],
+                    function (insertion) {
+                      rwlock.unlock();
+                      callback(true);
+                    });
+              }
+            });
           } else {
             rwlock.unlock();
-            console.error("The ticket that is moving is not in the given from column " + fromColumn);
+            console.error("The ticket that is moving is not in the given from column_id " + fromColumn);
             callback(false);
           }
         } else {
@@ -405,6 +429,21 @@ function Database(pool) {
             rwlock.unlock();
             callback(true);
           });
+        }
+      });
+    });
+  };
+
+  this.checkUserExists = function(username, callback) {
+    //returns true if user already exists
+    rwlock.writeLock(function(){
+      pool.query('SELECT username FROM users WHERE username = $1::text', [username], function (res) {
+        rwlock.unlock();
+        if (res.rows.length > 0) {
+          console.log("Username exists in db");
+          callback(true);
+        } else {
+          callback(false);
         }
       });
     });
