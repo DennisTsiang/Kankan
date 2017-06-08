@@ -352,7 +352,7 @@ function Database(pool) {
         if (res.rows.length > 0) {
           var array = [];
           for (var row of res.rows) {
-            array.push({username : row.username});
+            array.push(row.username);
           }
           rwlock.unlock();
           callback(array);
