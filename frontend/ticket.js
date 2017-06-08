@@ -9,6 +9,7 @@ function Ticket(ticket_id) {
   //this.progress = 0;
   this.deadlineActive = false;
   this.timeLeft = 0;
+  this.timeLeftFormatted = "Coming soon!";
 
   this.addMembersToTicket = function(array) {
     for (let i = 0; i < array.length; i++) {
