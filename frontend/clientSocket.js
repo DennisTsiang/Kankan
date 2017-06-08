@@ -198,7 +198,7 @@ function requestHandler(reply) {
       break;
     }
     case "user_new" : {
-      var success = reply.success;
+
     }
   }
 }

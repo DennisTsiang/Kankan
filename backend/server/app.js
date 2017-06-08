@@ -143,7 +143,7 @@ function App (db) {
         });
         break;
       case 'user_new' :
-        db.addNewUser(store['username'], function (success) {
+        db.addNewUser(request['username'], function (success) {
           callback( {type: 'user_new', success:success})
         });
         break;
