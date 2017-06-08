@@ -25,13 +25,21 @@ function Ticket(ticket_id) {
 
 
   //TODO:At the moment the start date updates when the deadline is made
-  this.setDeadline = function(year, month, day, hours, minutes) {
+  /*this.setDeadline = function(year, month, day, hours, minutes) {
     this.deadline = new Date(year, month - 1, day, hours, minutes);
     this.startdate = new Date();
     this.deadlineActive = true;
 
   };
+  */
 
+  this.setDeadline = function(deadline) {
+   this.deadline = new Date(deadline);
+   this.startdate = new Date();
+   this.deadlineActive = true;
+  };
+
+  /*
   this.setDeadlineFlat = function(deadline) {
     if (deadline == null) {
 
@@ -44,6 +52,7 @@ function Ticket(ticket_id) {
     }
     this.startdate = new Date();
   };
+  */
 
   this.resetDeadline = function() {
     this.startdate = new Date();
@@ -56,10 +65,8 @@ function Ticket(ticket_id) {
 
   this.updateProgress = function() {
 
-    console.log("updating");
-
-    let endtime = this.deadline.getTime();
-    let starttime = this.startdate.getTime();
+    let endtime = this.deadline;
+    let starttime = this.startdate;
 
     let currentDate = new Date();
 
@@ -81,8 +88,6 @@ function Ticket(ticket_id) {
       this.progress = 0;
       this.deadlineActive = 0;
     }
-
-    console.log("progress is " + this.progress);
 
   };
 }

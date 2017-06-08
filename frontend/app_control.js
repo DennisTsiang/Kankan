@@ -193,11 +193,62 @@ app.controller('editColumnCtrl', function($scope) {
   }
 });
 
-app.controller('DatepickerPopupDemoCtrl', function ($scope) {
+app.controller('DeadlineCtrl', function ($scope) {
+});
+
+app.controller('editTicketCtrl', function($scope) {
+
+  $scope.dynamicPopover = {
+    content: 'Hello world!',
+    templateUrl: 'addUser.html',
+    title: 'Title'
+  };
+
+  $scope.addUser = function (username) {
+    console.log(username);
+    addUserToTicket(username, get_kanban_scope().pid, $scope.tid);
+  };
+
+  function getTicket(id) {
+    let k_scope = get_kanban_scope();
+    return k_scope.project.tickets[id];
+  }
+
+  function getTid() {
+    let sel = 'div[ng-controller="ModalCtrl as $ctrl"]';
+    return angular.element(sel).scope().tid;
+  }
+
+  $scope.saveEditDeadline = function(deadline) {
+    let ticket = getTicket($scope.tid);
+    ticket.deadline = deadline;
+    console.log(deadline);
+
+    sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, deadline);
+  };
+
+  $scope.resetDeadline = function() {
+    let ticket = getTicket($scope.tid);
+
+    ticket.resetDeadline();
+    sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, ticket.deadline);
+  };
+
+  $scope.saveEditDesc = function(text) {
+    let ticket = getTicket($scope.tid);
+    if (ticket !== undefined) {
+      sendTicketUpdateDesc(ticket, get_kanban_scope().pid, text);
+    }
+  };
+
+  $scope.updateProgress = function() {
+    let ticket = getTicket($scope.tid);
+    ticket.updateProgress();
+  };
+
   $scope.today = function() {
     $scope.dt = new Date();
   };
-  $scope.today();
 
   $scope.clear = function() {
     $scope.dt = null;
@@ -211,22 +262,20 @@ app.controller('DatepickerPopupDemoCtrl', function ($scope) {
 
   $scope.dateOptions = {
     formatYear: 'yy',
-    maxDate: new Date(2020, 5, 22),
     minDate: new Date(),
     startingDay: 1
   };
 
-  $scope.format = 'dd-MMMM-yyyy';
 
-  $scope.open1 = function() {
-    $scope.popup1.opened = true;
+  $scope.openCalendar = function() {
+    $scope.popup.opened = true;
   };
 
   $scope.setDate = function(year, month, day) {
-    $scope.dt = new Date(year, month, day);
+    $scope.dt.setFullYear(year, month, day);
   };
 
-  $scope.popup1 = {
+  $scope.popup = {
     opened: false
   };
 
@@ -247,85 +296,10 @@ app.controller('DatepickerPopupDemoCtrl', function ($scope) {
 
     return '';
   }
-});
 
-app.controller('TimepickerDemoCtrl', function ($scope, $log) {
-  $scope.mytime = new Date();
-
-  $scope.hstep = 1;
-  $scope.mstep = 15;
-
-  $scope.options = {
-    hstep: [1, 2, 3],
-    mstep: [1, 5, 10, 15, 25, 30]
-  };
-
-  $scope.ismeridian = true;
   $scope.toggleMode = function () {
     $scope.ismeridian = !$scope.ismeridian;
   };
-
-  $scope.update = function () {
-    var d = new Date();
-    d.setHours(14);
-    d.setMinutes(0);
-    $scope.mytime = d;
-  };
-
-  $scope.changed = function () {
-    $log.log('Time changed to: ' + $scope.mytime);
-  };
-});
-
-app.controller('editTicketCtrl', function($scope, $document, $uibModal) {
-
-  /*$scope.open_code_navigator = function () {
-    angular.element('code-navigator-modal').addClass("go-left");
-    let modalInstance = $uibModal.open({
-      animation: true,
-      ariaLabelledBy: 'code-info-title',
-      ariaDescribedBy: 'code-info-modal-body',
-      templateUrl: 'code-popup',
-      controller: 'ModalInstanceCtrl',
-      //appendTo: parentElem,
-      backdrop: true,
-      windowClass: 'ticket-edit-modal',
-    })};
-  */
-
-  $scope.dynamicPopover = {
-    content: 'Hello world!',
-    templateUrl: 'addUser.html',
-    title: 'Title'
-  };
-
-  $scope.addUser = function (username) {
-    console.log(username);
-    addUserToTicket(username, get_kanban_scope().pid, $scope.tid);
-  };
-
-  $scope.deadlineUpdate = function() {
-    let ticket = getTicket(getTid())
-    $scope.deadline = ticket.deadline;
-    $scope.selectedDay = $scope.deadline.getDate().toString();
-    //Account for the fact months are stored as 0-11 in date object
-    $scope.selectedMonth = ($scope.deadline.getMonth() + 1).toString();
-    $scope.selectedYear = $scope.deadline.getFullYear().toString();
-    $scope.selectedHour = $scope.deadline.getHours().toString();
-    $scope.selectedMinute = $scope.deadline.getMinutes().toString();
-
-
-  };
-
-  function getTicket(id) {
-    let k_scope = get_kanban_scope();
-    return k_scope.project.tickets[id];
-  }
-
-  function getTid() {
-    let sel = 'div[ng-controller="ModalCtrl as $ctrl"]';
-    return angular.element(sel).scope().tid;
-  }
 
   //Enables all popovers.
   $('[data-toggle="popover"]').popover();
@@ -333,60 +307,21 @@ app.controller('editTicketCtrl', function($scope, $document, $uibModal) {
   //Get users for this ticket.
   getTicketUsers(get_kanban_scope().pid, getTid());
 
-  //Initialise arrays for drop down boxes
-  //TODO: Seems bad to do this every time?
-  $scope.days = generateArray(1, 31);
-
-  $scope.months = generateArray(1, 12);
-  $scope.years = ["2017", "2018"];
-  $scope.hours = generateArray(0, 23);
-  $scope.minutes = generateArray(0, 59);
-
   $scope.tid = getTid();
   $scope.ticket = getTicket($scope.tid);
   $scope.desc = $scope.ticket.desc;
 
-  $scope.deadlineUpdate();
-
-  $scope.saveEditDeadline = function() {
-
-    let ticket = getTicket($scope.tid);
-
-    sendTicketUpdateDeadline(ticket, get_kanban_scope().pid,
-      $scope.selectedMonth,
-      $scope.selectedYear,
-      $scope.selectedDay,
-      $scope.selectedHour,
-      $scope.selectedMinute);
+  $scope.format = 'yyyy-MMMM-dd';
+  $scope.today();
+  $scope.dt = $scope.ticket.deadline;
+  $scope.hstep = 1;
+  $scope.mstep = 1;
+  $scope.options = {
+    hstep: [1, 2, 3],
+    mstep: [1, 5, 10, 15, 25, 30]
   };
 
-  $scope.resetDeadline = function() {
-    let ticket = getTicket($scope.tid);
-
-    ticket.resetDeadline();
-    $scope.deadlineUpdate();
-    sendTicketUpdateDeadline(ticket, get_kanban_scope().pid,
-      $scope.selectedMonth,
-      $scope.selectedYear,
-      $scope.selectedDay,
-      $scope.selectedHour,
-      $scope.selectedMinute);
-  };
-
-  $scope.saveEditDesc = function(text) {
-    let ticket = getTicket($scope.tid);
-    if (ticket !== undefined) {
-      sendTicketUpdateDesc(ticket, get_kanban_scope().pid, text);
-    }
-
-  };
-
-  $scope.updateProgress = function() {
-
-    let ticket = getTicket($scope.tid);
-    ticket.updateProgress();
-
-  }
+  $scope.ismeridian = true;
 });
 
 app.controller('deleteTicketCtrl', function($scope, $sce) {

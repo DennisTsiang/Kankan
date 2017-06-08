@@ -8,30 +8,26 @@
           <div class="container-fluid">
             <div ng-controller="editTicketCtrl">
               <p editable-textarea="desc" onaftersave="saveEditDesc(desc)">{{desc || 'empty'}}</p>
-
-              <!--
-              <div ng-controller="DatepickerPopupDemoCtrl">
-                <div class="row vertical-align">
-                  <div class="col-md-6">
-                    <div ng-controller="TimepickerDemoCtrl" style="text-align: -webkit-center">
-                      <div uib-timepicker ng-model="mytime" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+              <div ng-controller="DeadlineCollapseCtrl">
+                <button type="button" class="btn btn-md btn-default" ng-click="isCollapsed = !isCollapsed">Edit deadline</button>
+                <div class="well"  uib-collapse="isCollapsed">
+                  <div class="row vertical-align">
+                    <div class="col-md-6">
+                      <div style="text-align: -webkit-center">
+                        <div uib-timepicker ng-model="dt" ng-change="saveEditDeadline(dt)" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <p class="input-group">
+                        <input type="text" class="form-control" ng-change="saveEditDeadline(dt)" uib-datepicker-popup="{{format}}" ng-model="dt" is-open="popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
+                        <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" ng-click="openCalendar()"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                      </p>
                     </div>
                   </div>
-                  <div class="col-md-6">
-                    <p class="input-group">
-                      <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dt" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
-                      <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              -->
 
-              <div ng-controller="DeadlineCollapseCtrl">
-                <button type="button" class="btn btn-lg btn-default" ng-click="isCollapsed = !isCollapsed">Edit deadline</button>
-                <div uib-collapse="isCollapsed">
+                <!--
                   <h3 class="center-align-text"> Submit a new deadline for this task</h3>
 
                   <div class="row">
@@ -75,7 +71,7 @@
 
                     <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
 
-                  -->
+-->
                 </div>
               </div>
               <br />

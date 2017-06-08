@@ -35,8 +35,7 @@ function App (db) {
           //       db.newColumn(newPid, "In Progess", 1, function (res2) {
           //         db.newColumn(newPid, "Done", 2, function (res3) {
                     resetLock.unlock();
-                    console.log("Deleted project " + pid);
-                    response.sendFile(frontend + 'frontend/kankan.html');
+                    //response.sendFile(frontend + 'frontend/kankan.html');
                 //   });
                 // });
               });
