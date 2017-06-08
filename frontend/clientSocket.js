@@ -10,7 +10,7 @@ function initiateConnection() {
 
 function setOnEvents() {
   socket.on('disconnect', function(){
-    alert("Disconnected");
+    console.log("Disconnected");
   });
 
   socket.on('requestreply', function(reply) {

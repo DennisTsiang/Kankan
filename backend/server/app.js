@@ -13,6 +13,7 @@ var express = require('express')();
 var http = require('http').Server(express);
 var io = require('socket.io')(http);
 var search = require('./fileGrep');
+var github = require('./gitHubIntegration');
 
 start_server(httpPort);
 
@@ -301,8 +302,9 @@ function start_server (port) {
     http.listen(port);
     console.log("HTTP server listening on port " + port + " at localhost.");
   }
-  search.setUpEventHandlers();
-  search.findString('findString(');
+
+  github.setGHRepo("pksunkara", "octonode");
+  github.printRepos();
 
 }
 
