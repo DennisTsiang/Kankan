@@ -96,9 +96,8 @@ app.controller('KanbanCtrl', function($scope, $location) {
 
   //updateTickets();
 
-  $scope.getBorderColour = function(millisecondsLeft, deadlineActive) {
+  $scope.getBorderColour = function(timeLeft, deadlineActive) {
     let css;
-    let timeLeft = millisecondsLeft/(1000 * 60 * 60)
 
     if (deadlineActive) {
       console.log("active");
@@ -128,6 +127,10 @@ app.controller('KanbanCtrl', function($scope, $location) {
           'border': '2px solid #ff0000'
         };
       }else{
+        css = {
+          'border': '2px solid #26292e'
+
+        };
 
       }
     } else {
@@ -211,6 +214,41 @@ app.controller('editColumnCtrl', function($scope) {
 app.controller('DeadlineCtrl', function ($scope) {
 });
 
+app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
+  var $ctrl = this;
+  $ctrl.animationsEnabled = true;
+
+  $ctrl.open = function (size, project) {
+    var modalInstance = $uibModal.open({
+      animation: $ctrl.animationsEnabled,
+      ariaLabelledBy: 'modal-title',
+      ariaDescribedBy: 'modal-body',
+      templateUrl: 'AddUsersModal.html',
+      controller: 'AddUsersInstanceCtrl',
+      controllerAs: '$ctrl',
+      size: size,
+      resolve: {
+        items: function () {
+          return project;
+        }
+      }
+    });
+  };
+});
+
+app.controller('AddUsersInstanceCtrl', function ($uibModalInstance, items) {
+  var $ctrl = this;
+  $ctrl.title = items.title;
+
+  $ctrl.ok = function () {
+    $uibModalInstance.close();
+  };
+
+  $ctrl.addUser = function (username) {
+    addUserToProject(username, items.project_id);
+  }
+});
+
 app.controller('editTicketCtrl', function($scope) {
 
   $scope.dynamicPopover = {
@@ -261,7 +299,7 @@ app.controller('editTicketCtrl', function($scope) {
     sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, deadline);
     updateTicketTimes()
 
-    
+
   };
 
   $scope.resetDeadline = function() {

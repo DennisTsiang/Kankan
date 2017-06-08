@@ -9,7 +9,8 @@ function Ticket(ticket_id) {
   //this.progress = 0;
   this.deadlineActive = false;
   this.timeLeft = 0;
-  this.timeLeftFormatted = "Coming soon!";
+  this.timeLeftFormatted = "";
+  this.timeFormatter = "";
 
   this.addMembersToTicket = function(array) {
     for (let i = 0; i < array.length; i++) {
@@ -73,7 +74,32 @@ function Ticket(ticket_id) {
 
     let currentDate = new Date();
 
-    this.timeLeft= endtime - currentDate;
+    this.timeLeft = (endtime - currentDate)/(1000 * 3600);
+    if(this.timeLeft < 0){
+      this.deadlineActive = false;
+      this.timeLeft = 0;
+
+    }
+
+    console.log("time left is " + this.timeLeft);
+
+    if(this.timeLeft < 1){
+      this.timeFormatter = "minutes";
+      this.timeLeftFormatted  = (Math.floor(this.timeLeft * 60)).toString();
+
+    }else if(this.timeLeft < (24)){
+      this.timeFormatter = "hours";
+      this.timeLeftFormatted  = (Math.floor(this.timeLeft)).toString();
+    }else if(this.timeLeft < (2 * 24)){
+      this.timeFormatter = "day";
+      this.timeLeftFormatted  = (Math.floor(this.timeLeft/24)).toString();
+    }else{
+      this.timeFormatter = "days";
+      this.timeLeftFormatted  = (Math.floor(this.timeLeft/24)).toString();
+    }
+
+
+
 
     /*
 
