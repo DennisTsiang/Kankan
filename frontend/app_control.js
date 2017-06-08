@@ -96,10 +96,9 @@ app.controller('KanbanCtrl', function($scope, $location) {
 
   //updateTickets();
 
-  $scope.getBorderColour = function(millisecondsLeft, deadlineActive) {
+  $scope.getBorderColour = function(timeLeft, deadlineActive) {
     let css;
-    let timeLeft = millisecondsLeft/(1000 * 60 * 60)
-
+    
     if (deadlineActive) {
       console.log("active");
       if (timeLeft > 5) {
@@ -241,7 +240,7 @@ app.controller('editTicketCtrl', function($scope) {
     sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, deadline);
     updateTicketTimes()
 
-    
+
   };
 
   $scope.resetDeadline = function() {
