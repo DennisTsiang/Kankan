@@ -65,8 +65,7 @@ app.controller('LoginController', function($scope, $location) {
   };
 
   $scope.newUser = function(username) {
-    addUserToProject(username, 0);
-    $location.path('/home');
+    storeNewUser(username);
   }
 });
 
