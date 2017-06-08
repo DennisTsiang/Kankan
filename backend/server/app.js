@@ -155,6 +155,11 @@ function App (db) {
           callback({type : 'user_check', result : result});
         });
         break;
+      case 'project_users' :
+        db.getProjectUsers(request['pid'], function (users) {
+          callback({type: 'project_users', object:users});
+        });
+        break;
       default:
         //TODO: Handle unknown request.
         break;
@@ -276,6 +281,27 @@ function App (db) {
       case 'project_remove':
         db.deleteProject(remove.pid, function (success) {
           callback({type:'project_remove', pid:remove.pid}, null);
+        });
+        break;
+      case 'user_remove' :
+        db.removeUser(remove.pid, remove.username, function(success) {
+          db.getKanban(remove['pid'], function (kanban) {
+            callback({type:'user_remove', object:kanban}, remove.pid);
+          });
+        });
+        break;
+      case "userOfProject_remove" :
+        db.removeUserFromProject(remove.username, remove.pid, function (success) {
+          db.getKanban(remove['pid'], function (kanban) {
+            callback({type: 'userOfProject_remove', object: kanban}, remove.pid);
+          });
+        });
+        break;
+      case "userOfTicket_remove" :
+        db.removeUserFromTicket(remove.username, remove.pid, remove.tid, function(success) {
+          db.getKanban(remove['pid'], function (kanban) {
+            callback({type:'userOfTicket_remove', object:kanban}, remove.pid);
+          });
         });
         break;
       default:

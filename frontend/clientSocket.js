@@ -131,6 +131,21 @@ function removeTicket(pid, ticket_id) {
   socket.emit("remove", JSON.stringify(jsonString));
 }
 
+function removeUser(pid, username) {
+  var jsonString = {type : 'user_remove', pid:pid, username:username};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
+function removeUserFromProject(pid, username) {
+  var jsonString = {type : 'userOfProject_remove', pid:pid, username:username};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
+function removeUserFromTicket(pid, username, tid) {
+  var jsonString = {type : 'userOfTicket_remove', pid:pid, username:username, tid:tid};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
 function getUserProjects(username, pid) {
   var jsonString = {type:'user_projects', username : username, pid : pid};
   socket.emit("request", JSON.stringify(jsonString));
@@ -158,6 +173,11 @@ function getUserTickets(username, pid) {
 
 function sendUsernameCheck(username) {
   var jsonString = {type: 'user_check', username : username};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
+function getProjectUsers(pid) {
+  var jsonString = {type : 'project_users', pid:pid};
   socket.emit("request", JSON.stringify(jsonString));
 }
 
@@ -210,6 +230,10 @@ function requestHandler(reply) {
       var taken = reply.result;
       break;
     }
+    case "project_users" : {
+      var users = reply.object;
+      break;
+    }
   }
 }
 
@@ -238,6 +262,17 @@ function removeHandler(reply) {
       } else {
         console.error("Getting deletion info for different project.")
       }
+      break;
+    }
+    case "user_remove" : {
+
+      break;
+    }
+    case "userOfTicket_remove" : {
+      //remove a user from a ticket
+      break;
+    }
+    case "userOfProject_remove" : {
       break;
     }
   }
