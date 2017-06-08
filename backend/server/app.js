@@ -12,6 +12,7 @@ var ticket = require('./ticket');
 var express = require('express')();
 var http = require('http').Server(express);
 var io = require('socket.io')(http);
+var search = require('./fileGrep');
 
 start_server(httpPort);
 
@@ -300,6 +301,9 @@ function start_server (port) {
     http.listen(port);
     console.log("HTTP server listening on port " + port + " at localhost.");
   }
+  search.setUpEventHandlers();
+  search.findString('findString(');
+
 }
 
 function stop_server() {
