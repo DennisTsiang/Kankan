@@ -1,26 +1,46 @@
-<div ng-controller="PopoverDemoCtrl">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-xs-3"></div>
-            <div class="col-xs-6 button-centered">
-                <h2 class="username-title">Welcome {{username}}</h2>
-                <br />
-                <div class="list-group">
-                    <a class="list-group-item username" ng-repeat="proj in a_k.projects" ng-click="chooseProject(proj.project_id)">
-                    {{proj.title}}
-                    </a>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-3"></div>
+        <div class="col-xs-6 button-centered">
+            <h2 class="username-title">Welcome {{username}}</h2>
+            <br />
+                <div>
+                    <ul>
+                        <div class="username" ng-repeat="proj in a_k.projects">
+                            <div class="btn-group btn-flex button-centered">
+                                <button type="button" ng-click="chooseProject(proj.project_id)"
+                                        class="btn btn-default btn-lg">{{proj.title}}</button>
+                                <button type="button" class="btn btn-default dropdown-toggle btn-lg" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu pull-right">
+                                    <li><a>Add Users</a></li>
+                                    <li><a ng-click="deleteProject(proj.project_id)">Delete Project</a></li>
+                                </ul>
+                            </div>
+                            <br />
+                        </div>
+                           <!--class="list-group-item username" ng-repeat="proj in a_k.projects"
+                           >{{proj.title}}-->
+                    </ul>
                 </div>
                 <br />
-                <button uib-popover-template="dynamicPopover.templateUrl" type="button" class="btn btn-primary">Create New Project</button>
-            </div>
+                <div ng-controller="NewProjectPopoverCtrl">
+                    <button popover-placement="right" uib-popover-template="dynamicPopover.templateUrl" type="button" class="btn btn-primary">Create New Project</button>
+                </div>
             <div class="col-xs-3"></div>
         </div>
     </div>
 </div>
-<script type="text/ng-template" id="myPopoverTemplate.html">
+
+<script type="text/ng-template" id="NewProjectPopover.html">
     <div class="form-group">
         <label>Enter Your New Project Title:</label>
-        <input type="text" ng-model="dynamicPopover.title" class="form-control">
-        <button type="submit" class="btn btn-primary" ng-click="newProject(dynamicPopover.title)">Create</button>
+        <input type="text" placeholder = "Enter here" ng-model="dynamicPopover.content" class="form-control username">
+        <br />
+        <button type="submit" class="btn btn-primary" ng-click="newProject(dynamicPopover.content)">Create</button>
     </div>
 </script>
+

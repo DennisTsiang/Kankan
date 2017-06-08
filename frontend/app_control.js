@@ -3,6 +3,7 @@
  */
 
 let app = angular.module('Kankan', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select', "ngRoute"]);
+var location;
 
 app.config(function($routeProvider) {
   $routeProvider
@@ -43,17 +44,24 @@ app.controller('HomeController', function($scope, $location) {
       get_kanban_scope().pid = proj_id;
       $location.path('/kanban');
     };
+
+    $scope.deleteProject = function(proj_id) {
+      removeProject(proj_id)
+    }
   }
 });
 
-app.controller('PopoverDemoCtrl', function($scope, $sce) {
+app.controller('NewProjectPopoverCtrl', function($scope, $sce) {
   $scope.dynamicPopover = {
-    templateUrl: 'myPopoverTemplate.html',
-    title: 'Enter Here'
+    templateUrl: 'NewProjectPopover.html'
   };
   $scope.newProject = function(project_name) {
     sendStoreProject(project_name);
   }
+});
+
+app.controller('ProjectDropdownCtrl', function ($scope, $sce) {
+
 });
 
 app.controller('LoginController', function($scope, $location) {
@@ -66,6 +74,8 @@ app.controller('LoginController', function($scope, $location) {
 
   $scope.newUser = function(username) {
     storeNewUser(username);
+    get_kanban_scope().username = username;
+    $location.path('/home');
   }
 });
 
@@ -231,6 +241,7 @@ app.controller('editTicketCtrl', function($scope) {
     sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, deadline);
     updateTicketTimes()
 
+    
   };
 
   $scope.resetDeadline = function() {
