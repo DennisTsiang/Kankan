@@ -432,6 +432,21 @@ function Database(pool) {
         }
       });
     });
+  };
+
+  this.checkUserExists = function(username, callback) {
+    //returns true if user already exists
+    rwlock.writeLock(function(){
+      pool.query('SELECT username FROM users WHERE username = $1::text', [username], function (res) {
+        rwlock.unlock();
+        if (res.rows.length > 0) {
+          console.log("Username exists in db");
+          callback(true);
+        } else {
+          callback(false);
+        }
+      });
+    });
   }
 }
 
