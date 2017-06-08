@@ -87,17 +87,27 @@ app.controller('KanbanCtrl', function($scope, $location) {
     //Enable popovers
     $('[data-toggle="popover"]').popover();
 
+
     sendKanbanRequest(get_kanban_scope().pid);
+
 
     $scope.sendKanbanRequest = function(pid) {
       sendKanbanRequest(pid);
     }
   }
 
+<<<<<<< HEAD
   //updateTickets();
+=======
+  updateProgressTickets();
+  $scope.goHome = function () {
+    $location.path('/home');
+  };
+>>>>>>> 77483c8bf179e7e12c562ee47daf766b6226853b
 
-  $scope.getBorderColour = function(timeLeft, deadlineActive) {
+  $scope.getBorderColour = function(millisecondsLeft, deadlineActive) {
     let css;
+    let timeLeft = millisecondsLeft/(1000 * 60 * 60)
 
     if (deadlineActive) {
       console.log("active");
@@ -127,10 +137,6 @@ app.controller('KanbanCtrl', function($scope, $location) {
           'border': '2px solid #ff0000'
         };
       }else{
-        css = {
-          'border': '2px solid #26292e'
-
-        };
 
       }
     } else {
@@ -214,41 +220,6 @@ app.controller('editColumnCtrl', function($scope) {
 app.controller('DeadlineCtrl', function ($scope) {
 });
 
-app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
-  var $ctrl = this;
-  $ctrl.animationsEnabled = true;
-
-  $ctrl.open = function (size, project) {
-    var modalInstance = $uibModal.open({
-      animation: $ctrl.animationsEnabled,
-      ariaLabelledBy: 'modal-title',
-      ariaDescribedBy: 'modal-body',
-      templateUrl: 'AddUsersModal.html',
-      controller: 'AddUsersInstanceCtrl',
-      controllerAs: '$ctrl',
-      size: size,
-      resolve: {
-        items: function () {
-          return project;
-        }
-      }
-    });
-  };
-});
-
-app.controller('AddUsersInstanceCtrl', function ($uibModalInstance, items) {
-  var $ctrl = this;
-  $ctrl.title = items.title;
-
-  $ctrl.ok = function () {
-    $uibModalInstance.close();
-  };
-
-  $ctrl.addUser = function (username) {
-    addUserToProject(username, items.project_id);
-  }
-});
-
 app.controller('editTicketCtrl', function($scope) {
 
   $scope.dynamicPopover = {
@@ -258,7 +229,6 @@ app.controller('editTicketCtrl', function($scope) {
   };
 
   $scope.addUser = function (username) {
-    console.log(username);
     addUserToTicket(username, get_kanban_scope().pid, $scope.tid);
   };
 
@@ -278,7 +248,6 @@ app.controller('editTicketCtrl', function($scope) {
     console.log(deadline);
     sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, deadline);
     updateTicketTimes()
-
 
   };
 
