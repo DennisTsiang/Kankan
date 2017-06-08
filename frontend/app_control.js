@@ -217,6 +217,7 @@ app.controller('editColumnCtrl', function($scope) {
 });
 
 app.controller('DeadlineCtrl', function ($scope) {
+
 });
 
 app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
