@@ -45,6 +45,10 @@ app.controller('HomeController', function($scope, $location) {
       get_kanban_scope().pid = proj_id;
       $location.path('/kanban');
     };
+
+    $scope.deleteProject = function(proj_id) {
+      removeProject(proj_id)
+    }
   }
 });
 

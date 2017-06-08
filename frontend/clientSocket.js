@@ -156,6 +156,11 @@ function getUserTickets(username, pid) {
   socket.emit("request", JSON.stringify(jsonString));
 }
 
+function sendUsernameCheck(username) {
+  var jsonString = {type: 'user_check', username : username};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
 function requestHandler(reply) {
   var type = reply.type;
   var request_data = reply.object;
@@ -203,6 +208,11 @@ function requestHandler(reply) {
       } else {
         get_kanban_scope().l.path('/login');
       }
+      break;
+    }
+    case "user_check" : {
+      var taken = reply.result;
+      break;
     }
   }
 }
@@ -211,8 +221,10 @@ function removeHandler(reply) {
   let type = reply.type;
   switch (type) {
     case "project_remove" : {
-      //TODO: Implement project deletion
       //Kick out of kanban view, take back to home page?
+      var pid = reply.pid;
+      delete get_kanban_scope().projects[pid];
+      get_kanban_scope().$apply();
       break;
     }
     case "column_remove" : {

@@ -95,7 +95,12 @@ function App (db) {
     socket.on('remove', function (data) {
       console.log('Received Remove');
       _this.handleRemove(JSON.parse(data), function (response, pid) {
-        io.sockets.in(pid).emit('removereply', JSON.stringify(response));
+        if (pid === null) {
+          socket.emit('removereply', JSON.stringify(response));
+          socket.broadcast.emit('removereply', JSON.stringify(response));
+        } else {
+          io.sockets.in(pid).emit('removereply', JSON.stringify(response));
+        }
         console.log('Replied to delete');
       });
     });
@@ -144,7 +149,12 @@ function App (db) {
         break;
       case 'user_new' :
         db.addNewUser(request['username'], function (success) {
-          callback( {type: 'user_new', success:success})
+          callback( {type: 'user_new', success:success});
+        });
+        break;
+      case 'user_check' :
+        db.checkUserExists(request['username'], function(result){
+          callback({type : 'user_check', result : result});
         });
         break;
       default:
@@ -263,9 +273,8 @@ function App (db) {
         break;
       case 'project_remove':
         db.deleteProject(remove.pid, function (success) {
-              callback({type: 'project_remove', pid: remove.pid}, remove.pid);
-            }
-        );
+          callback({type:'project_remove', pid:remove.pid}, null);
+        });
         break;
       default:
         //TODO: Handle unknown update.
