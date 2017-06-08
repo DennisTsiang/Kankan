@@ -3,7 +3,6 @@
  */
 
 let app = angular.module('Kankan', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select', "ngRoute"]);
-var location;
 
 app.config(function($routeProvider) {
   $routeProvider
@@ -23,10 +22,12 @@ app.config(function($routeProvider) {
     });
 });
 
-app.controller('ApplicationCtrl', function($scope) {
+app.controller('ApplicationCtrl', function($scope, $location) {
   $scope.projects = [];
   $scope.project = undefined;
   $scope.pid = undefined;
+
+  $scope.l = $location;
 
   initiateConnection();
 });
@@ -52,6 +53,7 @@ app.controller('NewProjectPopoverCtrl', function($scope, $sce) {
     templateUrl: 'NewProjectPopover.html'
   };
   $scope.newProject = function(project_name) {
+    $scope.$parent.$close();
     sendStoreProject(project_name);
   }
 });
@@ -71,7 +73,7 @@ app.controller('LoginController', function($scope, $location) {
   $scope.newUser = function(username) {
     storeNewUser(username);
     get_kanban_scope().username = username;
-    $location.path('/home');
+    //$location.path('/home');
   }
 });
 

@@ -197,7 +197,12 @@ function requestHandler(reply) {
       break;
     }
     case "user_new" : {
-
+      if (reply.success) {
+        get_kanban_scope().l.path('/home');
+        get_kanban_scope().$apply();
+      } else {
+        get_kanban_scope().l.path('/login');
+      }
     }
   }
 }
@@ -285,6 +290,7 @@ function storeHandler(reply) {
         addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
       } else {
         //TODO: something else
+
         console.log("Max ticket limit reached for this column ");
       }
       break;
