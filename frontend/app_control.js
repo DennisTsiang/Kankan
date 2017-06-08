@@ -3,6 +3,7 @@
  */
 
 let app = angular.module('Kankan', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select', "ngRoute"]);
+var location;
 
 app.config(function($routeProvider) {
   $routeProvider
@@ -43,17 +44,24 @@ app.controller('HomeController', function($scope, $location) {
       get_kanban_scope().pid = proj_id;
       $location.path('/kanban');
     };
+
+    $scope.deleteProject = function(proj_id) {
+      removeProject(proj_id)
+    }
   }
 });
 
-app.controller('PopoverDemoCtrl', function($scope, $sce) {
+app.controller('NewProjectPopoverCtrl', function($scope, $sce) {
   $scope.dynamicPopover = {
-    templateUrl: 'myPopoverTemplate.html',
-    title: 'Enter Here'
+    templateUrl: 'NewProjectPopover.html'
   };
   $scope.newProject = function(project_name) {
     sendStoreProject(project_name);
   }
+});
+
+app.controller('ProjectDropdownCtrl', function ($scope, $sce) {
+
 });
 
 app.controller('LoginController', function($scope, $location) {
@@ -66,6 +74,8 @@ app.controller('LoginController', function($scope, $location) {
 
   $scope.newUser = function(username) {
     storeNewUser(username);
+    get_kanban_scope().username = username;
+    $location.path('/home');
   }
 });
 
@@ -77,7 +87,9 @@ app.controller('KanbanCtrl', function($scope, $location) {
     //Enable popovers
     $('[data-toggle="popover"]').popover();
 
+
     sendKanbanRequest(get_kanban_scope().pid);
+
 
     $scope.sendKanbanRequest = function(pid) {
       sendKanbanRequest(pid);
@@ -85,6 +97,9 @@ app.controller('KanbanCtrl', function($scope, $location) {
   }
 
   updateProgressTickets();
+  $scope.goHome = function () {
+    $location.path('/home');
+  };
 
   $scope.getBorderColour = function(progress, deadlineActive) {
     let css;
@@ -199,7 +214,6 @@ app.controller('editTicketCtrl', function($scope) {
   };
 
   $scope.addUser = function (username) {
-    console.log(username);
     addUserToTicket(username, get_kanban_scope().pid, $scope.tid);
   };
 

@@ -97,7 +97,12 @@ function App (db) {
     socket.on('remove', function (data) {
       console.log('Received Remove');
       _this.handleRemove(JSON.parse(data), function (response, pid) {
-        io.sockets.in(pid).emit('removereply', JSON.stringify(response));
+        if (pid === null) {
+          socket.emit('removereply', JSON.stringify(response));
+          socket.broadcast.emit('removereply', JSON.stringify(response));
+        } else {
+          io.sockets.in(pid).emit('removereply', JSON.stringify(response));
+        }
         console.log('Replied to delete');
       });
     });
@@ -129,7 +134,9 @@ function App (db) {
         break;
       case 'add_user_to_ticket':
         db.addUserToTicket(request["username"], request["tid"], request["pid"], function(success) {
-          callback({type:'add_user_to_project'});
+          db.getTicketUsers(request['pid'], request['tid'], function(tid, users) {
+            callback({type:'ticket_users', object:{tid: tid, users: users}});
+          })
         });
         break;
       case 'user_tickets':
@@ -139,12 +146,17 @@ function App (db) {
         break;
       case 'ticket_users':
         db.getTicketUsers(request["pid"], request["tid"], function (tid, users) {
-          callback({type:'user_tickets', object:{tid: tid, users: users}});
+          callback({type:'ticket_users', object:{tid: tid, users: users}});
         });
         break;
       case 'user_new' :
-        db.addNewUser(store['username'], function (success) {
-          callback( {type: 'user_new', success:success})
+        db.addNewUser(request['username'], function (success) {
+          callback( {type: 'user_new', success:success});
+        });
+        break;
+      case 'user_check' :
+        db.checkUserExists(request['username'], function(result){
+          callback({type : 'user_check', result : result});
         });
         break;
       default:
@@ -263,9 +275,8 @@ function App (db) {
         break;
       case 'project_remove':
         db.deleteProject(remove.pid, function (success) {
-              callback({type: 'project_remove', pid: remove.pid}, remove.pid);
-            }
-        );
+          callback({type:'project_remove', pid:remove.pid}, null);
+        });
         break;
       default:
         //TODO: Handle unknown update.
