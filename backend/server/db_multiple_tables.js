@@ -70,9 +70,11 @@ function Database(pool) {
       pool.query('DROP TABLE columns_' + pid, [], function (err, res) {
         pool.query('DELETE FROM project_table WHERE project_id = $1::int', [pid], function (err, res2) {
           pool.query('DROP TABLE tickets_' + pid, [], function (err, res3) {
-            console.log('Deleted project ' + pid);
-            rwlock.unlock();
-            callback(true);
+            pool.query('DELETE FROM user_projects WHERE project_id = $1::int', [pid], function(res4) {
+              console.log('Deleted project ' + pid);
+              rwlock.unlock();
+              callback(true);
+            });
           });
         });
       });

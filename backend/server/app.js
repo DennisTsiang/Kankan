@@ -25,26 +25,27 @@ function App (db) {
     frontend = frontend.substring(0, frontend.length - 14);
     if (request.originalUrl === "/") {
       response.sendFile(frontend + 'frontend/kankan.html');
-    } else if (request.originalUrl === "/ResetTable") {
+    } else if (request.originalUrl.match(/DeleteTable\/(\d)/)) {
       resetLock.lock(function () {
-        db.deleteProject(0, function (successful) {
-          db.newProject("Kanban", function (newPid) {
-            if (newPid === 0) {
-              db.newColumn(newPid, "To Do", 0, function (res1) {
-                db.newColumn(newPid, "In Progess", 1, function (res2) {
-                  db.newColumn(newPid, "Done", 2, function (res3) {
+        var pid = parseInt(request.originalUrl.substring(request.originalUrl.length-1));
+        db.deleteProject(pid, function (successful) {
+          // db.newProject("Kanban", function (newPid) {
+          //   if (newPid === 0) {
+          //     db.newColumn(newPid, "To Do", 0, function (res1) {
+          //       db.newColumn(newPid, "In Progess", 1, function (res2) {
+          //         db.newColumn(newPid, "Done", 2, function (res3) {
                     resetLock.unlock();
-                    console.log("Finished Setup");
+                    console.log("Deleted project " + pid);
                     response.sendFile(frontend + 'frontend/kankan.html');
-                  });
-                });
+                //   });
+                // });
               });
-            } else {
-              resetLock.unlock();
-              console.error("Wrong pid!");
-            }
-          });
-        });
+            // } else {
+            //   resetLock.unlock();
+            //   console.error("Wrong pid!");
+            // }
+        //   });
+        // });
       });
     } else {
       response.sendFile(frontend + 'frontend' + request.originalUrl);
