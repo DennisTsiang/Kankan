@@ -29,7 +29,7 @@
                 </div>
                 <br />
                 <div ng-controller="NewProjectPopoverCtrl">
-                    <button popover-placement="right" uib-popover-template="dynamicPopover.templateUrl" type="button" class="btn btn-primary">Create New Project</button>
+                    <button popover-placement="right" uib-popover-template="dynamicPopover.templateUrl" popover-is-open="isOpen" ng-click="isOpen = true" type="button" class="btn btn-primary">Create New Project</button>
                 </div>
             <br />
             <button type="button" class="btn btn-info" ng-click="logOut()">Log Out</button>
