@@ -53,6 +53,13 @@ updateColLimitEvent = function (event) {
   let limit = event.srcElement.value;
   if (isNaN(limit)) {
     alert("Ticket limit must be a number");
+
+  } else if(limit < 1) {
+    alert("Column must be able to contain at least one ticket");
+
+  } else if (limit > 100) {
+    alert("Ticket limit must not exceed 100");
+
   } else {
     sendColumnUpdateLimit(get_kanban_scope().pid, colId, limit);
   }
