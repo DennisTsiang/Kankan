@@ -273,6 +273,7 @@ function Database(pool) {
       pool.query('SELECT ticket_id FROM tickets_' + pid + ' WHERE ticket_id = $1::int',
           [ticket.ticket_id], function (res) {
         if (res.rows.length === 1) {
+          var escTicketDesc = newDescription.replace(/"/g,'\\"').replace(/'/g, "\\'");
           pool.query('UPDATE tickets_' + pid + ' SET ticket_description = $1::text WHERE ticket_id = $2::int',
               [newDescription, ticket.ticket_id],
             function (insertion) {
