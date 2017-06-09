@@ -411,9 +411,8 @@ app.controller('deleteTicketCtrl', function($scope, $sce) {
 
   $scope.delete_ticket_button_click = function(id) {
     let info_header = $('#ticket_info_title')[0];
-
     //DIRTY - done to close modal.
-    $scope.$parent.$parent.$close();
+    $scope.$parent.$close();
 
     removeTicket(get_kanban_scope().pid, id);
     delete_ticket(id, false);
