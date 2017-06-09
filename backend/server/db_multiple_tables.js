@@ -152,7 +152,7 @@ function Database(pool) {
               var columns = [];
               res2.rows.forEach(function (row) {
                 //Get column ordering
-                var c = new column.Column(row["column_id"], row["column_title"], row["column_position", row["column_limit"]]);
+                var c = new column.Column(row["column_id"], row["column_title"], row["column_position"], row["column_limit"]);
                 columns.push(c);
               });
 
