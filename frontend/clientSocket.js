@@ -250,6 +250,10 @@ function removeHandler(reply) {
     case "project_remove" : {
       //Kick out of kanban view, take back to home page?
       var pid = reply.pid;
+      var currentpath = get_kanban_scope().l.path();
+      if (currentpath === '/kanban' && get_kanban_scope().pid === pid) {
+        get_kanban_scope().l.path('/home');
+      }
       delete get_kanban_scope().projects[pid];
       get_kanban_scope().$apply();
       break;
