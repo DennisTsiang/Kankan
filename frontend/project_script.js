@@ -49,7 +49,7 @@ function addColumn(title, position, id) {
 }
 
 updateColLimitEvent = function (event) {
-  let colId = event.srcElement.attributes['cid'];
+  let colId = event.srcElement.attributes['cid'].nodeValue;
   let limit = event.srcElement.value;
   if (isNaN(limit)) {
     alert("Ticket limit must be a number");
