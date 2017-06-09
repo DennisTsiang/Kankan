@@ -90,7 +90,7 @@ function generateTickets(ticket_info_list) {
   for (let ticket_info of ticket_info_list) {
     addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime);
   }
-  updateTicketTimes()
+  updateTicketTimes();
   updateTickets();
 
 }
@@ -110,9 +110,12 @@ function generate_kanban(received_project) {
   k_scope.project.column_order = {};
 
   for (let i = 0; i < received_project.columns.length; i++) {
-    let title = received_project.columns[i].title;
-    let position = received_project.columns[i].position;
-    let column = new Column(received_project.columns[i].column_id, title, position);
+    let received_column = received_project.columns[i];
+    let title = received_column.title;
+    let position = received_column.position;
+    let limit = received_column.limit;
+    let cid = received_column.column_id;
+    let column = new Column(cid, title, position, limit === null ? undefined : limit);
     k_scope.project.column_order[position] = column.column_id;
     k_scope.project.columns[column.column_id] = column;
   }
