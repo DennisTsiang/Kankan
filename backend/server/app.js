@@ -254,6 +254,7 @@ function App (db) {
             callback({type: 'column_limit', pid: update['pid'], cid: update['cid'], limit: update['limit']},
                 success, update.pid);
         });
+        break;
       default:
         //TODO: Handle unknown update.
         break;

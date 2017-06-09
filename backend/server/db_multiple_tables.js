@@ -500,6 +500,16 @@ function Database(pool) {
       });
     });
   };
+
+  this.updateColumnLimit = function (pid, cid, limit, callback) {
+    rwlock.writeLock(function() {
+      pool.query('UPDATE columns_' + pid + ' SET column_limit = $1::int WHERE column_id = $2::int',
+          [limit, cid], function(err, res) {
+        rwlock.unlock();
+        callback(true);
+      });
+    });
+  };
 }
 
 module.exports.Database = Database;

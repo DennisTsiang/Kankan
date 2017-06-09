@@ -189,6 +189,13 @@
                         </th>
                       </tr>
                       <tr>
+                        <td class="column-title" style="text-align: center;">
+                          <div class="form-group">
+                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" value="{{project.columns[col].limit}}" placeholder="Ticket limit" onchange="updateColLimitEvent(event)">
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
                         <td class="center-align-text">
                           <button type="button" class="btn btn-warning" ng-click="removeColumn(project.columns[col])">Remove</button>
                         </td>
