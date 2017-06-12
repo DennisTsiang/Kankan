@@ -24,7 +24,9 @@ function addTicket(col_id, ticket_id, desc, deadline) {
   let ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
+  if(deadline != null){
   ticket.setDeadline(deadline);
+  }
 
   let s = get_kanban_scope();
   s.project.tickets[ticket_id] = ticket;
@@ -46,12 +48,38 @@ function addColumn(title, position, id) {
   enableDnDColumns();
 }
 
+updateColLimitEvent = function (event) {
+  let colId = event.srcElement.attributes['cid'].nodeValue;
+  let limit = event.srcElement.value;
+  if (isNaN(limit)) {
+    alert("Ticket limit must be a number");
+
+  } else if(limit < 1) {
+    alert("Column must be able to contain at least one ticket");
+
+  } else if (limit > 100) {
+    alert("Ticket limit must not exceed 100");
+
+  } else {
+    sendColumnUpdateLimit(get_kanban_scope().pid, colId, limit);
+  }
+};
+
 function move_tickets(to_col_id, from_col_id, tid) {
   let scope = get_kanban_scope();
-  scope.project.tickets[tid].setColumn(to_col_id);
-  delete scope.project.columns[from_col_id].tickets[tid];
-  scope.project.columns[to_col_id].tickets[tid] = scope.project.tickets[tid];
-  scope.$apply();
+  let toColumn = scope.project.columns[to_col_id];
+  let fromColumn = scope.project.columns[from_col_id];
+  let column_limit = toColumn.limit;
+
+  let to_ticket_number = Object.keys(toColumn.tickets).length;
+  if (column_limit === undefined || to_ticket_number < column_limit ) {
+    scope.project.tickets[tid].setColumn(to_col_id);
+    delete fromColumn.tickets[tid];
+    toColumn.tickets[tid] = scope.project.tickets[tid];
+    scope.$apply();
+  } else {
+    alert("Cannot move ticket. Ticket limit reached.")
+  }
 }
 
 function delete_ticket(ticket_id, update) {
@@ -69,6 +97,9 @@ function generateTickets(ticket_info_list) {
   for (let ticket_info of ticket_info_list) {
     addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime);
   }
+  updateTicketTimes();
+  updateTickets();
+
 }
 
 function generate_kanban(received_project) {
@@ -86,9 +117,12 @@ function generate_kanban(received_project) {
   k_scope.project.column_order = {};
 
   for (let i = 0; i < received_project.columns.length; i++) {
-    let title = received_project.columns[i].title;
-    let position = received_project.columns[i].position;
-    let column = new Column(received_project.columns[i].column_id, title, position);
+    let received_column = received_project.columns[i];
+    let title = received_column.title;
+    let position = received_column.position;
+    let limit = received_column.limit;
+    let cid = received_column.column_id;
+    let column = new Column(cid, title, position, limit === null ? undefined : limit);
     k_scope.project.column_order[position] = column.column_id;
     k_scope.project.columns[column.column_id] = column;
   }
@@ -131,18 +165,18 @@ function generateArray(start, end) {
 }
 */
 
-function updateProgressTickets() {
-  setInterval(updateProgressBars, 10000);
+function updateTickets() {
+  setInterval(updateTicketTimes, 10000);
   //updateProgressBars();
 }
 
 
-function updateProgressBars() {
+function updateTicketTimes() {
   let s = get_kanban_scope();
   for (let ticket in s.project.tickets) {
     let tick = s.project.tickets[ticket];
     if (tick.deadlineActive) {
-      tick.updateProgress();
+      tick.updateTimeLeft();
     }
   }
   s.$apply();

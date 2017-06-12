@@ -146,13 +146,13 @@ function Database(pool) {
     rwlock.readLock(function () {
       pool.query('SELECT project_id, project_name FROM project_table WHERE project_id = $1::int', [pid], function(res) {
         if (res.rows.length === 1) {
-          pool.query('SELECT column_id, column_title, column_position FROM columns_' + pid +
+          pool.query('SELECT column_id, column_title, column_position, column_limit FROM columns_' + pid +
               ' WHERE project_id = $1::int', [pid], function (res2) {
             if (res2.rows.length > 0) {
               var columns = [];
               res2.rows.forEach(function (row) {
                 //Get column ordering
-                var c = new column.Column(row["column_id"], row["column_title"], row["column_position"]);
+                var c = new column.Column(row["column_id"], row["column_title"], row["column_position"], row["column_limit"]);
                 columns.push(c);
               });
 
@@ -338,7 +338,27 @@ function Database(pool) {
           callback(array);
         } else {
           rwlock.unlock();
-          console.error("User does not exist in db");
+          callback([]);
+        }
+      });
+    });
+  };
+
+  this.getProjectUsers = function (pid, callback) {
+    //returns the users assigned to this project
+    rwlock.readLock(function () {
+      pool.query('SELECT username FROM user_projects ' +
+          'WHERE project_id = $1::int', [pid], function (res) {
+        if (res.rows.length > 0) {
+          var array = [];
+          for (var row of res.rows) {
+            array.push(row.username);
+          }
+          rwlock.unlock();
+          callback(array);
+        } else {
+          rwlock.unlock();
+          console.error("Project with pid: " + pid +" does not exist in db");
         }
       });
     });
@@ -434,6 +454,38 @@ function Database(pool) {
     });
   };
 
+  this.removeUser = function (username, callback) {
+    rwlock.writeLock(function() {
+      pool.query('DELETE FROM users WHERE username = $1::text', [username], function(res){
+        pool.query('DELETE FROM user_projects WHERE username = $1::text', [username], function(res2){
+          pool.query('DELETE FROM user_tickets WHERE username = $1::text', [username], function(res3){
+            rwlock.unlock();
+            callback(true);
+          });
+        });
+      });
+    });
+  };
+
+  this.removeUserFromProject = function (username, pid, callback) {
+    rwlock.writeLock(function() {
+      pool.query('DELETE FROM user_projects WHERE username = $1::text AND project_id = $2::int', [username, pid], function(res){
+        rwlock.unlock();
+        callback(true);
+      });
+    });
+  };
+
+  this.removeUserFromTicket = function (username, pid, tid) {
+    rwlock.writeLock(function() {
+      pool.query('DELETE FROM user_tickets WHERE username = $1::text " +' +
+          'AND project_id = $2::int AND ticket_id = $3::int', [username, pid, tid], function(res) {
+        rwlock.unlock();
+        callback(true);
+      });
+    });
+  };
+
   this.checkUserExists = function(username, callback) {
     //returns true if user already exists
     rwlock.writeLock(function(){
@@ -447,7 +499,17 @@ function Database(pool) {
         }
       });
     });
-  }
+  };
+
+  this.updateColumnLimit = function (pid, cid, limit, callback) {
+    rwlock.writeLock(function() {
+      pool.query('UPDATE columns_' + pid + ' SET column_limit = $1::int WHERE column_id = $2::int',
+          [limit, cid], function(err, res) {
+        rwlock.unlock();
+        callback(true);
+      });
+    });
+  };
 }
 
 module.exports.Database = Database;

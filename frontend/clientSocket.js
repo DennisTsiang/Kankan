@@ -80,7 +80,6 @@ function sendColumnUpdateLimit(pid, cid, newlimit) {
   socket.emit("update", JSON.stringify(jsonString));
 }
 
-//TODO: Will change this and update handler to support deadline when backend has support
 function sendTicketUpdateDesc(ticket, pid, desc) {
   var jsonString = {type: "ticket_info", ticket: ticket, pid : pid, new_description : desc};
   socket.emit("update", JSON.stringify(jsonString));
@@ -131,6 +130,21 @@ function removeTicket(pid, ticket_id) {
   socket.emit("remove", JSON.stringify(jsonString));
 }
 
+function removeUser(pid, username) {
+  var jsonString = {type : 'user_remove', pid:pid, username:username};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
+function removeUserFromProject(pid, username) {
+  var jsonString = {type : 'userOfProject_remove', pid:pid, username:username};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
+function removeUserFromTicket(pid, username, tid) {
+  var jsonString = {type : 'userOfTicket_remove', pid:pid, username:username, tid:tid};
+  socket.emit("remove", JSON.stringify(jsonString));
+}
+
 function getUserProjects(username, pid) {
   var jsonString = {type:'user_projects', username : username, pid : pid};
   socket.emit("request", JSON.stringify(jsonString));
@@ -138,7 +152,7 @@ function getUserProjects(username, pid) {
 
 function addUserToProject(username, pid) {
   var jsonString = {type:'new_user_project', username : username, pid : pid};
-  socket.emit("request", JSON.stringify(jsonString));
+  socket.emit("store", JSON.stringify(jsonString));
 }
 
 function addUserToTicket(username, pid, tid) {
@@ -161,6 +175,11 @@ function sendUsernameCheck(username) {
   socket.emit("request", JSON.stringify(jsonString));
 }
 
+function getProjectUsers(pid) {
+  var jsonString = {type : 'project_users', pid:pid};
+  socket.emit("request", JSON.stringify(jsonString));
+}
+
 function requestHandler(reply) {
   var type = reply.type;
   var request_data = reply.object;
@@ -174,16 +193,13 @@ function requestHandler(reply) {
       //Send for tickets, once received kanban.
       sendTicketsRequest(get_kanban_scope().pid);
       generate_other_user_kanbans();
+      getProjectUsers(get_kanban_scope().pid);
       break;
     }
     case "user_projects" : {
       let projects = reply.object;
       //Generates/updates projects and other_projects variables.
       generate_user_kanbans(projects);
-      break;
-    }
-    case "new_user_project": {
-      getUserProjects(get_kanban_scope().username);
       break;
     }
     case "user_tickets": {
@@ -202,10 +218,27 @@ function requestHandler(reply) {
       break;
     }
     case "user_new" : {
+      if (reply.success) {
+        get_kanban_scope().l.path('/home');
+        get_kanban_scope().$apply();
+      } else {
+        get_kanban_scope().l.path('/login');
+      }
       break;
     }
     case "user_check" : {
-      var taken = reply.result;
+      if (reply.result) {
+        get_kanban_scope().l.path('/home');
+        get_kanban_scope().$apply();
+      } else {
+        get_kanban_scope().l.path('/login');
+      }
+      break;
+    }
+    case "project_users" : {
+      let users = reply.object;
+      get_kanban_scope().project.members = users;
+      get_kanban_scope().$apply();
       break;
     }
   }
@@ -217,6 +250,10 @@ function removeHandler(reply) {
     case "project_remove" : {
       //Kick out of kanban view, take back to home page?
       var pid = reply.pid;
+      var currentpath = get_kanban_scope().l.path();
+      if (currentpath === '/kanban' && get_kanban_scope().pid === pid) {
+        get_kanban_scope().l.path('/home');
+      }
       delete get_kanban_scope().projects[pid];
       get_kanban_scope().$apply();
       break;
@@ -238,6 +275,17 @@ function removeHandler(reply) {
       }
       break;
     }
+    case "user_remove" : {
+
+      break;
+    }
+    case "userOfTicket_remove" : {
+      //remove a user from a ticket
+      break;
+    }
+    case "userOfProject_remove" : {
+      break;
+    }
   }
 }
 
@@ -257,8 +305,6 @@ function updateHandler(reply) {
       break;
     }
     case "ticket_deadline" : {
-      console.log("reply now is " + JSON.stringify(reply));
-      console.log(reply.deadline);
       let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
       ticket.setDeadline(reply.deadline);
       scope.$apply();
@@ -272,16 +318,19 @@ function updateHandler(reply) {
       break;
     }
     case "column_title" : {
-      var pid = reply.pid;
-      var cid = reply.cid;
-      var title = reply.title;
+      let pid = reply.pid;
+      let cid = reply.cid;
+      let title = reply.title;
       get_kanban_scope().project.columns[cid].title = title;
       get_kanban_scope().$apply();
     }
     case "column_limit" : {
-      var cid = reply.cid;
-      var pid = reply.pid;
-      var limit = reply.limit;
+      let cid = reply.cid;
+      let pid = reply.pid;
+      let limit = reply.limit;
+      let column = get_kanban_scope().project.columns[cid];
+      column.limit = limit;
+      get_kanban_scope().$apply();
     }
   }
 
@@ -295,7 +344,6 @@ function storeHandler(reply) {
       if (ticket_info.tid !== "Maxticketlimitreached") {
         addTicket(ticket_info.column_id, ticket_info.tid, reply.desc);
       } else {
-        //TODO: something else
         console.log("Max ticket limit reached for this column ");
       }
       break;
@@ -310,6 +358,10 @@ function storeHandler(reply) {
     case "project_new": {
       var pid = reply.object;
       addUserToProject(get_kanban_scope().username, pid);
+      break;
+    }
+    case "new_user_project": {
+      getUserProjects(get_kanban_scope().username);
       break;
     }
 

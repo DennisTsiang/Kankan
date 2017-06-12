@@ -6,8 +6,12 @@ function Ticket(ticket_id) {
   this.col = -1;
   this.deadline = null;
   this.startdate = null;
-  this.progress = 0;
+  //this.progress = 0;
   this.deadlineActive = false;
+  this.timeLeft = 0;
+  this.timeLeftFormatted = "";
+  this.timeFormatter = "";
+  this.isTimeLeft = "";
 
   this.addMembersToTicket = function(array) {
     for (let i = 0; i < array.length; i++) {
@@ -34,9 +38,11 @@ function Ticket(ticket_id) {
   */
 
   this.setDeadline = function(deadline) {
-   this.deadline = new Date(deadline);
-   this.startdate = new Date();
-   this.deadlineActive = true;
+    this.deadline = new Date(deadline);
+    this.startdate = new Date();
+    this.timeleft = 0;
+    this.deadlineActive = true;
+    this.isTimeLeft = "Time left: ";
   };
 
   /*
@@ -56,21 +62,65 @@ function Ticket(ticket_id) {
 
   this.resetDeadline = function() {
     this.startdate = new Date();
-    this.deadline = new Date();
+    this.deadline = null;
     this.deadlineActive = false;
-    this.progress = 0;
+    this.timeLeft = 0;
+    this.isTimeLeft = "";
+
 
   };
 
 
-  this.updateProgress = function() {
+  this.updateTimeLeft = function() {
 
     let endtime = this.deadline;
-    let starttime = this.startdate;
+    //let starttime = this.startdate;
 
     let currentDate = new Date();
 
-    let timeWidth = endtime - starttime;
+    this.timeLeft = (endtime - currentDate) / (1000 * 3600);
+    if (this.timeLeft <= 0) {
+      console.log("timeleft less than 0");
+
+      if (this.deadlineActive == true) {
+        console.log("was active");
+        this.deadlineActive = false;
+        this.isTimeLeft = "Due";
+        this.timeFormatter = "";
+        this.timeLeftFormatted = "";
+      } else {
+
+        this.timeLeftFormatted = "";
+        this.timeFormatter = "";
+        this.isTimeLeft = "";
+
+      }
+      this.timeLeft = 0;
+
+    } else {
+
+      console.log("time left is " + this.timeLeft);
+
+      if (this.timeLeft < 1) {
+        this.timeFormatter = "minutes";
+        this.timeLeftFormatted = (Math.floor(this.timeLeft * 60)).toString();
+
+      } else if (this.timeLeft < (24)) {
+        this.timeFormatter = "hours";
+        this.timeLeftFormatted = (Math.floor(this.timeLeft)).toString();
+      } else if (this.timeLeft < (2 * 24)) {
+        this.timeFormatter = "day";
+        this.timeLeftFormatted = (Math.floor(this.timeLeft / 24)).toString();
+      } else {
+        this.timeFormatter = "days";
+        this.timeLeftFormatted = (Math.floor(this.timeLeft / 24)).toString();
+      }
+    }
+
+
+
+
+    /*
 
     if (timeWidth > 0) {
 
@@ -88,6 +138,14 @@ function Ticket(ticket_id) {
       this.progress = 0;
       this.deadlineActive = 0;
     }
+
+    */
+
+    console.log("time left is " + this.timeLeft);
+    //  console.log("starttime " + starttime);
+    //  console.log("endtime is " + endtime);
+
+    //console.log("startdate is " + this.startdate);
 
   };
 }

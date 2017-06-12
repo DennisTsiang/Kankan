@@ -1,3 +1,37 @@
+@media screen and (min-width: 768px){
+  .ticket {
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    min-height:150px;
+    margin: 5px;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #26292e;
+    border-radius: 4px;
+    background-color: #e8eaeb;
+    float: left;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+
+  .ticket {
+    min-width: 70px;
+    display: flex;
+    flex-direction: column;
+    min-height:40px;
+    margin: 5px;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #26292e;
+    border-radius: 4px;
+    background-color: #e8eaeb;
+    float: left;
+  }
+
+}
+
 h1 {
   word-wrap: break-word;
    color: navy;
@@ -6,20 +40,6 @@ h1 {
 div {
   word-wrap: break-word;
 
-}
-
-.ticket {
-  min-width: 150px;
-  display: flex;
-  flex-direction: column;
-  min-height: 90px;
-  margin: 5px;
-  font-weight: bold;
-  text-align: center;
-  border: 2px solid #26292e;
-  border-radius: 4px;
-  background-color: #e8eaeb;
-  float: left;
 }
 
 .project-title {

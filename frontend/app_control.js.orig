@@ -3,6 +3,7 @@
  */
 
 let app = angular.module('Kankan', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'xeditable', 'ui.select', "ngRoute"]);
+var location;
 
 app.config(function($routeProvider) {
   $routeProvider
@@ -22,12 +23,10 @@ app.config(function($routeProvider) {
     });
 });
 
-app.controller('ApplicationCtrl', function($scope, $location) {
+app.controller('ApplicationCtrl', function($scope) {
   $scope.projects = [];
   $scope.project = undefined;
   $scope.pid = undefined;
-
-  $scope.l = $location;
 
   initiateConnection();
 });
@@ -49,11 +48,6 @@ app.controller('HomeController', function($scope, $location) {
     $scope.deleteProject = function(proj_id) {
       removeProject(proj_id)
     }
-
-    $scope.logOut = function() {
-      $location.path('/login')
-      //$scope.a_k = get_kanban_scope();
-    }
   }
 });
 
@@ -62,7 +56,6 @@ app.controller('NewProjectPopoverCtrl', function($scope, $sce) {
     templateUrl: 'NewProjectPopover.html'
   };
   $scope.newProject = function(project_name) {
-    $scope.isOpen = false;
     sendStoreProject(project_name);
   }
 });
@@ -76,12 +69,13 @@ app.controller('LoginController', function($scope, $location) {
 
   $scope.login = function(name) {
     get_kanban_scope().username = name;
-    sendUsernameCheck(name);
+    $location.path('/home');
   };
 
   $scope.newUser = function(username) {
-    get_kanban_scope().username = username;
     storeNewUser(username);
+    get_kanban_scope().username = username;
+    $location.path('/home');
   }
 });
 
@@ -93,22 +87,30 @@ app.controller('KanbanCtrl', function($scope, $location) {
     //Enable popovers
     $('[data-toggle="popover"]').popover();
 
+
     sendKanbanRequest(get_kanban_scope().pid);
+
 
     $scope.sendKanbanRequest = function(pid) {
       sendKanbanRequest(pid);
-    };
+    }
   }
 
-
+<<<<<<< HEAD
+  //updateTickets();
+=======
+  updateProgressTickets();
   $scope.goHome = function () {
     $location.path('/home');
   };
+>>>>>>> 77483c8bf179e7e12c562ee47daf766b6226853b
 
-  $scope.getBorderColour = function(timeLeft, deadlineActive) {
+  $scope.getBorderColour = function(millisecondsLeft, deadlineActive) {
     let css;
+    let timeLeft = millisecondsLeft/(1000 * 60 * 60)
 
     if (deadlineActive) {
+      console.log("active");
       if (timeLeft > 5) {
         css = {
           'border': '2px solid #26292e'
@@ -130,17 +132,15 @@ app.controller('KanbanCtrl', function($scope, $location) {
         };
 
       }else if(timeLeft > 0){
+        console.log("value is  " + timeLeft);
         css = {
           'border': '2px solid #ff0000'
         };
       }else{
-        css = {
-          'border': '2px solid #26292e'
-
-        };
 
       }
     } else {
+      console.log("notactive");
       css = {
         'border': '2px solid #26292e'
 
@@ -214,46 +214,10 @@ app.controller('editColumnCtrl', function($scope) {
 
   $scope.updateColTitle = function(col, title) {
     updateColumnTitle(col.column_id, get_kanban_scope().pid, title);
-  };
+  }
 });
 
 app.controller('DeadlineCtrl', function ($scope) {
-
-});
-
-app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
-  var $ctrl = this;
-  $ctrl.animationsEnabled = true;
-
-  $ctrl.open = function (size, project) {
-    var modalInstance = $uibModal.open({
-      animation: $ctrl.animationsEnabled,
-      ariaLabelledBy: 'modal-title',
-      ariaDescribedBy: 'modal-body',
-      templateUrl: 'AddUsersModal.html',
-      controller: 'AddUsersInstanceCtrl',
-      controllerAs: '$ctrl',
-      size: size,
-      resolve: {
-        items: function () {
-          return project;
-        }
-      }
-    });
-  };
-});
-
-app.controller('AddUsersInstanceCtrl', function ($uibModalInstance, items) {
-  var $ctrl = this;
-  $ctrl.title = items.title;
-
-  $ctrl.ok = function () {
-    $uibModalInstance.close();
-  };
-
-  $ctrl.addUser = function (username) {
-    addUserToProject(username, items.project_id);
-  }
 });
 
 app.controller('editTicketCtrl', function($scope) {
@@ -262,24 +226,6 @@ app.controller('editTicketCtrl', function($scope) {
     content: 'Hello world!',
     templateUrl: 'addUser.html',
     title: 'Title'
-  };
-
-  $scope.getProjectMembers = function() {
-    return get_kanban_scope().project.members;
-  };
-
-  $scope.isMemberAddedToTicket = function (member) {
-    return getTicket(getTid()).members.includes(member);
-  };
-
-  $scope.toggleMemberToTicket = function (member) {
-    if ($scope.isMemberAddedToTicket(member)) {
-      //remove member
-      removeUserFromTicket(get_kanban_scope().pid, member, getTid());
-    } else {
-      //add member
-      addUserToTicket(member, get_kanban_scope().pid, getTid());
-    }
   };
 
   $scope.addUser = function (username) {
@@ -299,9 +245,9 @@ app.controller('editTicketCtrl', function($scope) {
   $scope.saveEditDeadline = function(deadline) {
     let ticket = getTicket($scope.tid);
     ticket.deadline = deadline;
+    console.log(deadline);
     sendTicketUpdateDeadline(ticket, get_kanban_scope().pid, deadline);
     updateTicketTimes()
-
 
   };
 
@@ -411,8 +357,9 @@ app.controller('deleteTicketCtrl', function($scope, $sce) {
 
   $scope.delete_ticket_button_click = function(id) {
     let info_header = $('#ticket_info_title')[0];
+
     //DIRTY - done to close modal.
-    $scope.$parent.$close();
+    $scope.$parent.$parent.$close();
 
     removeTicket(get_kanban_scope().pid, id);
     delete_ticket(id, false);
