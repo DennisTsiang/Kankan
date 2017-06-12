@@ -345,7 +345,8 @@ function start_server (port) {
   }
 
   github.setGHRepo("pksunkara", "octonode");
-  github.printRepos();
+  github.printRepos("master");
+  search.findString("octonode");
 
 }
 

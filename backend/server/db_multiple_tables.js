@@ -375,7 +375,7 @@ function Database(pool) {
           });
         } else {
           rwlock.unlock();
-          console.error("User already exists in db");
+          console.error("User already exists in project");
         }
       });
     })
