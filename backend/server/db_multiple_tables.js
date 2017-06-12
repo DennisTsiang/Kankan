@@ -146,13 +146,13 @@ function Database(pool) {
     rwlock.readLock(function () {
       pool.query('SELECT project_id, project_name FROM project_table WHERE project_id = $1::int', [pid], function(res) {
         if (res.rows.length === 1) {
-          pool.query('SELECT column_id, column_title, column_position FROM columns_' + pid +
+          pool.query('SELECT column_id, column_title, column_position, column_limit FROM columns_' + pid +
               ' WHERE project_id = $1::int', [pid], function (res2) {
             if (res2.rows.length > 0) {
               var columns = [];
               res2.rows.forEach(function (row) {
                 //Get column ordering
-                var c = new column.Column(row["column_id"], row["column_title"], row["column_position"]);
+                var c = new column.Column(row["column_id"], row["column_title"], row["column_position"], row["column_limit"]);
                 columns.push(c);
               });
 
@@ -366,19 +366,26 @@ function Database(pool) {
 
   this.addUserToProject = function (username, pid, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT username FROM user_projects WHERE username = $1::text AND project_id = $2::int',
-          [username, pid], function (checkRes) {
-        if (checkRes.rows.length === 0 ) {
-          pool.query('INSERT INTO user_projects VALUES($1::text, $2::int)', [username, pid], function (res) {
-            rwlock.unlock();
-            callback(true);
-          });
+      pool.query('SELECT username FROM users WHERE username = $1::text', [username], function (res) {
+        if (res.rows.length !== 0) {
+          pool.query('SELECT username FROM user_projects WHERE username = $1::text AND project_id = $2::int',
+              [username, pid], function (checkRes) {
+                if (checkRes.rows.length === 0) {
+                  pool.query('INSERT INTO user_projects VALUES($1::text, $2::int)', [username, pid], function (res) {
+                    rwlock.unlock();
+                    callback(true);
+                  });
+                } else {
+                  rwlock.unlock();
+                  console.error("User already exists in project");
+                }
+              });
         } else {
           rwlock.unlock();
-          console.error("User already exists in db");
+          console.error("Trying to add a user that does not exist");
         }
       });
-    })
+    });
   };
 
   this.addUserToTicket = function (username, tid, pid, callback) {

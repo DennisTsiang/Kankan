@@ -581,6 +581,13 @@ app.controller('editColumnCtrl', function($scope, socket) {
   $scope.updateColLimitEvent = function (colId, newLimit) {
     if (isNaN(newLimit)) {
       alert("Ticket limit must be a number");
+
+    } else if(newLimit < 1) {
+      alert("Column must be able to contain at least one ticket");
+
+    } else if (newLimit > 100) {
+      alert("Ticket limit must not exceed 100");
+
     } else {
       sendColumnUpdateLimit(socket, get_kanban_scope().pid, colId, newLimit);
     }
@@ -782,7 +789,6 @@ app.controller('deleteTicketCtrl', function($scope, $sce, socket) {
 
   $scope.delete_ticket_button_click = function(id) {
     let info_header = $('#ticket_info_title')[0];
-
     //DIRTY - done to close modal.
     $scope.$parent.$close();
 

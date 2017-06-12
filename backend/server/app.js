@@ -30,7 +30,8 @@ function App (db) {
         var pid = parseInt(request.originalUrl.substring(request.originalUrl.length-1));
         db.deleteProject(pid, function (successful) {
           // db.newProject("Kanban", function (newPid) {
-          //   if (newPid === 0) {
+          //
+          // if (newPid === 0) {
           //     db.newColumn(newPid, "To Do", 0, function (res1) {
           //       db.newColumn(newPid, "In Progess", 1, function (res2) {
           //         db.newColumn(newPid, "Done", 2, function (res3) {
