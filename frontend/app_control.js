@@ -313,6 +313,7 @@ app.controller('editTicketCtrl', function($scope) {
   };
 
   $scope.saveEditDesc = function(text) {
+    console.log("Called");
     let ticket = getTicket($scope.tid);
     if (ticket !== undefined) {
       sendTicketUpdateDesc(ticket, get_kanban_scope().pid, text);
