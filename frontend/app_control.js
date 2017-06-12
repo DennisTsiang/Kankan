@@ -17,9 +17,27 @@ app.config(function($routeProvider) {
       templateUrl: 'home.html',
       controller: 'HomeController'
     })
+    .when('/overview', {
+      templateUrl: 'overview.html',
+      controller: 'OverviewController'
+    })
     .otherwise({
       redirectTo: '/login'
     });
+});
+
+app.controller('OverviewController', function($scope, $location){
+
+  if (get_kanban_scope().username === undefined) {
+    $location.path('/login');
+  } else {
+    $scope.username = get_kanban_scope().username;
+  }
+
+  $scope.goHome = function () {
+    $location.path('/home');
+  };
+
 });
 
 app.controller('ApplicationCtrl', function($scope, $location, socket) {
@@ -63,10 +81,10 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
 
 
     function printSocketStatus() {
-      if (!socket.connected) {
-        console.log("Not connected");
-      } else {
+      if (isSocketConnected()) {
         console.log("Client has successfully connected");
+      } else {
+        console.log("Not connected");
       }
     }
 
@@ -317,7 +335,7 @@ app.controller('HomeController', function($scope, $location, socket) {
     };
 
     $scope.logOut = function() {
-      $location.path('/login')
+      $location.path('/login');
       //$scope.a_k = get_kanban_scope();
     }
   }
@@ -368,6 +386,11 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
 
   $scope.goHome = function () {
     $location.path('/home');
+  };
+
+  $scope.goOverview = function(){
+    $location.path('/overview');
+
   };
 
   $scope.getBorderColour = function(timeLeft, deadlineActive) {
@@ -494,6 +517,7 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
       }
     });
   };
+
 });
 
 var popupInstance = this;
@@ -659,6 +683,7 @@ app.controller('editTicketCtrl', function($scope, socket) {
   };
 
   $scope.saveEditDesc = function(text) {
+    console.log("Called");
     let ticket = getTicket($scope.tid);
     if (ticket !== undefined) {
       sendTicketUpdateDesc(socket, ticket, get_kanban_scope().pid, text);

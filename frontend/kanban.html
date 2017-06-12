@@ -7,10 +7,31 @@
         <div class="modal-body" id="ticket-info-modal-body">
           <div class="container-fluid">
             <div ng-controller="editTicketCtrl">
-              <p editable-textarea="desc" onaftersave="saveEditDesc(desc)">{{desc || 'empty'}}</p>
+
+
+              <textarea ng-model="desc" type="Ticket Name" name="desc" rows="5" placeholder="New Ticket" class="form-control" ng-change="saveEditDesc(desc)"></textarea>
+
+
               <div ng-controller="DeadlineCollapseCtrl">
-                <button type="button" class="btn btn-md btn-default" ng-click="isCollapsed = !isCollapsed">Edit deadline</button>
-                <div class="well"  uib-collapse="isCollapsed">
+
+                <div class="row">
+                  <div class="col-sm-4"></div>
+                  <div class="col-sm-4">
+
+
+                    <div class="ticketButtons">
+                      <button type="button" class="btn btn-md btn-default" ng-click="isCollapsed = !isCollapsed">Edit deadline </button>
+
+
+                      <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-md btn-default">Add user </button>
+                    </div>
+
+                  </div>
+                  <div class="col-sm-4"></div>
+                </div>
+
+
+                <div class="well" uib-collapse="isCollapsed">
                   <div class="row vertical-align">
                     <div class="col-md-6">
                       <div style="text-align: -webkit-center">
@@ -19,7 +40,8 @@
                     </div>
                     <div class="col-md-6">
                       <p class="input-group">
-                        <input type="text" class="form-control" ng-change="saveEditDeadline(dt)" uib-datepicker-popup="{{format}}" ng-model="dt" is-open="popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
+                        <input type="text" class="form-control" ng-change="saveEditDeadline(dt)" uib-datepicker-popup="{{format}}" ng-model="dt" is-open="popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats"
+                        />
                         <span class="input-group-btn">
                       <button type="button" class="btn btn-default" ng-click="openCalendar()"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -27,63 +49,9 @@
                     </div>
                   </div>
 
-                <!--
-                  <h3 class="center-align-text"> Submit a new deadline for this task</h3>
-
-                  <div class="row">
-                    <div class="col-xs-1"></div>
-                    <div class="col-xs-2">
-                      <p>Day</p>
-                      <select ng-model="selectedDay" ng-options="day for day in days" ng-change="saveEditDeadline()">
-                      </select>
-                    </div>
-
-                    <div class="col-xs-2">
-                      <p>Month</p>
-                      <select ng-model="selectedMonth" ng-options="month for month in months" ng-change="saveEditDeadline()">
-                      </select>
-                    </div>
-
-                    <div class="col-xs-2">
-                      <p>Year</p>
-                      <select ng-model="selectedYear" ng-options="year for year in years" ng-change="saveEditDeadline()">
-                      </select>
-                    </div>
-
-                    <div class="col-xs-4">
-                      <p>Time of day</p>
-
-                      <select ng-model="selectedHour" ng-options="hour for hour in hours" ng-change="saveEditDeadline()">
-                      </select>
-                      <select ng-model="selectedMinute" ng-options="minute for minute in minutes" ng-change="saveEditDeadline()">
-                      </select>
-
-                    </div>
-                    <div class="col-xs-1"></div>
-
-                  </div>
-                  <!--
-                  <div class="row">
-
-                    <button type="button" ng-click="saveEditDeadline()" class="btn btn-primary">Save Deadline</button>
-
-                    <h2>Current Deadline: {{selectedHour}}:{{selectedMinute}} on {{selectedDay}}/{{selectedMonth}}/{{selectedYear}}</h2>
-
-                    <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
-
--->
                 </div>
               </div>
               <br />
-              <div class="center-align-text">
-                <div class="container-fluid">
-                  <div class="col-xs-6" style="text-align: left; padding-left: 0;">
-                    <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-md btn-default">
-                      Add user
-                    </button>
-                  </div>
-                </div>
-              </div>
               <div ng-controller="deleteTicketCtrl" class="modal-footer center-align-text">
                 <div class="container-fluid">
                   <div class="col-xs-6" style="text-align: left; padding-left: 0;">
@@ -115,7 +83,8 @@
             <div class="row">
               <div class="col-xs-6">
                 <!-- Select file/methods -->
-                <input type="text" ng-model="selectFileName" placeholder="File name" uib-typeahead="fileName for fileName in getFile($viewValue)" typeahead-on-select="selectFile($item, $model, $label, $event)" typeahead-loading="loadingFileNames" typeahead-no-results="noFileResults" class="form-control">
+                <input type="text" ng-model="selectFileName" placeholder="File name" uib-typeahead="fileName for fileName in getFile($viewValue)" typeahead-on-select="selectFile($item, $model, $label, $event)" typeahead-loading="loadingFileNames" typeahead-no-results="noFileResults"
+                  class="form-control">
                 <i ng-show="loadingFileNames" class="glyphicon glyphicon-refresh"></i>
                 <div ng-show="noFileResults">
                   <i class="glyphicon glyphicon-remove"></i> No Results Found
@@ -127,7 +96,8 @@
                     Attach whole file to ticket
                   </label>
                   <div ng-show="!wholeFile">
-                    <input type="text" ng-model="selectMethodName" placeholder="Method name" uib-typeahead="methodName for methodName in getMethod(selectFileName, $viewValue)" typeahead-on-select="selectMethod($item, $model, $label, $event, selectFileName)" typeahead-loading="loadingMethodNames" typeahead-no-results="noMethodResults" class="form-control">
+                    <input type="text" ng-model="selectMethodName" placeholder="Method name" uib-typeahead="methodName for methodName in getMethod(selectFileName, $viewValue)" typeahead-on-select="selectMethod($item, $model, $label, $event, selectFileName)" typeahead-loading="loadingMethodNames"
+                      typeahead-no-results="noMethodResults" class="form-control">
                     <i ng-show="loadingMethodNames" class="glyphicon glyphicon-refresh"></i>
                     <div ng-show="noMethodResults">
                       <i class="glyphicon glyphicon-remove"></i> No Results Found
@@ -159,8 +129,7 @@
   <!-- Add user popup -->
   <script type="text/ng-template" id="addUser.html">
     <div class="list-group" style="max-height: 300px; overflow-y: scroll">
-      <a ng-repeat="member in getProjectMembers()" ng-click="toggleMemberToTicket(member)"
-         ng-class="{'list-group-item':true, 'active':isMemberAddedToTicket(member)}">{{member}}</a>
+      <a ng-repeat="member in getProjectMembers()" ng-click="toggleMemberToTicket(member)" ng-class="{'list-group-item':true, 'active':isMemberAddedToTicket(member)}">{{member}}</a>
     </div>
 
     <!--
@@ -231,90 +200,88 @@
                   </td>
                 </tr>
               </table>
-          </div>
+            </div>
             <!-- Add new column -->
             <div class="col-xs-1">
               <button class="btn btn-info btn-lg" ng-click="addColumn()"><span class="glyphicon glyphicon-plus"></span></button>
             </div>
-            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default" ng-click="$ctrl.close()">Close</button>
-    </div>
-  </script>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" ng-click="$ctrl.close()">Close</button>
+</div>
+</script>
 
-  <div id="kanban_location" ng-controller="KanbanCtrl">
+<div id="kanban_location" ng-controller="KanbanCtrl">
+  <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
 
-
-    <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
-      <ul class="nav navbar-nav navbar-left vertical-align">
+    <ul class="nav navbar-nav navbar-left vertical-align">
         <!-- Add buttons -->
         <li><button class="btn btn-primary btn-lg" style="margin-left: 15px" ng-click="addBTN()">Add ticket</button></li>
 
-        <!-- Button for user to return to home page - select other project from there. -->
-        <li>
-          <div class="btn-group btn-lg" uib-dropdown=>
-            <button type="button" ng-click="goHome()" class="btn btn-link btn-md">Home</button>
-            <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
+      <!-- Button for user to return to home page - select other project from there. -->
+      <li>
+        <div class="btn-group btn-lg" uib-dropdown=>
+          <button type="button" ng-click="goHome()" class="btn btn-link btn-md">Home</button>
+          <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
               <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
-              <li role="menuitem">
-                <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
-              </li>
+          </button>
+          <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+            <li role="menuitem">
+              <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
+            </li>
 
-              <!-- Go to other projects -->
-              <li class="divider" ng-repeat-start="proj in other_projects"></li>
-              <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
-            </ul>
-          </div>
-        </li>
-        <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
-      </ul>
-      <a class="navbar-brand navbar-right project-title" id="project_title">
-            <!-- Project title -->
-            {{project.title}}
-      </a>
-      <!-- //TODO: Make project title a drop down - with project options. -->
-    </nav>
+            <!-- Go to other projects -->
+            <li class="divider" ng-repeat-start="proj in other_projects"></li>
+            <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
+          </ul>
+        </div>
+      </li>
+      <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
 
-    <div class="offset-navbar-height container-fluid">
+      <!-- Look at overview -->
+      <li><a href="" ng-click="goOverview()" class="btn ">User Overview</a></li>
+    </ul>
+    <a class="navbar-brand navbar-right project-title" id="project_title">
+      <!-- Project title -->
+      {{project.title}}
+    </a>
+    <!-- //TODO: Make project title a drop down - with project options. -->
+  </nav>
 
-      <div class="row">
-        <!-- Kanban table -->
-        <div class="col-xs-12">
-          <table id="kanban" class="table table-bordered">
+  <div class="offset-navbar-height container-fluid">
+    <div class="row">
+      <!-- Kanban table -->
+      <div class="col-xs-12">
+        <table id="kanban" class="table table-bordered">
+          <tr>
+            <th class="column-title" ng-repeat="col in project.column_order">{{project.columns[col].title}}</th>
+          </tr>
 
-            <tr>
-              <th class="column-title" ng-repeat="col in project.column_order">{{project.columns[col].title}}</th>
-            </tr>
-
-            <tr>
-              <td ng-repeat="col in project.column_order" class="ticket-column"
-                  ondragleave="angular.element(this).scope().handleTicketDragLeave(event)"
-                  ondragover="angular.element(this).scope().handleTicketDragOver(event)"
-                  ondrop="angular.element(this).scope().handleTicketDrop(event)"
-                  cid="{{project.columns[col].column_id}}">
-                <!-- Tickets -->
-                <div ng-repeat="ticket in project.columns[col].tickets" ng-click="$ctrl.open_ticket_editor(ticket.ticket_id)"
-                ng-style="border = getBorderColour(ticket.timeLeft, ticket.deadlineActive)"
-                 draggable="true" id="{{ticket.ticket_id}}" ondragstart="angular.element(this).scope().handleTicketDragStart(event)" class="ticket">
-                  <h3>{{ticket.desc}}</h3>
-                    <h4>{{ticket.isTimeLeft}} {{ticket.timeLeftFormatted}} {{ticket.timeFormatter}}</h4>
-
-                  <!--
+          <tr>
+            <td ng-repeat="col in project.column_order" class="ticket-column"
+                ondragleave="angular.element(this).scope().handleTicketDragLeave(event)"
+                ondragover="angular.element(this).scope().handleTicketDragOver(event)"
+                ondrop="angular.element(this).scope().handleTicketDrop(event)"
+                cid="{{project.columns[col].column_id}}">
+              <!-- Tickets -->
+              <div ng-repeat="ticket in project.columns[col].tickets" ng-click="$ctrl.open_ticket_editor(ticket.ticket_id)"
+                   ng-style="border = getBorderColour(ticket.timeLeft, ticket.deadlineActive)"
+                   draggable="true" id="{{ticket.ticket_id}}" ondragstart="angular.element(this).scope().handleTicketDragStart(event)" class="ticket">
+                <h3>{{ticket.desc}}</h3>
+                <h4>{{ticket.isTimeLeft}} {{ticket.timeLeftFormatted}} {{ticket.timeFormatter}}</h4>
+                <!--
                   <uib-progressbar class="progress-striped active" value="ticket.progress" type="{{ticket.deadlineState}}">{{ticket.progress}} <i ng-show="showWarning">Close to Deadline</i></uib-progressbar>
                   -->
-                </div>
-
-              </td>
-            </tr>
-          </table>
-        </div>
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
     </div>
   </div>
+</div>
 </div>
