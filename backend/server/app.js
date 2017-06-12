@@ -89,7 +89,11 @@ function App (db) {
       console.log('Received Update');
       _this.handleUpdate(JSON.parse(data), function (response, success, pid) {
         if (success) {
-          io.sockets.in(pid).emit('updatereply', JSON.stringify(response));
+          if (pid === null) {
+            socket.emit('updatereply', JSON.stringify(response));
+          } else {
+            io.sockets.in(pid).emit('updatereply', JSON.stringify(response));
+          }
           console.log('Replied to update');
         }
       });
@@ -178,7 +182,7 @@ function App (db) {
                 store["pid"]);
           } else {
             callback({type: 'ticket_new', object: {tid: "Maxticketlimitreached", column_id: store['column_id'], pid: store['pid']}},
-                store["pid"]);
+                null);
           }
         });
         break;
@@ -217,7 +221,10 @@ function App (db) {
               ticket_id: update.ticket.ticket_id
             }, success, update.pid);
           } else {
-            callback({}, success, update.pid);
+            callback({
+              type: 'ticket_moved',
+              ticket_id: "Maxticketlimitreached"
+            }, true, null);
           }
         });
         break;

@@ -63,16 +63,10 @@ function move_tickets(to_col_id, from_col_id, tid) {
   let toColumn = scope.project.columns[to_col_id];
   let fromColumn = scope.project.columns[from_col_id];
 
-  let column_limit = toColumn.limit;
-  let to_ticket_number = toColumn.tickets.length;
-  if (column_limit === undefined || to_ticket_number < column_limit) {
-    scope.project.tickets[tid].setColumn(to_col_id);
-    delete fromColumn.tickets[tid];
-    toColumn.tickets[tid] = scope.project.tickets[tid];
-    scope.$apply();
-  } else {
-    alert("Cannot move ticket. Ticket limit reached.")
-  }
+  scope.project.tickets[tid].setColumn(to_col_id);
+  delete fromColumn.tickets[tid];
+  toColumn.tickets[tid] = scope.project.tickets[tid];
+  scope.$apply();
 }
 
 function delete_ticket(ticket_id, update) {
