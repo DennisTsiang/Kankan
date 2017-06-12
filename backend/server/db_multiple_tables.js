@@ -476,9 +476,9 @@ function Database(pool) {
     });
   };
 
-  this.removeUserFromTicket = function (username, pid, tid) {
+  this.removeUserFromTicket = function (username, pid, tid, callback) {
     rwlock.writeLock(function() {
-      pool.query('DELETE FROM user_tickets WHERE username = $1::text " +' +
+      pool.query('DELETE FROM user_tickets WHERE username = $1::text ' +
           'AND project_id = $2::int AND ticket_id = $3::int', [username, pid, tid], function(res) {
         rwlock.unlock();
         callback(true);
