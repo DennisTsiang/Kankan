@@ -17,9 +17,17 @@ app.config(function($routeProvider) {
       templateUrl: 'home.html',
       controller: 'HomeController'
     })
+    .when('/overview', {
+      templateUrl: 'overview.html',
+      controller: 'OverviewController'
+    })
     .otherwise({
       redirectTo: '/login'
     });
+});
+
+app.controller('OverviewController', function($scope, $location){
+
 });
 
 app.controller('ApplicationCtrl', function($scope, $location) {
@@ -47,11 +55,11 @@ app.controller('HomeController', function($scope, $location) {
     };
 
     $scope.deleteProject = function(proj_id) {
-      removeProject(proj_id)
+      removeProject(proj_id);
     }
 
     $scope.logOut = function() {
-      $location.path('/login')
+      $location.path('/login');
       //$scope.a_k = get_kanban_scope();
     }
   }
@@ -104,6 +112,11 @@ app.controller('KanbanCtrl', function($scope, $location) {
   $scope.goHome = function () {
     $location.path('/home');
   };
+
+  $scope.goOverview = function(){
+    $location.path('/overview');
+
+  }
 
   $scope.getBorderColour = function(timeLeft, deadlineActive) {
     let css;
@@ -186,6 +199,7 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
       }
     });
   };
+
 });
 
 var popupInstance = this;
