@@ -295,7 +295,12 @@ function updateHandler(reply) {
   let type = reply.type;
   switch (type) {
     case "ticket_moved" : {
-      move_tickets(reply.to_col, reply.from_col, reply.ticket_id);
+      if (reply.ticket_id !== "Maxticketlimitreached") {
+        move_tickets(reply.to_col, reply.from_col, reply.ticket_id);
+      } else {
+        console.log("Max ticket limit reached for this column ");
+        alert("Cannot move ticket. Ticket limit reached.")
+      }
       break;
     }
     case "ticket_info" : {
