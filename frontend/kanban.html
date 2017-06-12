@@ -9,11 +9,28 @@
             <div ng-controller="editTicketCtrl">
 
 
-                <textarea ng-model="desc" type="Ticket Name" name="desc" rows="5" placeholder="New Ticket" class="form-control" ng-change="saveEditDesc(desc)"></textarea>
+              <textarea ng-model="desc" type="Ticket Name" name="desc" rows="5" placeholder="New Ticket" class="form-control" ng-change="saveEditDesc(desc)"></textarea>
 
 
               <div ng-controller="DeadlineCollapseCtrl">
-                <button type="button" class="btn btn-md btn-default" ng-click="isCollapsed = !isCollapsed">Edit deadline</button>
+
+                <div class="row">
+                  <div class="col-sm-4"></div>
+                  <div class="col-sm-4">
+
+
+                    <div class="ticketButtons">
+                      <button type="button" class="btn btn-md btn-default" ng-click="isCollapsed = !isCollapsed">Edit deadline </button>
+
+
+                      <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-md btn-default">Add user </button>
+                    </div>
+
+                  </div>
+                  <div class="col-sm-4"></div>
+                </div>
+
+
                 <div class="well" uib-collapse="isCollapsed">
                   <div class="row vertical-align">
                     <div class="col-md-6">
@@ -32,70 +49,8 @@
                     </div>
                   </div>
 
-                  <!--
-                  <h3 class="center-align-text"> Submit a new deadline for this task</h3>
-
-                  <div class="row">
-                    <div class="col-xs-1"></div>
-                    <div class="col-xs-2">
-                      <p>Day</p>
-                      <select ng-model="selectedDay" ng-options="day for day in days" ng-change="saveEditDeadline()">
-                      </select>
-                    </div>
-
-                    <div class="col-xs-2">
-                      <p>Month</p>
-                      <select ng-model="selectedMonth" ng-options="month for month in months" ng-change="saveEditDeadline()">
-                      </select>
-                    </div>
-
-                    <div class="col-xs-2">
-                      <p>Year</p>
-                      <select ng-model="selectedYear" ng-options="year for year in years" ng-change="saveEditDeadline()">
-                      </select>
-                    </div>
-
-                    <div class="col-xs-4">
-                      <p>Time of day</p>
-
-                      <select ng-model="selectedHour" ng-options="hour for hour in hours" ng-change="saveEditDeadline()">
-                      </select>
-                      <select ng-model="selectedMinute" ng-options="minute for minute in minutes" ng-change="saveEditDeadline()">
-                      </select>
-
-                    </div>
-                    <div class="col-xs-1"></div>
-
-                  </div>
-                  <!--
-                  <div class="row">
-
-                    <button type="button" ng-click="saveEditDeadline()" class="btn btn-primary">Save Deadline</button>
-
-                    <h2>Current Deadline: {{selectedHour}}:{{selectedMinute}} on {{selectedDay}}/{{selectedMonth}}/{{selectedYear}}</h2>
-
-                    <button type="button" ng-click="updateProgress()" class="btn btn-primary">Update Progress</button>
-
--->
                 </div>
               </div>
-              <br />
-              <div class="center-align-text">
-                <div class="container-fluid">
-                  <div class="col-xs-6" style="text-align: left; padding-left: 0;">
-                    <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-md btn-default">
-                      Add user
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <!--
-              <div class="list-group">
-                <a class="list-group-item username" ng-repeat="user in ticket.members">
-                    {{user}}
-                </a>
-              </div>
-              -->
             </div>
           </div>
         </div>
