@@ -97,11 +97,35 @@
       </uib-tab>
 
       <uib-tab index="1" classes="column-title" heading="Code" disable="tab.disabled">
-        <div class="modal-body">
+        <div class="modal-body" ng-controller="CodeCtrl">
           <div class="container-fluid">
-            <p>
-              Insert code selecting stuff here.
-            </p>
+            <div class="row">
+              <div class="col-xs-6">
+                <!-- Select file/methods -->
+                <input type="text" ng-model="selectFileName" placeholder="File name" uib-typeahead="fileName for fileName in getFile($viewValue)" typeahead-on-select="selectFile($item, $model, $label, $event)" typeahead-loading="loadingFileNames" typeahead-no-results="noFileResults" class="form-control">
+                <i ng-show="loadingFileNames" class="glyphicon glyphicon-refresh"></i>
+                <div ng-show="noFileResults">
+                  <i class="glyphicon glyphicon-remove"></i> No Results Found
+                </div>
+                <div ng-show="selectedFile">
+                  <hr />
+                  <label>
+                    <input type="checkbox" ng-model="wholeFile">
+                    Attach whole file to ticket
+                  </label>
+                  <div ng-show="!wholeFile">
+                    <input type="text" ng-model="selectMethodName" placeholder="Method name" uib-typeahead="methodName for methodName in getMethod(selectFileName, $viewValue)" typeahead-on-select="selectMethod($item, $model, $label, $event, selectFileName)" typeahead-loading="loadingMethodNames" typeahead-no-results="noMethodResults" class="form-control">
+                    <i ng-show="loadingMethodNames" class="glyphicon glyphicon-refresh"></i>
+                    <div ng-show="noMethodResults">
+                      <i class="glyphicon glyphicon-remove"></i> No Results Found
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xs-6">
+                <!-- Code -->
+              </div>
+            </div>
           </div>
         </div>
       </uib-tab>

@@ -81,7 +81,7 @@ function Ticket(ticket_id) {
     this.timeLeft = (endtime - currentDate) / (1000 * 3600);
     if (this.timeLeft <= 0) {
       if (this.deadlineActive == true) {
-        console.log("was active");
+        //console.log("was active");
         this.deadlineActive = false;
         this.isTimeLeft = "Due";
         this.timeFormatter = "";

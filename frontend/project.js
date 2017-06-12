@@ -8,4 +8,6 @@ function Project(project_id){
   this.tickets = {};
   this.members = [];
   this.title = "";
+
+  this.repositoryUrl = "";
 }

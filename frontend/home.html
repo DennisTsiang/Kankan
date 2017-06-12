@@ -39,11 +39,14 @@
 </div>
 
 <script type="text/ng-template" id="NewProjectPopover.html">
-    <form class="form-group">
+    <form class="form-group button-centered">
         <label>Enter Your New Project Title:</label>
-        <input type="text" placeholder = "Enter here" ng-model="dynamicPopover.content" class="form-control username">
+        <input type="text" placeholder = "Title" ng-model="projectName" class="form-control username">
         <br />
-        <button type="submit" class="btn btn-primary" ng-click="newProject(dynamicPopover.content)">Create</button>
+        <label>Enter Your Project Repository URL:</label>
+        <input type="text" placeholder = "URL" ng-model="repoUrl" class="form-control username">
+        <br />
+        <button type="submit" class="btn btn-primary" ng-click="newProject(projectName, repoUrl)">Create</button>
     </form>
 </script>
 

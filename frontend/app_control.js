@@ -61,9 +61,9 @@ app.controller('NewProjectPopoverCtrl', function($scope, $sce) {
   $scope.dynamicPopover = {
     templateUrl: 'NewProjectPopover.html'
   };
-  $scope.newProject = function(project_name) {
+  $scope.newProject = function(project_name, url) {
     $scope.isOpen = false;
-    sendStoreProject(project_name);
+    sendStoreProject(project_name, url);
   }
 });
 
@@ -422,4 +422,53 @@ app.controller('deleteTicketCtrl', function($scope, $sce) {
 
 app.controller('DeadlineCollapseCtrl', function ($scope) {
   $scope.isCollapsed = true;
+});
+
+app.controller('CodeCtrl', function ($scope, $http) {
+  $scope.wholeFile = true; //Default
+
+  //TODO: Send request to server, for files beginning with val. Responds with filenames.
+  $scope.getFile = function(file) {
+    $scope.selectedFile = false;
+    return $http.get('//maps.googleapis.com/maps/api/geocode/json', {
+      params: {
+        address: file,
+        sensor: false
+      }
+    }).then(function(response){
+      return response.data.results.map(function(item){
+        return item.formatted_address;
+      });
+    });
+  };
+
+  $scope.selectFile = function ($item, $model, $label, $event) {
+    console.log($item);
+    //TODO: Select file
+
+    $scope.selectedFile = true;
+  };
+
+  //TODO: Send request to server, for methods beginning with val. Responds with methodnames.
+  $scope.getMethod = function(file, method) {
+    $scope.selectedMethod = false;
+    return $http.get('//maps.googleapis.com/maps/api/geocode/json', {
+      params: {
+        address: method,
+        sensor: false
+      }
+    }).then(function(response){
+      return response.data.results.map(function(item){
+        return item.formatted_address;
+      });
+    });
+  };
+
+  $scope.selectMethod = function ($item, $model, $label, $event, file) {
+    console.log($item);
+    console.log(file);
+
+    //TODO: Select method
+    $scope.selectedMethod = true;
+  };
 });
