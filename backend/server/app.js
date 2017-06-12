@@ -25,28 +25,6 @@ function App (db) {
     frontend = frontend.substring(0, frontend.length - 14);
     if (request.originalUrl === "/") {
       response.sendFile(frontend + 'frontend/kankan.html');
-    } else if (request.originalUrl.match(/DeleteTable\/(\d)/)) {
-      resetLock.lock(function () {
-        var pid = parseInt(request.originalUrl.substring(request.originalUrl.length-1));
-        db.deleteProject(pid, function (successful) {
-          // db.newProject("Kanban", function (newPid) {
-          //
-          // if (newPid === 0) {
-          //     db.newColumn(newPid, "To Do", 0, function (res1) {
-          //       db.newColumn(newPid, "In Progess", 1, function (res2) {
-          //         db.newColumn(newPid, "Done", 2, function (res3) {
-                    resetLock.unlock();
-                    //response.sendFile(frontend + 'frontend/kankan.html');
-                //   });
-                // });
-              });
-            // } else {
-            //   resetLock.unlock();
-            //   console.error("Wrong pid!");
-            // }
-        //   });
-        // });
-      });
     } else {
       response.sendFile(frontend + 'frontend' + request.originalUrl);
     }
@@ -163,6 +141,16 @@ function App (db) {
       case 'project_users' :
         db.getProjectUsers(request['pid'], function (users) {
           callback({type: 'project_users', object:users});
+        });
+        break;
+      case 'project_files' :
+        db.getFilenames(request.pid, request.filename, function (filenames) {
+          callback({type: 'project_files', object:filenames});
+        });
+        break;
+      case 'file_methods' :
+        db.getMethodnames(request.pid, request.filename, request.methodname, function (methodnames) {
+          callback({type:'file_methods', object:methodnames});
         });
         break;
       default:
