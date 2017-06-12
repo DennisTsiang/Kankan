@@ -366,19 +366,26 @@ function Database(pool) {
 
   this.addUserToProject = function (username, pid, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT username FROM user_projects WHERE username = $1::text AND project_id = $2::int',
-          [username, pid], function (checkRes) {
-        if (checkRes.rows.length === 0 ) {
-          pool.query('INSERT INTO user_projects VALUES($1::text, $2::int)', [username, pid], function (res) {
-            rwlock.unlock();
-            callback(true);
-          });
+      pool.query('SELECT username FROM users WHERE username = $1::text', [username], function (res) {
+        if (res.rows.length !== 0) {
+          pool.query('SELECT username FROM user_projects WHERE username = $1::text AND project_id = $2::int',
+              [username, pid], function (checkRes) {
+                if (checkRes.rows.length === 0) {
+                  pool.query('INSERT INTO user_projects VALUES($1::text, $2::int)', [username, pid], function (res) {
+                    rwlock.unlock();
+                    callback(true);
+                  });
+                } else {
+                  rwlock.unlock();
+                  console.error("User already exists in project");
+                }
+              });
         } else {
           rwlock.unlock();
-          console.error("User already exists in db");
+          console.error("Trying to add a user that does not exist");
         }
       });
-    })
+    });
   };
 
   this.addUserToTicket = function (username, tid, pid, callback) {
