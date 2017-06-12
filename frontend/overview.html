@@ -1,4 +1,39 @@
+
+
 <div class="container-fluid">
+
+  <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
+    <ul class="nav navbar-nav navbar-left vertical-align">
+      <!-- Add buttons -->
+      <li><button class="btn btn-primary btn-lg" style="margin-left: 15px; background-color: grey; border-color: grey">Add ticket</button></li>
+
+      <!-- Button for user to return to home page - select other project from there. -->
+      <li>
+        <div class="btn-group btn-lg" uib-dropdown=>
+          <button type="button" ng-click="goHome()" class="btn btn-link btn-md">Home</button>
+          <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
+              <span class="caret"></span>
+            </button>
+          <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+            <li role="menuitem">
+              <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
+            </li>
+
+            <!-- Go to other projects -->
+            <li class="divider" ng-repeat-start="proj in other_projects"></li>
+            <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
+          </ul>
+        </div>
+      </li>
+      
+      <li><a href="" ng-click="goOverview()" class="btn ">User Overview</a></li>
+    </ul>
+    <a class="navbar-brand navbar-right project-title" id="project_title">
+      <!-- Project title -->
+      {{project.title}}
+    </a>
+    <!-- //TODO: Make project title a drop down - with project options. -->
+  </nav>
 <div class="col-sm-4"</div>
 <div class="col-sm-4"</div>
 <div class="col-sm-4"</div>
