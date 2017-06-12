@@ -34,6 +34,14 @@
 
 }
 
+.Project_overviews {
+  margin-top: 100px;
+}
+
+.Project_overviews h2 {
+  font-weight: bold;
+}
+
 textarea {
   resize: vertical; /* user can resize vertically, but width is fixed */
 }
