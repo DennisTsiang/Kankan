@@ -84,6 +84,19 @@
                   </div>
                 </div>
               </div>
+              <div ng-controller="deleteTicketCtrl" class="modal-footer center-align-text">
+                <div class="container-fluid">
+                  <div class="col-xs-6" style="text-align: left; padding-left: 0;">
+                    <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-md btn-warning">
+                      Remove ticket
+                    </button>
+                  </div>
+                  <div class="col-xs-6" style="text-align: right; padding-right: 0">
+                    <button type="button" class="btn btn-lg btn-default" ng-click="$ctrl.close()">Close</button>
+                  </div>
+                </div>
+              </div>
+
               <!--
               <div class="list-group">
                 <a class="list-group-item username" ng-repeat="user in ticket.members">
@@ -131,25 +144,11 @@
       </uib-tab>
     </uib-tabset>
 
-
     <!--
     <div class="modal-header">
       <h3 class="modal-title" id="ticket-info-title">Edit Ticket</h3>
     </div> -->
 
-
-    <div ng-controller="deleteTicketCtrl" class="modal-footer center-align-text">
-      <div class="container-fluid">
-        <div class="col-xs-6" style="text-align: left; padding-left: 0;">
-          <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-md btn-warning">
-            Remove ticket
-          </button>
-        </div>
-        <div class="col-xs-6" style="text-align: right; padding-right: 0">
-          <button type="button" class="btn btn-lg btn-default" ng-click="$ctrl.close()">Close</button>
-        </div>
-      </div>
-    </div>
   </script>
 
   <!-- Delete ticket popup -->
@@ -198,7 +197,7 @@
     </div>
 
     <div class="modal-body">
-      <div ng-controller="editColumnCtrl">
+      <div id="editColumnCtrlId" ng-controller="editColumnCtrl">
         <div class="container-fluid">
           <div class="row vertical-align">
             <!-- Editable column -->
@@ -206,7 +205,11 @@
               <table>
                 <tr>
                   <td ng-repeat="col in project.column_order">
-                    <table class="table table-bordered" column_id="{{project.columns[col].column_id}}" draggable="true" ondragstart="handleColumnDragStart(event)" ondragover="handleColumnDragOver(event)" ondrop="handleColumnDrop(event)">
+                    <table class="table table-bordered" column_id="{{project.columns[col].column_id}}" draggable="true"
+                           ondragleave="angular.element(this).scope().handleColumnDragStart(event)"
+                           ondragover="angular.element(this).scope().handleColumnDragOver(event)"
+                           ondrop="angular.element(this).scope().handleColumnDrop(event)"
+                    >
                       <tr>
                         <th class="column-title">
                           <p editable-textarea="project.columns[col].title" onaftersave="updateColTitle(project.columns[col], project.columns[col].title)">{{project.columns[col].title || 'empty'}}</p>
@@ -215,7 +218,7 @@
                       <tr>
                         <td class="column-title" style="text-align: center;">
                           <div class="form-group">
-                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" value="{{project.columns[col].limit}}" placeholder="Ticket limit" onchange="updateColLimitEvent(event)">
+                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" ng-model="newLimit" value="{{project.columns[col].limit}}" placeholder="Ticket limit" ng-change="updateColLimitEvent(col, newLimit)">
                           </div>
                         </td>
                       </tr>
@@ -249,7 +252,7 @@
     <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
       <ul class="nav navbar-nav navbar-left vertical-align">
         <!-- Add buttons -->
-        <li><button class="btn btn-primary btn-lg" style="margin-left: 15px" onclick="addBTN()">Add ticket</button></li>
+        <li><button class="btn btn-primary btn-lg" style="margin-left: 15px" ng-click="addBTN()">Add ticket</button></li>
 
         <!-- Button for user to return to home page - select other project from there. -->
         <li>
@@ -290,11 +293,15 @@
             </tr>
 
             <tr>
-              <td ng-repeat="col in project.column_order" class="ticket-column" cid="{{project.columns[col].column_id}}">
+              <td ng-repeat="col in project.column_order" class="ticket-column"
+                  ondragleave="angular.element(this).scope().handleTicketDragLeave(event)"
+                  ondragover="angular.element(this).scope().handleTicketDragOver(event)"
+                  ondrop="angular.element(this).scope().handleTicketDrop(event)"
+                  cid="{{project.columns[col].column_id}}">
                 <!-- Tickets -->
                 <div ng-repeat="ticket in project.columns[col].tickets" ng-click="$ctrl.open_ticket_editor(ticket.ticket_id)"
                 ng-style="border = getBorderColour(ticket.timeLeft, ticket.deadlineActive)"
-                 draggable="true" id="{{ticket.ticket_id}}" ondragstart="handleTicketDragStart(event)" class="ticket">
+                 draggable="true" id="{{ticket.ticket_id}}" ondragstart="angular.element(this).scope().handleTicketDragStart(event)" class="ticket">
                   <h3>{{ticket.desc}}</h3>
                     <h4>{{ticket.isTimeLeft}} {{ticket.timeLeftFormatted}} {{ticket.timeFormatter}}</h4>
 
