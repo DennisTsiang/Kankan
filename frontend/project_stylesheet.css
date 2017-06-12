@@ -1,6 +1,6 @@
 @media screen and (min-width: 768px){
   .ticket {
-    min-width: 200px;
+    width: 200px;
     display: flex;
     flex-direction: column;
     min-height:150px;
@@ -11,13 +11,14 @@
     border-radius: 4px;
     background-color: #e8eaeb;
     float: left;
+
   }
 }
 
 @media only screen and (max-width: 768px) {
 
   .ticket {
-    min-width: 70px;
+    width: 70px;
     display: flex;
     flex-direction: column;
     min-height:40px;
@@ -28,6 +29,7 @@
     border-radius: 4px;
     background-color: #e8eaeb;
     float: left;
+
   }
 
 }
