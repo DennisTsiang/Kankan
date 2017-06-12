@@ -189,6 +189,10 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
         }
         case "userOfTicket_remove" : {
           //remove a user from a ticket
+          generate_kanban(reply.object);
+
+          //Send for tickets, once received kanban.
+          sendTicketsRequest(socket, get_kanban_scope().pid);
           break;
         }
         case "userOfProject_remove" : {
