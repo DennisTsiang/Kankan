@@ -320,6 +320,11 @@ function start_server (port) {
 
   io_client.on('connection', app.handleConnection);
   socket_code.connect(code_server);
+  socket_code.on('connect', function () {
+    socket_code.on('set_gh_url', function (reply) {
+      io_client.sockets.in(reply.pid).emit('set_gh_url');
+    });
+  });
   if (!module.parent) {
     http.listen(port);
     console.log("HTTP server listening on port " + port + " at localhost.");
@@ -332,7 +337,7 @@ function stop_server() {
 }
 
 function set_gh_url(pid, gh_url) {
-  var requestobj = {type:'set_gh_url', pid:pid};
+  var requestobj = {type:'set_gh_url', pid:pid, gh_url:gh_url};
   socket_code.emit('request', requestobj);
 }
 
