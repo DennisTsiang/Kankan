@@ -478,6 +478,7 @@ function Database(pool) {
     rwlock.writeLock(function () {
       pool.query('INSERT INTO ticket_files_' + pid + ' VALUES($1::text, $2::text, $3::int)',
           [filename, methodname, ticket_id], function () {
+        rwlock.unlock();
         callback(true);
       })
     })
@@ -487,6 +488,7 @@ function Database(pool) {
     rwlock.writeLock(function () {
       pool.query('DELETE FROM ticket_files_' + pid + ' WHERE filename=$1::text AND methodname=$2::text AND ' +
           'ticket_id=$3::int',[filename, methodname, ticket_id], function () {
+            rwlock.unlock();
             callback(true);
           })
     })
