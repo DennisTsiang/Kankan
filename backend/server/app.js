@@ -8,7 +8,7 @@ var app = new App(db);
 var ticket = require('./ticket');
 var express = require('express')();
 var http = require('http').Server(express);
-const code_server = 'http://129.31.229.213:8008';
+const code_server = 'http://146.169.45.29:8008';
 var socket_code = require('socket.io-client')(code_server);
 var io_client = require('socket.io')(http);
 start_server(httpPort);
