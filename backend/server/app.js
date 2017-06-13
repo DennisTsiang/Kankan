@@ -146,7 +146,7 @@ function App (db) {
         });
         break;
       case 'file_methods' :
-        db.getMethodnames(request.pid, request.filename, request.methodname, function (methodnames) {
+        db.getMethodNames(request.pid, request.filename, request.methodname, function (methodnames) {
           callback({type:'file_methods', object:methodnames});
         });
         break;
@@ -174,7 +174,7 @@ function App (db) {
         break;
       case 'project_new':
         db.newProject(store["project_name"], function (pid) {
-          set_gh_url(pid, store['gh_url']);
+          set_gh_url(pid, store['project_url']);
           callback({type:'project_new', object:pid}, null);
         });
         break;
@@ -330,6 +330,8 @@ function start_server (port) {
 
   io_client.on('connection', app.handleConnection);
   socket_code.on('connect', function () {
+    console.log("Connected to code server");
+
     socket_code.on('set_gh_url', function (reply) {
       io_client.sockets.in(reply.pid).emit('set_gh_url');
     });
@@ -346,6 +348,7 @@ function stop_server() {
 }
 
 function set_gh_url(pid, gh_url) {
-  var requestobj = {type:'set_gh_url', pid:pid, gh_url:gh_url};
+  var requestobj = JSON.stringify({type:'set_gh_url', pid:pid, gh_url:gh_url});
+  console.log("sent gh request " + requestobj);
   socket_code.emit('request', requestobj);
 }
