@@ -3,6 +3,9 @@ function get_kanban_scope() {
 }
 
 function addTicket(col_id, ticket_id, desc, deadline) {
+  console.log("col id is " + col_id);
+  console.log("ticket is is " + ticket_id);
+  console.log("deadline is " + deadline);
   let ticket = new Ticket(ticket_id);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
@@ -21,7 +24,7 @@ function move_tickets(to_col_id, from_col_id, tid) {
   let scope = get_kanban_scope();
   let toColumn = scope.project.columns[to_col_id];
   let fromColumn = scope.project.columns[from_col_id];
-  
+
   scope.project.tickets[tid].setColumn(to_col_id);
   delete fromColumn.tickets[tid];
   toColumn.tickets[tid] = scope.project.tickets[tid];
@@ -38,7 +41,9 @@ function delete_ticket(ticket_id) {
 }
 
 function generateTickets(ticket_info_list) {
+  console.log("info list is " + JSON.stringify(ticket_info_list));
   for (let ticket_info of ticket_info_list) {
+    console.log("loop " + JSON.stringify(ticket_info));
     addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime);
   }
   updateTicketTimes();
@@ -71,11 +76,14 @@ function generate_kanban(received_project) {
   }
 }
 
-function generate_user_kanbans(projects) {
+function generate_user_kanbans(projects, socket) {
   let projectsH = {};
 
   for (let proj in projects) {
     projectsH[projects[proj].project_id] = projects[proj];
+      console.log("project is " + JSON.stringify(projects[proj]))
+      sendTicketsRequest(socket, projects[proj].project_id);
+
   }
 
   get_kanban_scope().projects = projectsH;

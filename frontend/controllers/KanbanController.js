@@ -17,10 +17,6 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
     $location.path('/home');
   };
 
-  $scope.goOverview = function(){
-    $location.path('/overview');
-
-  };
 
   $scope.getBorderColour = function(timeLeft, deadlineActive) {
     let css;

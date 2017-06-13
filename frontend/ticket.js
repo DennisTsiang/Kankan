@@ -4,7 +4,6 @@ function Ticket(ticket_id) {
   this.members = [];
   this.desc = "";
   this.col = -1;
-  this.
   this.deadline = null;
   this.startdate = null;
   //this.progress = 0;

@@ -147,7 +147,7 @@ function Database(pool) {
               row["ticket_description"], row["deadline"]));
         });
         rwlock.unlock();
-        callback(tickets);
+        callback(pid, tickets);
       });
     });
   };

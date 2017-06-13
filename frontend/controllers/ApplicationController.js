@@ -54,9 +54,13 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
     function requestHandler(socket, reply) {
       var type = reply.type;
       var request_data = reply.object;
+
+      console.log("request data is is " + JSON.stringify(reply.object));
       switch (type) {
         case "tickets" : {
-          generateTickets(request_data);
+          if(get_kanban_scope().project !== undefined){
+          generateTickets(request_data.tickets);
+        }
           break;
         }
         case "kanban" : {
@@ -69,12 +73,14 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
         }
         case "user_projects" : {
           let projects = reply.object;
+          console.log("user projects reply is " + JSON.stringify(reply));
           //Generates/updates projects and other_projects variables.
-          generate_user_kanbans(projects);
+          generate_user_kanbans(projects, socket);
           break;
         }
         case "user_tickets": {
-          var tickets = reply.object;
+          console.log("tickets is " + reply);
+          var tickets = reply.object.tickets;
           break;
         }
         case "ticket_users": {
@@ -248,4 +254,3 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
     }
   });
 });
-
