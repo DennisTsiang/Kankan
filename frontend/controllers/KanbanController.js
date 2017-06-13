@@ -405,7 +405,8 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
     socket.emit('request', JSON.stringify({pid:get_kanban_scope().pid, type:'project_files', filename: file}));
 
-    socket.on('requestreply', function(reply) {
+    socket.on('requestreply', function(reply_string) {
+      let reply = JSON.parse(reply_string);
       console.log(reply);
       if (reply.type === 'project_files') {
         filenames['names'] = reply.object;

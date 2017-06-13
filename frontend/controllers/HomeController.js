@@ -7,6 +7,23 @@ app.controller('HomeController', function($scope, $location, socket) {
     getUserProjects(socket, $scope.username);
     $scope.a_k = get_kanban_scope();
 
+
+    for (project in projects) {
+      sendTicketsRequest(socket, project.pid);
+    }
+
+    socket.on('requestreply', function(reply) {
+
+      if () {
+
+      }
+
+    });
+
+
+    //sendAllProjectUserRequest()
+    //Do this because the other one is dependend on get kanban scope
+
     $scope.chooseProject = function(proj_id) {
       get_kanban_scope().pid = proj_id;
       $location.path('/kanban');
@@ -33,15 +50,15 @@ app.controller('NewProjectPopoverCtrl', function($scope, $sce, socket) {
   }
 });
 
-app.controller('ProjectDropdownCtrl', function ($scope, $sce) {
+app.controller('ProjectDropdownCtrl', function($scope, $sce) {
 
 });
 
-app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
+app.controller('AddUsersCtrl', function($uibModal, $log, $document) {
   var $ctrl = this;
   $ctrl.animationsEnabled = true;
 
-  $ctrl.open = function (size, project) {
+  $ctrl.open = function(size, project) {
     var modalInstance = $uibModal.open({
       animation: $ctrl.animationsEnabled,
       ariaLabelledBy: 'modal-title',
@@ -51,7 +68,7 @@ app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
       controllerAs: '$ctrl',
       size: size,
       resolve: {
-        items: function () {
+        items: function() {
           return project;
         }
       }
@@ -59,16 +76,15 @@ app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
   };
 });
 
-app.controller('AddUsersInstanceCtrl', function ($uibModalInstance, items, socket) {
+app.controller('AddUsersInstanceCtrl', function($uibModalInstance, items, socket) {
   var $ctrl = this;
   $ctrl.title = items.title;
 
-  $ctrl.ok = function () {
+  $ctrl.ok = function() {
     $uibModalInstance.close();
   };
 
-  $ctrl.addUser = function (username) {
+  $ctrl.addUser = function(username) {
     addUserToProject(socket, username, items.project_id);
   }
 });
-
