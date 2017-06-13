@@ -177,8 +177,7 @@
                     <table class="table table-bordered" column_id="{{project.columns[col].column_id}}" draggable="true"
                            ondragleave="angular.element(this).scope().handleColumnDragStart(event)"
                            ondragover="angular.element(this).scope().handleColumnDragOver(event)"
-                           ondrop="angular.element(this).scope().handleColumnDrop(event)"
-                    >
+                           ondrop="angular.element(this).scope().handleColumnDrop(event)">
                       <tr>
                         <th class="column-title">
                           <p editable-textarea="project.columns[col].title" onaftersave="updateColTitle(project.columns[col], project.columns[col].title)">{{project.columns[col].title || 'empty'}}</p>
@@ -187,7 +186,7 @@
                       <tr>
                         <td class="column-title" style="text-align: center;">
                           <div class="form-group">
-                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" ng-model="newLimit" value="{{project.columns[col].limit}}" placeholder="Ticket limit" ng-change="updateColLimitEvent(col, newLimit)">
+                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" ng-model="newLimit" ng-init="newLimit = project.columns[col].limit" placeholder="Ticket limit" ng-change="updateColLimitEvent(col, newLimit)">
                           </div>
                         </td>
                       </tr>
