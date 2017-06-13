@@ -123,7 +123,7 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
       ariaLabelledBy: 'ticket-info-title',
       ariaDescribedBy: 'ticket-info-modal-body',
       templateUrl: 'ticket-popup',
-      controller: 'ModalInstanceCtrl',
+      controller: 'TicketModalInstanceCtrl',
       controllerAs: '$ctrl',
       windowClass: 'code-navigator-modal',
       size: 'lg',
@@ -137,7 +137,7 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
     let modalInstance = $uibModal.open({
       animation: true,
       templateUrl: 'edit-column-popup',
-      controller: 'ModalInstanceCtrl',
+      controller: 'ColumnModalInstanceCtrl',
       controllerAs: '$ctrl',
       size: 'lg',
       windowClass: 'edit-columns-popup',
@@ -149,8 +149,7 @@ app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $documen
 
 });
 
-var popupInstance = this;
-app.controller('ModalInstanceCtrl', function($uibModalInstance) {
+app.controller('ColumnModalInstanceCtrl', function($scope, $uibModalInstance) {
   let $ctrl = this;
   $ctrl.close = function() {
     $uibModalInstance.close($ctrl.selected);
@@ -158,6 +157,27 @@ app.controller('ModalInstanceCtrl', function($uibModalInstance) {
 
   $ctrl.cancel = function() {
     $uibModalInstance.dismiss('cancel');
+  };
+});
+
+app.controller('TicketModalInstanceCtrl', function($scope, $uibModalInstance) {
+  let $ctrl = this;
+  $ctrl.close = function() {
+    $uibModalInstance.close($ctrl.selected);
+  };
+
+  $ctrl.cancel = function() {
+    $uibModalInstance.dismiss('cancel');
+  };
+
+  $scope.getTicket = function (id) {
+    let k_scope = get_kanban_scope();
+    return k_scope.project.tickets[id];
+  };
+
+  $scope.getTid = function () {
+    let sel = 'div[ng-controller="ModalCtrl as $ctrl"]';
+    return angular.element(sel).scope().tid;
   };
 });
 
@@ -257,18 +277,8 @@ app.controller('editTicketCtrl', function($scope, socket) {
     addUserToTicket(socket, username, get_kanban_scope().pid, $scope.tid);
   };
 
-  function getTicket(id) {
-    let k_scope = get_kanban_scope();
-    return k_scope.project.tickets[id];
-  }
-
-  function getTid() {
-    let sel = 'div[ng-controller="ModalCtrl as $ctrl"]';
-    return angular.element(sel).scope().tid;
-  }
-
   $scope.saveEditDeadline = function(deadline) {
-    let ticket = getTicket($scope.tid);
+    let ticket = $scope.getTicket($scope.tid);
     ticket.deadline = deadline;
     sendTicketUpdateDeadline(socket, ticket, get_kanban_scope().pid, deadline);
     updateTicketTimes()
@@ -277,7 +287,7 @@ app.controller('editTicketCtrl', function($scope, socket) {
   };
 
   $scope.resetDeadline = function() {
-    let ticket = getTicket($scope.tid);
+    let ticket = $scope.getTicket($scope.tid);
 
     ticket.resetDeadline();
     sendTicketUpdateDeadline(socket, ticket, get_kanban_scope().pid, ticket.deadline);
@@ -285,14 +295,14 @@ app.controller('editTicketCtrl', function($scope, socket) {
 
   $scope.saveEditDesc = function(text) {
     console.log("Called");
-    let ticket = getTicket($scope.tid);
+    let ticket = $scope.getTicket($scope.tid);
     if (ticket !== undefined) {
       sendTicketUpdateDesc(socket, ticket, get_kanban_scope().pid, text);
     }
   };
 
   $scope.updateTimeLeft = function() {
-    let ticket = getTicket($scope.tid);
+    let ticket = $scope.getTicket($scope.tid);
     ticket.updateTimeLeft();
   };
 
@@ -355,10 +365,10 @@ app.controller('editTicketCtrl', function($scope, socket) {
   $('[data-toggle="popover"]').popover();
 
   //Get users for this ticket.
-  getTicketUsers(socket, get_kanban_scope().pid, getTid());
+  getTicketUsers(socket, get_kanban_scope().pid, $scope.getTid());
 
-  $scope.tid = getTid();
-  $scope.ticket = getTicket($scope.tid);
+  $scope.tid = $scope.getTid();
+  $scope.ticket = $scope.getTicket($scope.tid);
   $scope.desc = $scope.ticket.desc;
 
   $scope.format = 'yyyy-MMMM-dd';
@@ -442,5 +452,10 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     //TODO: Select method
 
     $scope.selectedMethod = true;
+  };
+
+  $scope.getTicketCodeData = function () {
+    let ticket = $scope.getTicket($scope.getTid());
+    return ticket.codeData;
   };
 });

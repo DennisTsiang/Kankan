@@ -4,7 +4,7 @@ function Ticket(ticket_id) {
   this.members = [];
   this.desc = "";
   this.col = -1;
-  this.
+  this.codeData = {};
   this.deadline = null;
   this.startdate = null;
   //this.progress = 0;
@@ -26,6 +26,10 @@ function Ticket(ticket_id) {
 
   this.setColumn = function(n) {
     this.col = n;
+  };
+
+  this.setCodeData = function (codeData) {
+    this.codeData = codeData;
   };
 
 
