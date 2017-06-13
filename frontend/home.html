@@ -1,31 +1,44 @@
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-xs-3"></div>
-    <div class="col-xs-6 button-centered">
-      <h2 class="username-title">Welcome {{username}}</h2>
 
-      <div ng-controller="NewProjectPopoverCtrl">
-        <button popover-placement="right" uib-popover-template="dynamicPopover.templateUrl" popover-is-open="isOpen" ng-click="isOpen = true" type="button" class="btn btn-primary">Create New Project</button>
-      </div>
-      <br />
-      <button type="button" class="btn btn-info" ng-click="logOut()">Log Out</button>
-    </div>
-    <div class="col-xs-3"></div>
-  </div>
-
-  <div class="Project_overviews">
+  <div class="top-menu">
 
     <div class="row">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-8">
+        <h2 class="username-title">Welcome {{username}}</h2>
+        <div class="col-sm-2"></div>
+      </div>
+    </div>
+    <div class="row">
 
-      <div class="col-sm-2">
-        <h2>Project </h2></div>
-      <div class="col-sm-2">
-        <h2>Members</h2></div>
-      <div class="col-sm-6">
-        <h2>Upcoming Deadlines</h2></div>
-      <div class="col-sm-2">
-        <h2>Summary</h2></div>
+      <div ng-controller="NewProjectPopoverCtrl">
 
+        <div class="col-sm-10">
+          <button popover-placement="right" uib-popover-template="dynamicPopover.templateUrl" popover-is-open="isOpen" ng-click="isOpen = true" type="button" class="btn btn-primary">Create New Project</button>
+          <button type="button" class="btn btn-info" ng-click="logOut()">Log Out</button>
+
+        </div>
+        <div class="col-sm-2"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="project_overviews">
+
+    <div class="top-headers">
+      <div class="row">
+
+        <div class="col-sm-2">
+          <h2>Project </h2></div>
+        <div class="col-sm-2">
+          <h2>Members</h2></div>
+        <div class="col-sm-6">
+          <h2>Upcoming Deadlines</h2></div>
+        <div class="col-sm-2">
+          <h2>Summary</h2></div>
+
+      </div>
     </div>
 
     <div class="row" ng-repeat="project in projects">
@@ -34,7 +47,7 @@
         <div class="btn-group btn-flex button-centered" ng-controller="AddUsersCtrl as $ctrl">
           <button type="button" class="btn btn-default" ng-click="chooseProject(project.project_id)">
 
-                                {{project.title}}
+                                <b>{{project.title}}</b>
                               </button>
           <button type="button" class="btn btn-default dropdown-toggle btn-lg" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="caret"></span>

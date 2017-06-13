@@ -34,11 +34,28 @@
 
 }
 
-.Project_overviews {
-  margin-top: 100px;
+.row button {
+  margin-top:8px;
 }
 
-.Project_overviews h2 {
+.project_overviews {
+  margin-top: 25px;
+}
+
+.top-menu {
+  margin-top: 20px;
+}
+
+.project_overviews > .row {
+  border-style: solid;
+  border-radius: 8px;
+  border-width: 1px;
+  border-color: grey;
+  padding-bottom: 5px;
+
+}
+
+.project_overviews h2 {
   font-weight: bold;
 }
 
