@@ -39,8 +39,10 @@ function delete_ticket(ticket_id) {
 }
 
 function generateTickets(ticket_info_list) {
+  console.log("info list is " + JSON.stringify(ticket_info_list));
   for (let ticket_info of ticket_info_list) {
-    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime, ticket_info.files);
+    console.log("loop " + JSON.stringify(ticket_info));
+    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime);
   }
   updateTicketTimes();
   updateTickets();
@@ -72,11 +74,14 @@ function generate_kanban(received_project) {
   }
 }
 
-function generate_user_kanbans(projects) {
+function generate_user_kanbans(projects, socket) {
   let projectsH = {};
 
   for (let proj in projects) {
     projectsH[projects[proj].project_id] = projects[proj];
+      console.log("project is " + JSON.stringify(projects[proj]))
+      sendTicketsRequest(socket, projects[proj].project_id);
+
   }
 
   get_kanban_scope().projects = projectsH;

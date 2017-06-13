@@ -178,7 +178,7 @@ function Database(pool) {
         }
         rwlock.unlock();
         sortTickets(tickets);
-        callback(tickets);
+        callback(pid, tickets);
       });
     });
   };

@@ -1,4 +1,25 @@
 app.controller('HomeController', function($scope, $location, socket) {
+
+  $scope.showDeadlines = function(project) {
+    console.log("project is " + project.project_id);
+    console.log("tickets is " + JSON.stringify(project.tickets));
+  }
+
+
+  socket.on('requestreply', function(reply_string) {
+    let reply = JSON.parse(reply_string);
+    console.log("got reply");
+    if (reply.type === "tickets") {
+      console.log("set");
+
+      $scope.projects[reply.object.pid].tickets = reply.object.tickets;
+
+      $scope.showDeadlines($scope.projects[reply.object.pid]);
+
+
+    }
+  });
+
   if (get_kanban_scope().username === undefined) {
     $location.path('/login');
   } else {
@@ -7,20 +28,26 @@ app.controller('HomeController', function($scope, $location, socket) {
     getUserProjects(socket, $scope.username);
     $scope.a_k = get_kanban_scope();
 
-    $scope.chooseProject = function(proj_id) {
-      get_kanban_scope().pid = proj_id;
-      $location.path('/kanban');
-    };
-
-    $scope.deleteProject = function(proj_id) {
-      removeProject(socket, proj_id)
-    };
-
-    $scope.logOut = function() {
-      $location.path('/login');
-      //$scope.a_k = get_kanban_scope();
-    }
   }
+
+  //sendAllProjectUserRequest()
+  //Do this because the other one is dependend on get kanban scope
+
+
+  $scope.chooseProject = function(proj_id) {
+    get_kanban_scope().pid = proj_id;
+    $location.path('/kanban');
+  };
+
+  $scope.deleteProject = function(proj_id) {
+    removeProject(socket, proj_id)
+  };
+
+  $scope.logOut = function() {
+    $location.path('/login');
+    //$scope.a_k = get_kanban_scope();
+  }
+
 });
 
 app.controller('NewProjectPopoverCtrl', function($scope, $sce, socket) {
@@ -33,15 +60,15 @@ app.controller('NewProjectPopoverCtrl', function($scope, $sce, socket) {
   }
 });
 
-app.controller('ProjectDropdownCtrl', function ($scope, $sce) {
+app.controller('ProjectDropdownCtrl', function($scope, $sce) {
 
 });
 
-app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
+app.controller('AddUsersCtrl', function($uibModal, $log, $document) {
   var $ctrl = this;
   $ctrl.animationsEnabled = true;
 
-  $ctrl.open = function (size, project) {
+  $ctrl.open = function(size, project) {
     var modalInstance = $uibModal.open({
       animation: $ctrl.animationsEnabled,
       ariaLabelledBy: 'modal-title',
@@ -51,7 +78,7 @@ app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
       controllerAs: '$ctrl',
       size: size,
       resolve: {
-        items: function () {
+        items: function() {
           return project;
         }
       }
@@ -59,16 +86,15 @@ app.controller('AddUsersCtrl', function ($uibModal, $log, $document) {
   };
 });
 
-app.controller('AddUsersInstanceCtrl', function ($uibModalInstance, items, socket) {
+app.controller('AddUsersInstanceCtrl', function($uibModalInstance, items, socket) {
   var $ctrl = this;
   $ctrl.title = items.title;
 
-  $ctrl.ok = function () {
+  $ctrl.ok = function() {
     $uibModalInstance.close();
   };
 
-  $ctrl.addUser = function (username) {
+  $ctrl.addUser = function(username) {
     addUserToProject(socket, username, items.project_id);
   }
 });
-

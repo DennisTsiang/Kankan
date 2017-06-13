@@ -99,8 +99,8 @@ function App (db) {
         break;
 
       case 'tickets':
-        db.getTickets(request['pid'], function (tickets) {
-          callback({type:'tickets', object:tickets});
+        db.getTickets(request['pid'], function (pid, tickets) {
+          callback({type:'tickets', object:{pid:pid, tickets:tickets}});
         });
         break;
       case 'user_projects':
@@ -352,7 +352,3 @@ function set_gh_url(pid, gh_url) {
   console.log("sent gh request " + requestobj);
   socket_code.emit('request', requestobj);
 }
-
-
-
-

@@ -17,10 +17,6 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
     $location.path('/home');
   };
 
-  $scope.goOverview = function(){
-    $location.path('/overview');
-
-  };
 
   $scope.getBorderColour = function(timeLeft, deadlineActive) {
     let css;
@@ -409,10 +405,10 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
   let server_response = {'filenames':[], 'methodnames': []};
 
-  socket.on('requestreply', function(jr) {
-    let reply = JSON.parse(jr);
-
-    if (reply.type === "project_files") {
+  socket.on('requestreply', function(reply_string) {
+    let reply = JSON.parse(reply_string);
+    console.log(reply);
+    if (reply.type === 'project_files') {
       server_response['filenames'] = reply.object;
     }
   });
@@ -441,9 +437,10 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     $scope.selectedFile = true;
   };
 
-  socket.on('requestreply', function(jr) {
-    let reply = JSON.parse(jr);
-    if (reply.type === 'file_methods') {
+  socket.on('requestreply', function(reply_string) {
+    let reply = JSON.parse(reply_string);
+    console.log(reply);
+    if (reply.type === 'method_names') {
       server_response['methodnames'] = reply.object;
     }
   });

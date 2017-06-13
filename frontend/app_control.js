@@ -17,10 +17,6 @@ app.config(function($routeProvider) {
       templateUrl: 'home.html',
       controller: 'HomeController'
     })
-    .when('/overview', {
-      templateUrl: 'overview.html',
-      controller: 'OverviewController'
-    })
     .otherwise({
       redirectTo: '/login'
     });
@@ -53,4 +49,3 @@ app.factory('socket', function ($rootScope) {
     }
   };
 });
-
