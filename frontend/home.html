@@ -65,23 +65,20 @@
           <h3>{{member}}</h3></div>
       </div>
       <div class="col-sm-6">
-        <div class="row">
 
-          <div class="col-sm-4">
-            <h3>{{project.upcomingDeadlines[0].desc}}</h3>
-            <h4>{{project.upcomingDeadlines[0].isTimeLeft}} {{project.upcomingDeadlines[0].timeLeftFormatted}} {{project.upcomingDeadlines[0].timeFormatter}}</h4></div>
-          <div class="col-sm-4"></div>
-          <div class="col-sm-4"></div>
+        <div class="ticket-upcoming" ng-repeat ="ticket in project.upcomingDeadlines">
+          <h3>{{ticket.desc}}</h3>
+          <h4>{{ticket.isTimeLeft}} {{ticket.timeLeftFormatted}} {{ticket.timeFormatter}}</h4></div>
 
 
 
-        </div>
       </div>
-      <div class="col-sm-2">Palceholder</div>
-
-    </div>
+    <div class="col-sm-2">Do we even need this? Not sure, will get back to you.</div>
+  </div>
 
   </div>
+
+</div>
 
 </div>
 

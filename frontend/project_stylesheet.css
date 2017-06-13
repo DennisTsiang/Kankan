@@ -34,12 +34,28 @@
 
 }
 
+.ticket-upcoming {
+  width: 125px;
+  display: flex;
+  flex-direction: column;
+  min-height:75px;
+  margin: 5px;
+  font-weight: bold;
+  text-align: center;
+  border: 2px solid #26292e;
+  border-radius: 4px;
+  background-color: #e8eaeb;
+  float: left;
+
+}
+
 .row button {
   margin-top:8px;
 }
 
 .project_overviews {
   margin-top: 25px;
+  padding: 15px;
 }
 
 .top-menu {

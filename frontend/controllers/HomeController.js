@@ -8,17 +8,17 @@ app.controller('HomeController', function($scope, $location, socket) {
     console.log("tickets is " + JSON.stringify(project.tickets));
 
 
-    for(tickethash in project.tickets){
+    for (tickethash in project.tickets) {
       let ticket = project.tickets[tickethash];
 
       console.log("pushing " + ticket.desc + " for " + ticket.datetime);
-      if(ticket.datetime != null){
+      if (ticket.datetime != null) {
         ticket.deadlineActive = true;
 
       }
 
 
-      if(ticket.deadlineActive){
+      if (ticket.deadlineActive) {
         project.upcomingDeadlines.push(ticket);
       }
 
@@ -52,6 +52,13 @@ app.controller('HomeController', function($scope, $location, socket) {
 
     getUserProjects(socket, $scope.username);
     $scope.a_k = get_kanban_scope();
+
+
+/*
+    if (get_kanban_scope().project !== undefined) {
+      sendKanbanRequest(socket, get_kanban_scope().pid);
+    }
+    */
 
   }
 
