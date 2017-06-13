@@ -146,7 +146,7 @@ function App (db) {
         });
         break;
       case 'file_methods' :
-        db.getMethodnames(request.pid, request.filename, request.methodname, function (methodnames) {
+        db.getMethodNames(request.pid, request.filename, request.methodname, function (methodnames) {
           callback({type:'file_methods', object:methodnames});
         });
         break;
