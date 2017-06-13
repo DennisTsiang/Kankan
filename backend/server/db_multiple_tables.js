@@ -36,17 +36,23 @@ function Database(pool) {
                     'PRIMARY KEY (project_id, ticket_id) )',
                     [], function () {
                       pool.query('CREATE TABLE github_table_' + pid + ' (' +
-                      'filename varchar(100), ' +
-                      'methodname varchar (100), ' +
-                      'startline integer, ' +
-                      'endline integer , ' +
-                      'PRIMARY KEY (filename, methodname, startline) )',
-                      [], function (finishedCreate) {
-                        rwlock.unlock();
-                        console.log("Created new project " + project_name);
-                        callback(pid);
-                      });
-                    })
+                          'filename varchar(100), ' +
+                          'methodname varchar (100), ' +
+                          'startline integer, ' +
+                          'endline integer , ' +
+                          'PRIMARY KEY (filename, methodname) )',
+                          [], function (finishedCreate) {
+                            pool.query('CREATE TABLE ticket_files_' + pid + ' (' +
+                                'filename varchar(100), ' +
+                                'methodname varchar(100), ' +
+                                'ticket_id integer, ' +
+                                'PRIMARY KEY (filename, methodname, ticket_id) )', [], function () {
+                              rwlock.unlock();
+                              console.log("Created new project " + project_name);
+                              callback(pid);
+                            });
+                          })
+                    });
               });
         });
       });
@@ -80,9 +86,11 @@ function Database(pool) {
           pool.query('DROP TABLE tickets_' + pid, [], function (err, res3) {
             pool.query('DELETE FROM user_projects WHERE project_id = $1::int', [pid], function(res4) {
               pool.query('DROP TABLE github_table_' + pid, [], function(err, res5) {
-                console.log('Deleted project ' + pid);
-                rwlock.unlock();
-                callback(true);
+                pool.query('DROP TABLE ticket_files_' + pid, [], function (err, res) {
+                  console.log('Deleted project ' + pid);
+                  rwlock.unlock();
+                  callback(true);
+                })
               });
             });
           });
@@ -139,18 +147,55 @@ function Database(pool) {
 
   this.getTickets = function (pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT * FROM tickets_' + pid + ' ORDER BY ticket_id ASC', [], function(res) {
+      pool.query('SELECT t1.*, t2.filename, t2.methodname FROM tickets_' + pid + ' AS t1 LEFT JOIN ticket_files_' + pid +
+          ' AS t2 ON t1.ticket_id = t2.ticket_id ORDER BY t1.ticket_id ASC', [], function(res) {
         var tickets = [];
-        res.rows.forEach(function (row) {
-          //Create ticket objects
-          tickets.push(new ticket.Ticket(row["ticket_id"], row["column_id"],
-              row["ticket_description"], row["deadline"]));
-        });
+        if (res.rows.length > 1) {
+          var row = res.rows[0];
+          var current_ticket = row['ticket_id'];
+          var files = [];
+          var column_id = row["column_id"];
+          var ticket_description = row["ticket_description"];
+          var deadline = row["deadline"];
+          files.push({filename:row.filename, methodname:row.methodname});
+          for (var i = 1; i < res.rows.length; i++) {
+            row = res.rows[i];
+            if (row['ticket_id'] === current_ticket) {
+              files.push({filename:row.filename, methodname:row.methodname});
+            } else {
+              tickets.push(new ticket.Ticket(current_ticket, column_id,
+                  ticket_description, deadline, files));
+              current_ticket = row['ticket_id'];
+              column_id = row["column_id"];
+              ticket_description = row["ticket_description"];
+              deadline = row["deadline"];
+              files = [];
+              files.push({filename:row.filename, methodname:row.methodname});
+            }
+          }
+          tickets.push(new ticket.Ticket(current_ticket, column_id,
+              ticket_description, deadline, files));
+        }
         rwlock.unlock();
+        sortTickets(tickets);
         callback(pid, tickets);
       });
     });
   };
+
+  function sortTickets(tickets) {
+    tickets.forEach(function(ticket) {
+      var hashmap = {};
+      ticket.files.forEach(function (file) {
+        if (file.filename in hashmap) {
+          hashmap[file.filename].push(file.methodname);
+        } else {
+          hashmap[file.filename] = [file.methodname];
+        }
+      });
+      ticket.files = hashmap;
+    });
+  }
 
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
@@ -189,13 +234,13 @@ function Database(pool) {
         tid = res.rows[0].max + 1;
       }
       pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, \'New Ticket\', NULL)',
-          [tid, column_id, pid],
-          function (insertion) {
-            rwlock.unlock();
-            callback(tid);
-          });
+        [tid, column_id, pid],
+        function (insertion) {
+          rwlock.unlock();
+          callback(tid);
+      });
     });
-  };
+  }
 
   this.newTicket = function (pid, column_id, callback) {
     rwlock.writeLock(function () {
@@ -222,8 +267,10 @@ function Database(pool) {
     rwlock.writeLock(function () {
       pool.query('DELETE FROM tickets_' + pid + ' WHERE ticket_id = $1::int',
           [ticket_id], function (res) {
-        rwlock.unlock();
-        callback(true);
+        pool.query('DELETE FROM ticket_files_' + pid + ' WHERE ticket_id=$1::int', [ticket_id], function (res) {
+          rwlock.unlock();
+          callback(true);
+        });
       });
     });
   };
@@ -337,8 +384,8 @@ function Database(pool) {
 
   this.getFilenames = function (pid, filename, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT DISTINCT(filename) FROM github_table_' + pid + ' WHERE filename LIKE \'%$1::text%\'',
-        [filename], function (res) {
+      pool.query('SELECT DISTINCT(filename) FROM github_table_' + pid + ' WHERE filename LIKE \'%' + filename + '%\'',
+        [], function (res) {
             var filenames = [];
             for (var row of res.rows) {
               filenames.push(row.filename);
@@ -352,8 +399,8 @@ function Database(pool) {
   this.getMethodnames = function (pid, filename, methodname, callback) {
     rwlock.readLock(function () {
       pool.query('SELECT DISTINCT(methodname) FROM github_table_' + pid + ' WHERE filename = $1::text ' +
-          'AND methodname LIKE \'%$2::text%\'',
-          [filename, methodname], function (res) {
+          'AND methodname LIKE \'%' + methodname + '%\'',
+          [filename], function (res) {
             var methodnames = [];
             for (var row of res.rows) {
               methodnames.push(row.filename);
@@ -425,6 +472,24 @@ function Database(pool) {
         }
       });
     });
+  };
+
+  this.addMethodToTicket = function (pid, filename, methodname, ticket_id, callback) {
+    rwlock.writeLock(function () {
+      pool.query('INSERT INTO ticket_files_' + pid + ' VALUES($1::text, $2::text, $3::int)',
+          [filename, methodname, ticket_id], function () {
+        callback(true);
+      })
+    })
+  };
+
+  this.removeMethodFromTicket = function (pid, filename, methodname, ticket_id, callback) {
+    rwlock.writeLock(function () {
+      pool.query('DELETE FROM ticket_files_' + pid + ' WHERE filename=$1::text AND methodname=$2::text AND ' +
+          'ticket_id=$3::int',[filename, methodname, ticket_id], function () {
+            callback(true);
+          })
+    })
   };
 
   this.addUserToTicket = function (username, tid, pid, callback) {

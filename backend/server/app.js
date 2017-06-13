@@ -180,12 +180,17 @@ function App (db) {
         break;
       case 'column_new':
         db.newColumn(store["pid"], store["column_name"], store["position"], function (cid, column_name, position) {
-          callback({type:'column_new',object: {cid:cid, column_name:column_name, position:position}}, store['pid']);
+          callback({type:'column_new', object:{cid:cid, column_name:column_name, position:position}}, store['pid']);
         });
         break;
       case 'new_user_project':
         db.addUserToProject(store["username"], store["pid"], function(success) {
           callback({type:'new_user_project'}, 'all');
+        });
+        break;
+      case 'add_ticket_method':
+        db.addMethodToTicket(store.pid, store.filename, store.methodname, store.ticket_id, function (res) {
+          callback({type:'add_ticket_method', ticket_id:store.ticket_id, filename:store.filename, methodname:store.methodname}, store.pid);
         });
         break;
       default:
@@ -300,6 +305,12 @@ function App (db) {
           db.getKanban(remove['pid'], function (kanban) {
             callback({type:'userOfTicket_remove', object:kanban}, remove.pid);
           });
+        });
+        break;
+      case 'remove_ticket_method':
+        db.removeMethodFromTicket(remove.pid, remove.filename, remove.methodname, remove.ticket_id, function (res) {
+          callback({type:'remove_ticket_method', ticket_id:remove.ticket_id,
+            filename:remove.filename, methodname:remove.methodname}, remove.pid);
         });
         break;
       default:
