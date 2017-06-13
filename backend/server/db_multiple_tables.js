@@ -396,14 +396,14 @@ function Database(pool) {
     });
   };
 
-  this.getMethodnames = function (pid, filename, methodname, callback) {
+  this.getMethodNames = function (pid, filename, methodname, callback) {
     rwlock.readLock(function () {
       pool.query('SELECT DISTINCT(methodname) FROM github_table_' + pid + ' WHERE filename = $1::text ' +
           'AND methodname LIKE \'%' + methodname + '%\'',
           [filename], function (res) {
             var methodnames = [];
             for (var row of res.rows) {
-              methodnames.push(row.filename);
+              methodnames.push(row.methodname);
             }
             rwlock.unlock();
             callback(methodnames);
