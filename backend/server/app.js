@@ -8,10 +8,9 @@ var app = new App(db);
 var ticket = require('./ticket');
 var express = require('express')();
 var http = require('http').Server(express);
-var io = require('socket.io');
-var io_client = require('socket.io')(http);
-var socket_code = new io.Socket();
 const code_server = 'http://146.169.45.29:8008';
+var socket_code = require('socket.io-client')(code_server);
+var io_client = require('socket.io')(http);
 start_server(httpPort);
 
 function App (db) {
@@ -319,7 +318,6 @@ function start_server (port) {
   express.get('/\*', app.handleFileConnection);
 
   io_client.on('connection', app.handleConnection);
-  socket_code.connect(code_server);
   socket_code.on('connect', function () {
     socket_code.on('set_gh_url', function (reply) {
       io_client.sockets.in(reply.pid).emit('set_gh_url');
