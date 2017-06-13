@@ -398,18 +398,21 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
   $scope.wholeFile = true; //Default
 
   //TODO: Send request to server, for files beginning with val. Responds with filenames.
+  let filenames = {'filenames':[]};
+
   $scope.getFile = function(file) {
     $scope.selectedFile = false;
-    return $http.get('//maps.googleapis.com/maps/api/geocode/json', {
-      params: {
-        address: file,
-        sensor: false
+
+    socket.emit('request', JSON.stringify({pid:get_kanban_scope().pid, type:'project_files', filename: file}));
+
+    socket.on('requestreply', function(reply) {
+      console.log(reply);
+      if (reply.type === 'project_files') {
+        filenames['names'] = reply.object;
       }
-    }).then(function(response){
-      return response.data.results.map(function(item){
-        return item.formatted_address;
-      });
     });
+
+    return filenames['names'];
   };
 
   $scope.selectFile = function ($item, $model, $label, $event) {
