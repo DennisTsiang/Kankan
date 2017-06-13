@@ -397,51 +397,50 @@ app.controller('DeadlineCollapseCtrl', function ($scope) {
 app.controller('CodeCtrl', function ($scope, $http, socket) {
   $scope.wholeFile = true; //Default
 
-  //TODO: Send request to server, for files beginning with val. Responds with filenames.
-  let filenames = {'filenames':[]};
+  let server_response = {'filenames':[], 'methodnames': []};
 
   $scope.getFile = function(file) {
     $scope.selectedFile = false;
 
-    socket.emit('request', JSON.stringify({pid:get_kanban_scope().pid, type:'project_files', filename: file}));
+    getProjectFiles(socket, get_kanban_scope().pid, file);
 
     socket.on('requestreply', function(reply) {
       console.log(reply);
       if (reply.type === 'project_files') {
-        filenames['names'] = reply.object;
+        server_response['filenames'] = reply.object;
       }
     });
 
-    return filenames['names'];
+    return server_response['filenames'];
   };
 
-  $scope.selectFile = function ($item, $model, $label, $event) {
-    console.log($item);
+  $scope.selectFile = function (file, $model, $label, $event) {
+    console.log(file);
     //TODO: Select file
+
 
     $scope.selectedFile = true;
   };
 
-  //TODO: Send request to server, for methods beginning with val. Responds with methodnames.
   $scope.getMethod = function(file, method) {
     $scope.selectedMethod = false;
-    return $http.get('//maps.googleapis.com/maps/api/geocode/json', {
-      params: {
-        address: method,
-        sensor: false
+
+    getFileMethods(socket, get_kanban_scope().pid, file, method);
+
+    socket.on('requestreply', function(reply) {
+      console.log(reply);
+      if (reply.type === 'method_names') {
+        server_response['methodnames'] = reply.object;
       }
-    }).then(function(response){
-      return response.data.results.map(function(item){
-        return item.formatted_address;
-      });
     });
+
+    return server_response['methodnames'];
   };
 
-  $scope.selectMethod = function ($item, $model, $label, $event, file) {
-    console.log($item);
-    console.log(file);
-
+  $scope.selectMethod = function (method, $model, $label, $event, file) {
+    console.log(method);
     //TODO: Select method
+
     $scope.selectedMethod = true;
   };
 });
