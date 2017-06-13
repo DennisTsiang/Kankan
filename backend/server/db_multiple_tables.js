@@ -384,8 +384,8 @@ function Database(pool) {
 
   this.getFilenames = function (pid, filename, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT DISTINCT(filename) FROM github_table_' + pid + ' WHERE filename LIKE \'%$1::text%\'',
-        [filename], function (res) {
+      pool.query('SELECT DISTINCT(filename) FROM github_table_' + pid + ' WHERE filename LIKE \'%' + filename + '%\'',
+        [], function (res) {
             var filenames = [];
             for (var row of res.rows) {
               filenames.push(row.filename);
@@ -399,8 +399,8 @@ function Database(pool) {
   this.getMethodnames = function (pid, filename, methodname, callback) {
     rwlock.readLock(function () {
       pool.query('SELECT DISTINCT(methodname) FROM github_table_' + pid + ' WHERE filename = $1::text ' +
-          'AND methodname LIKE \'%$2::text%\'',
-          [filename, methodname], function (res) {
+          'AND methodname LIKE \'%' + methodname + '%\'',
+          [filename], function (res) {
             var methodnames = [];
             for (var row of res.rows) {
               methodnames.push(row.filename);
