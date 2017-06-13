@@ -40,7 +40,7 @@ function delete_ticket(ticket_id) {
 
 function generateTickets(ticket_info_list) {
   for (let ticket_info of ticket_info_list) {
-    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime, ticket_info.codeData);
+    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime, ticket_info.files);
   }
   updateTicketTimes();
   updateTickets();
