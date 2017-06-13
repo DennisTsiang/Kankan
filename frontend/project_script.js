@@ -7,7 +7,6 @@ function addTicket(col_id, ticket_id, desc, deadline, codeData) {
   ticket.setCodeData(codeData);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
-  console.log("adding ticket");
   if(deadline != null){
     ticket.setDeadline(deadline);
   }
@@ -40,10 +39,8 @@ function delete_ticket(ticket_id) {
 }
 
 function generateTickets(ticket_info_list) {
-  console.log("info list is " + JSON.stringify(ticket_info_list));
   for (let ticket_info of ticket_info_list) {
-    console.log("loop " + JSON.stringify(ticket_info));
-    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime);
+    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime, ticket_info.files);
   }
   updateTicketTimes();
   updateTickets();
@@ -80,7 +77,6 @@ function generate_user_kanbans(projects, socket) {
 
   for (let proj in projects) {
     projectsH[projects[proj].project_id] = projects[proj];
-      console.log("project is " + JSON.stringify(projects[proj]))
       sendTicketsRequest(socket, projects[proj].project_id);
 
   }

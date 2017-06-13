@@ -108,6 +108,7 @@
                     </div>
                   </div>
                 </div>
+                <br />
                 <div class="row">
                   <table class="table">
                     <tr>
@@ -116,7 +117,20 @@
                     </tr>
                     <tr ng-repeat="(filename, methodnames) in getTicketCodeData()">
                       <td>{{filename}}</td>
-                      <td>{{methodnames}}</td>
+                      <td>
+                        <div class="container-fluid">
+                          <div class="row" ng-repeat="method in methodnames">
+                            <div class="col-xs-6">
+                              <a ng-click="showCode(filename, method)">
+                                {{method}}
+                              </a>
+                            </div>
+                            <div class="col-xs-6">
+                              <button type="button" class="btn btn-warning btn-sm" style="margin-top: 0" ng-click="removeMethod(filename, method)">Remove method</button>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
                     </tr>
                   </table>
                 </div>

@@ -55,7 +55,6 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
       var type = reply.type;
       var request_data = reply.object;
 
-      console.log("request data is is " + JSON.stringify(reply.object));
       switch (type) {
         case "tickets" : {
           if(get_kanban_scope().project !== undefined){
@@ -73,13 +72,11 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
         }
         case "user_projects" : {
           let projects = reply.object;
-          console.log("user projects reply is " + JSON.stringify(reply));
           //Generates/updates projects and other_projects variables.
           generate_user_kanbans(projects, socket);
           break;
         }
         case "user_tickets": {
-          console.log("tickets is " + reply);
           var tickets = reply.object.tickets;
           break;
         }

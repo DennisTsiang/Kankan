@@ -1,49 +1,31 @@
 app.controller('HomeController', function($scope, $location, socket) {
 
-
-  $scope.showDeadlines = function(project) {
-
-    project.upcomingDeadlines = [];
-    console.log("project is " + project.project_id);
-    console.log("tickets is " + JSON.stringify(project.tickets));
-
-
-    for (tickethash in project.tickets) {
-      let ticket = project.tickets[tickethash];
-
-      console.log("pushing " + ticket.desc + " for " + ticket.datetime);
-      if (ticket.datetime != null) {
-        ticket.deadlineActive = true;
-
-      }
-
-
-      if (ticket.deadlineActive) {
-        project.upcomingDeadlines.push(ticket);
-      }
-
-
-    }
-
-
-
-
-  }
-
-
   socket.on('requestreply', function(reply_string) {
     let reply = JSON.parse(reply_string);
-    console.log("got reply");
     if (reply.type === "tickets") {
-      console.log("set");
 
       $scope.projects[reply.object.pid].tickets = reply.object.tickets;
 
       $scope.showDeadlines($scope.projects[reply.object.pid]);
-
-
     }
   });
+
+  $scope.showDeadlines = function(project) {
+
+    project.upcomingDeadlines = [];
+
+    for (tickethash in project.tickets) {
+      let ticket = project.tickets[tickethash];
+
+      if (ticket.datetime != null) {
+        ticket.deadlineActive = true;
+      }
+
+      if (ticket.deadlineActive) {
+        project.upcomingDeadlines.push(ticket);
+      }
+    }
+  };
 
   if (get_kanban_scope().username === undefined) {
     $location.path('/login');
