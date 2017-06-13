@@ -2,30 +2,8 @@
   <div class="row">
     <div class="col-xs-3"></div>
     <div class="col-xs-6 button-centered">
-      <br />
       <h2 class="username-title">Welcome {{username}}</h2>
-      <br />
-      <div>
-        <ul>
-          <div class="username" ng-repeat="proj in a_k.projects">
-            <div class="btn-group btn-flex button-centered" ng-controller="AddUsersCtrl as $ctrl">
-              <button type="button" ng-click="chooseProject(proj.project_id)" class="btn btn-default btn-lg">{{proj.title}}</button>
-              <button type="button" class="btn btn-default dropdown-toggle btn-lg" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="caret"></span>
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-              <ul class="dropdown-menu pull-right">
-                <li><a ng-click="$ctrl.open('sm', proj)">Add Users</a></li>
-                <li><a ng-click="deleteProject(proj.project_id)">Delete Project</a></li>
-              </ul>
-            </div>
-            <br />
-          </div>
-          <!--class="list-group-item username" ng-repeat="proj in a_k.projects"
-                           >{{proj.title}}-->
-        </ul>
-      </div>
-      <br />
+
       <div ng-controller="NewProjectPopoverCtrl">
         <button popover-placement="right" uib-popover-template="dynamicPopover.templateUrl" popover-is-open="isOpen" ng-click="isOpen = true" type="button" class="btn btn-primary">Create New Project</button>
       </div>
@@ -40,7 +18,7 @@
     <div class="row">
 
       <div class="col-sm-2">
-        <h2>Project Name</h2></div>
+        <h2>Project </h2></div>
       <div class="col-sm-2">
         <h2>Members</h2></div>
       <div class="col-sm-6">
@@ -53,7 +31,22 @@
     <div class="row" ng-repeat="project in projects">
 
       <div class="col-sm-2">
-        <h3>{{project.title}}</h3></div>
+        <div class="btn-group btn-flex button-centered" ng-controller="AddUsersCtrl as $ctrl">
+          <button type="button" class="btn btn-default" ng-click="chooseProject(project.project_id)">
+
+                                {{project.title}}
+                              </button>
+          <button type="button" class="btn btn-default dropdown-toggle btn-lg" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+          <ul class="dropdown-menu pull-right">
+            <li><a ng-click="$ctrl.open('sm', project)">Add Users</a></li>
+            <li><a ng-click="deleteProject(project.project_id)">Delete Project</a></li>
+          </ul>
+        </div>
+
+      </div>
       <div class="col-sm-2">
         <div class="projmembers" ng-repeat="member in project.members">
           <h3>{{member}}</h3></div>
@@ -62,8 +55,8 @@
         <div class="row">
 
           <div class="col-sm-4">
-            <h3>{{upcomingDeadlines[0].desc}}</h3>
-            <h4>{{upcomingDeadlines[0].isTimeLeft}} {{upcomingDeadlines[0].timeLeftFormatted}} {{upcomingDeadlines[0].timeFormatter}}</h4></div>
+            <h3>{{project.upcomingDeadlines[0].desc}}</h3>
+            <h4>{{project.upcomingDeadlines[0].isTimeLeft}} {{project.upcomingDeadlines[0].timeLeftFormatted}} {{project.upcomingDeadlines[0].timeFormatter}}</h4></div>
           <div class="col-sm-4"></div>
           <div class="col-sm-4"></div>
 

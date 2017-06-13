@@ -1,8 +1,9 @@
 app.controller('HomeController', function($scope, $location, socket) {
 
-  $scope.upcomingDeadlines = [];
 
   $scope.showDeadlines = function(project) {
+
+    project.upcomingDeadlines = [];
     console.log("project is " + project.project_id);
     console.log("tickets is " + JSON.stringify(project.tickets));
 
@@ -18,10 +19,9 @@ app.controller('HomeController', function($scope, $location, socket) {
 
 
       if(ticket.deadlineActive){
-        $scope.upcomingDeadlines.push(ticket);
+        project.upcomingDeadlines.push(ticket);
       }
 
-      console.log("deadline0 is " + $scope.upcomingDeadlines[0]);
 
     }
 
