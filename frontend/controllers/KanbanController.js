@@ -260,16 +260,16 @@ app.controller('editTicketCtrl', function($scope, socket) {
   };
 
   $scope.isMemberAddedToTicket = function (member) {
-    return getTicket(getTid()).members.includes(member);
+    return $scope.getTicket($scope.getTid()).members.includes(member);
   };
 
   $scope.toggleMemberToTicket = function (member) {
     if ($scope.isMemberAddedToTicket(member)) {
       //remove member
-      removeUserFromTicket(socket, get_kanban_scope().pid, member, getTid());
+      removeUserFromTicket(socket, get_kanban_scope().pid, member, $scope.getTid());
     } else {
       //add member
-      addUserToTicket(socket, member, get_kanban_scope().pid, getTid());
+      addUserToTicket(socket, member, get_kanban_scope().pid, $scope.getTid());
     }
   };
 
@@ -409,17 +409,17 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
   let server_response = {'filenames':[], 'methodnames': []};
 
+  socket.on('requestreply', function(jr) {
+    let reply = JSON.parse(jr);
+
+    if (reply.type === "project_files") {
+      server_response['filenames'] = reply.object;
+    }
+  });
+
   $scope.getFile = function(file) {
     $scope.selectedFile = false;
-
     getProjectFiles(socket, get_kanban_scope().pid, file);
-
-    socket.on('requestreply', function(reply) {
-      console.log(reply);
-      if (reply.type === 'project_files') {
-        server_response['filenames'] = reply.object;
-      }
-    });
 
     return server_response['filenames'];
   };
@@ -441,24 +441,25 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     $scope.selectedFile = true;
   };
 
+  socket.on('requestreply', function(jr) {
+    let reply = JSON.parse(jr);
+    if (reply.type === 'file_methods') {
+      server_response['methodnames'] = reply.object;
+    }
+  });
+
   $scope.getMethod = function(file, method) {
     $scope.selectedMethod = false;
 
     getFileMethods(socket, get_kanban_scope().pid, file, method);
 
-    socket.on('requestreply', function(reply) {
-      if (reply.type === 'method_names') {
-        server_response['methodnames'] = reply.object;
-      }
-    });
-
     return server_response['methodnames'];
   };
 
   $scope.selectMethod = function (method, $model, $label, $event, file) {
-    console.log(method);
+    //console.log(method);
 
-    addMethodToTicket(get_kanban_scope().pid, file, method, $scope.getTid());
+    addMethodToTicket(socket, get_kanban_scope().pid, file, method, $scope.getTid());
 
     socket.on('storereply', function(reply) {
       if (reply.type === 'add_ticket_method') {

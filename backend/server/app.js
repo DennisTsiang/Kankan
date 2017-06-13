@@ -8,7 +8,7 @@ var app = new App(db);
 var ticket = require('./ticket');
 var express = require('express')();
 var http = require('http').Server(express);
-const code_server = 'http://146.169.45.29:8008';
+const code_server = 'http://129.31.229.213:8008';
 var socket_code = require('socket.io-client')(code_server);
 var io_client = require('socket.io')(http);
 start_server(httpPort);
@@ -174,7 +174,7 @@ function App (db) {
         break;
       case 'project_new':
         db.newProject(store["project_name"], function (pid) {
-          set_gh_url(pid, store['gh_url']);
+          set_gh_url(pid, store['project_url']);
           callback({type:'project_new', object:pid}, null);
         });
         break;
@@ -330,6 +330,8 @@ function start_server (port) {
 
   io_client.on('connection', app.handleConnection);
   socket_code.on('connect', function () {
+    console.log("Connected to code server");
+
     socket_code.on('set_gh_url', function (reply) {
       io_client.sockets.in(reply.pid).emit('set_gh_url');
     });
@@ -346,7 +348,8 @@ function stop_server() {
 }
 
 function set_gh_url(pid, gh_url) {
-  var requestobj = {type:'set_gh_url', pid:pid, gh_url:gh_url};
+  var requestobj = JSON.stringify({type:'set_gh_url', pid:pid, gh_url:gh_url});
+  console.log("sent gh request " + requestobj);
   socket_code.emit('request', requestobj);
 }
 

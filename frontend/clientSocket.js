@@ -5,12 +5,12 @@ function sendKanbanRequest(socket, pid) {
   sendKanbanRequestHelper(socket, pid);
 }
 
-function addMethodToTicket(pid, filename, methodname, ticket_id) {
+function addMethodToTicket(socket, pid, filename, methodname, ticket_id) {
   var ticketObj = {type:'add_ticket_method', pid:pid, filename:filename, methodname:methodname, ticket_id:ticket_id};
   socket.emit("store", JSON.stringify(ticketObj));
 }
 
-function removeMethodFromTicket(pid, filename, methodname, ticket_id) {
+function removeMethodFromTicket(socket, pid, filename, methodname, ticket_id) {
   var ticketObj = {type:'remove_ticket_method', pid:pid, filename:filename, methodname:methodname, ticket_id:ticket_id};
   socket.emit("remove", JSON.stringify(ticketObj));
 }
