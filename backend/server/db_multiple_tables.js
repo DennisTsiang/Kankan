@@ -316,7 +316,7 @@ function Database(pool) {
     });
   };
 
-   this.updateTicketDeadline = function (pid, ticket, datetime, callback) {
+  this.updateTicketDeadline = function (pid, ticket, datetime, callback) {
     rwlock.writeLock(function () {
       pool.query('SELECT ticket_id FROM tickets_' + pid + ' WHERE  ticket_id = $1::int',
           [ticket.ticket_id], function (res) {
@@ -334,7 +334,6 @@ function Database(pool) {
 
     });
   };
-
 
   this.getFilenames = function (pid, filename, callback) {
     rwlock.readLock(function () {

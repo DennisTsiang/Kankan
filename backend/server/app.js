@@ -1,6 +1,3 @@
-/**
- * Created by yianni on 25/05/17.
- */
 module.exports.App = App;
 
 var httpPort = process.argv[3];
@@ -11,14 +8,15 @@ var app = new App(db);
 var ticket = require('./ticket');
 var express = require('express')();
 var http = require('http').Server(express);
-var io = require('socket.io')(http);
-
+var io = require('socket.io');
+var io_client = require('socket.io')(http);
+var socket_code = new io.Socket();
+const code_server = 'http://146.169.45.29:8008';
 start_server(httpPort);
 
 function App (db) {
 
   var _this = this;
-  var resetLock = require('locks').createMutex();
 
   this.handleFileConnection = function (request, response) {
     var frontend = __dirname;
@@ -58,7 +56,7 @@ function App (db) {
           socket.emit('storereply', JSON.stringify(response));
           socket.broadcast.emit('storereply', JSON.stringify(response));
         } else {
-          io.sockets.in(pid).emit('storereply', JSON.stringify(response));
+          io_client.sockets.in(pid).emit('storereply', JSON.stringify(response));
         }
         console.log('Replied to store');
       });
@@ -71,7 +69,7 @@ function App (db) {
           if (pid === null) {
             socket.emit('updatereply', JSON.stringify(response));
           } else {
-            io.sockets.in(pid).emit('updatereply', JSON.stringify(response));
+            io_client.sockets.in(pid).emit('updatereply', JSON.stringify(response));
           }
           console.log('Replied to update');
         }
@@ -85,7 +83,7 @@ function App (db) {
           socket.emit('removereply', JSON.stringify(response));
           socket.broadcast.emit('removereply', JSON.stringify(response));
         } else {
-          io.sockets.in(pid).emit('removereply', JSON.stringify(response));
+          io_client.sockets.in(pid).emit('removereply', JSON.stringify(response));
         }
         console.log('Replied to delete');
       });
@@ -177,6 +175,7 @@ function App (db) {
         break;
       case 'project_new':
         db.newProject(store["project_name"], function (pid) {
+          set_gh_url(pid, store['gh_url']);
           callback({type:'project_new', object:pid}, null);
         });
         break;
@@ -251,6 +250,9 @@ function App (db) {
                 success, update.pid);
         });
         break;
+      case 'gh_url' :
+        set_gh_url(update.pid, update.gh_url);
+        break;
       default:
         //TODO: Handle unknown update.
         break;
@@ -307,20 +309,6 @@ function App (db) {
     }
   };
 
-  var clientCodePath = 'Client.html';
-  fs = require('fs');
-
-  this.sendClientCode = function (response) {
-    fs.readFile(clientCodePath, 'utf8', function (err, data) {
-      if (err) {
-        response.write("There was an error completing your request.\n");
-      } else {
-        response.write(data);
-      }
-
-      response.end();
-    });
-  };
 }
 
 module.exports.start_server = start_server;
@@ -330,8 +318,8 @@ function start_server (port) {
 
   express.get('/\*', app.handleFileConnection);
 
-  io.on('connection', app.handleConnection);
-
+  io_client.on('connection', app.handleConnection);
+  socket_code.connect(code_server);
   if (!module.parent) {
     http.listen(port);
     console.log("HTTP server listening on port " + port + " at localhost.");
@@ -339,8 +327,13 @@ function start_server (port) {
 }
 
 function stop_server() {
-  io.close();
+  io_client.close();
   console.log('Server was closed');
+}
+
+function set_gh_url(pid, gh_url) {
+  var requestobj = {type:'set_gh_url', pid:pid};
+  socket_code.emit('request', requestobj);
 }
 
 
