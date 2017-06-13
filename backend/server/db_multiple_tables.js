@@ -177,10 +177,25 @@ function Database(pool) {
               ticket_description, deadline, files));
         }
         rwlock.unlock();
+        sortTickets(tickets);
         callback(tickets);
       });
     });
   };
+
+  function sortTickets(tickets) {
+    tickets.forEach(function(ticket) {
+      var hashmap = {};
+      ticket.files.forEach(function (file) {
+        if (file.filename in hashmap) {
+          hashmap[file.filename].push(file.methodname);
+        } else {
+          hashmap[file.filename] = [file.methodname];
+        }
+      });
+      ticket.files = hashmap;
+    });
+  }
 
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
