@@ -7,6 +7,7 @@ function addTicket(col_id, ticket_id, desc, deadline, codeData) {
   ticket.setCodeData(codeData);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
+  console.log("adding ticket");
   if(deadline != null){
     ticket.setDeadline(deadline);
   }
@@ -22,7 +23,7 @@ function move_tickets(to_col_id, from_col_id, tid) {
   let scope = get_kanban_scope();
   let toColumn = scope.project.columns[to_col_id];
   let fromColumn = scope.project.columns[from_col_id];
-  
+
   scope.project.tickets[tid].setColumn(to_col_id);
   delete fromColumn.tickets[tid];
   toColumn.tickets[tid] = scope.project.tickets[tid];

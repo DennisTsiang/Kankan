@@ -58,7 +58,19 @@
         <div class="projmembers" ng-repeat="member in project.members">
           <h3>{{member}}</h3></div>
       </div>
-      <div class="col-sm-6">Placeholder</div>
+      <div class="col-sm-6">
+        <div class="row">
+
+          <div class="col-sm-4">
+            <h3>{{upcomingDeadlines[0].desc}}</h3>
+            <h4>{{upcomingDeadlines[0].isTimeLeft}} {{upcomingDeadlines[0].timeLeftFormatted}} {{upcomingDeadlines[0].timeFormatter}}</h4></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-4"></div>
+
+
+
+        </div>
+      </div>
       <div class="col-sm-2">Palceholder</div>
 
     </div>

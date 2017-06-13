@@ -1,8 +1,33 @@
 app.controller('HomeController', function($scope, $location, socket) {
 
+  $scope.upcomingDeadlines = [];
+
   $scope.showDeadlines = function(project) {
     console.log("project is " + project.project_id);
     console.log("tickets is " + JSON.stringify(project.tickets));
+
+
+    for(tickethash in project.tickets){
+      let ticket = project.tickets[tickethash];
+
+      console.log("pushing " + ticket.desc + " for " + ticket.datetime);
+      if(ticket.datetime != null){
+        ticket.deadlineActive = true;
+
+      }
+
+
+      if(ticket.deadlineActive){
+        $scope.upcomingDeadlines.push(ticket);
+      }
+
+      console.log("deadline0 is " + $scope.upcomingDeadlines[0]);
+
+    }
+
+
+
+
   }
 
 
