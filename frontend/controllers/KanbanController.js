@@ -428,7 +428,8 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
     getFileMethods(socket, get_kanban_scope().pid, file, method);
 
-    socket.on('requestreply', function(reply) {
+    socket.on('requestreply', function(reply_string) {
+      let reply = JSON.parse(reply_string);
       console.log(reply);
       if (reply.type === 'method_names') {
         server_response['methodnames'] = reply.object;
