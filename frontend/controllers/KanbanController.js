@@ -440,7 +440,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
   socket.on('requestreply', function(reply_string) {
     let reply = JSON.parse(reply_string);
     console.log(reply);
-    if (reply.type === 'method_names') {
+    if (reply.type === 'file_methods') {
       server_response['methodnames'] = reply.object;
     }
   });
@@ -453,24 +453,24 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     return server_response['methodnames'];
   };
 
+  socket.on('storereply', function(reply) {
+    if (reply.type === 'add_ticket_method') {
+      let tid = reply.ticket_id;
+      let filename = reply.filename;
+      let methodname = reply.methodname;
+
+      if (filename in $scope.getTicket($scope.getTid()).codeData) {
+        $scope.getTicket($scope.getTid()).codeData[filename].push(methodname);
+      } else {
+        $scope.getTicket($scope.getTid()).codeData[filename] = [methodname];
+      }
+    }
+  });
+
   $scope.selectMethod = function (method, $model, $label, $event, file) {
     //console.log(method);
 
     addMethodToTicket(socket, get_kanban_scope().pid, file, method, $scope.getTid());
-
-    socket.on('storereply', function(reply) {
-      if (reply.type === 'add_ticket_method') {
-        let tid = reply.ticket_id;
-        let filename = reply.filename;
-        let methodname = reply.methodname;
-
-        if (filename in $scope.getTicket($scope.getTid()).codeData) {
-          $scope.getTicket($scope.getTid()).codeData[filename].push(methodname);
-        } else {
-          $scope.getTicket($scope.getTid()).codeData[filename] = [methodname];
-        }
-      }
-    });
 
     $scope.selectedMethod = true;
   };
