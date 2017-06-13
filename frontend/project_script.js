@@ -2,12 +2,13 @@ function get_kanban_scope() {
   return angular.element($('#Application')).scope();
 }
 
-function addTicket(col_id, ticket_id, desc, deadline) {
+function addTicket(col_id, ticket_id, desc, deadline, codeData) {
   let ticket = new Ticket(ticket_id);
+  ticket.setCodeData(codeData);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
   if(deadline != null){
-  ticket.setDeadline(deadline);
+    ticket.setDeadline(deadline);
   }
 
   let s = get_kanban_scope();
@@ -39,7 +40,7 @@ function delete_ticket(ticket_id) {
 
 function generateTickets(ticket_info_list) {
   for (let ticket_info of ticket_info_list) {
-    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime);
+    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime, ticket_info.codeData);
   }
   updateTicketTimes();
   updateTickets();

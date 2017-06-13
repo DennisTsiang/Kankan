@@ -132,3 +132,11 @@ function getProjectUsers(socket, pid) {
   var jsonString = {type : 'project_users', pid:pid};
   socket.emit("request", JSON.stringify(jsonString));
 }
+
+function getProjectFiles(socket, pid, partial_filename) {
+  socket.emit('request', JSON.stringify({pid:pid, type:'project_files', filename: partial_filename}));
+}
+
+function getFileMethods(socket, pid, filename, partial_methodname) {
+  socket.emit('request', JSON.stringify({pid:pid, type:'file_methods', filename: filename, methodname: partial_methodname}));
+}
