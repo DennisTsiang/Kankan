@@ -82,6 +82,7 @@ textarea {
 h1 {
   word-wrap: break-word;
    color: navy;
+   font-size: 59px;
 }
 
 div {
@@ -175,7 +176,7 @@ div {
 
 .home-title {
   text-align: center;
-  font-size: 15px;
+  font-size: 45px;
   margin-top: auto;
   margin-bottom: auto;
 }
