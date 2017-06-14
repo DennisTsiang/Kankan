@@ -174,8 +174,16 @@ function App (db) {
         break;
       case 'project_new':
         db.newProject(store["project_name"], function (pid) {
-          set_gh_url(pid, store['project_url']);
-          callback({type:'project_new', object:pid}, null);
+          db.newColumn(pid, 'Analyze',0, function () {
+            db.newColumn(pid, 'Development', 1, function () {
+              db.newColumn(pid, 'Testing', 2, function () {
+                db.newColumn(pid, 'Done', 3, function () {
+                  set_gh_url(pid, store['project_url']);
+                  callback({type:'project_new', object:pid}, null);
+                });
+              });
+            });
+          });
         });
         break;
       case 'column_new':
