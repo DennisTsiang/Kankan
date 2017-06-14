@@ -23,7 +23,7 @@
                       <button type="button" class="btn btn-md btn-default" ng-click="isCollapsed = !isCollapsed">Edit deadline </button>
 
 
-                      <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-md btn-default">Add user </button>
+                      <button uib-popover-template="dynamicPopover.templateUrl" popover-trigger="'outsideClick'" popover-placement="right" type="button" class="btn btn-md btn-default">Add user </button>
                     </div>
 
                   </div>
@@ -55,7 +55,8 @@
               <div ng-controller="deleteTicketCtrl" class="modal-footer center-align-text">
                 <div class="container-fluid">
                   <div class="col-xs-6" style="text-align: left; padding-left: 0;">
-                    <button uib-popover-template="dynamicPopover.templateUrl" popover-placement="right" type="button" class="btn btn-md btn-warning">
+                    <button uib-popover-template="dynamicPopover.templateUrl" popover-trigger="'outsideClick'"
+                            popover-placement="right" type="button" class="btn btn-md btn-warning">
                       Remove ticket
                     </button>
                   </div>
