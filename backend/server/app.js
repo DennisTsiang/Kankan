@@ -136,8 +136,8 @@ function App (db) {
         });
         break;
       case 'project_users' :
-        db.getProjectUsers(request['pid'], function (users) {
-          callback({type: 'project_users', object:users});
+        db.getProjectUsers(request['pid'], function (pid, users) {
+          callback({type: 'project_users', object:{pid:pid, users:users}});
         });
         break;
       case 'project_files' :
