@@ -40,6 +40,7 @@ function Database(pool) {
                           'methodname varchar (100), ' +
                           'startline integer, ' +
                           'endline integer , ' +
+                          'download_url varchar (250), ' +
                           'PRIMARY KEY (filename, methodname) )',
                           [], function (finishedCreate) {
                             pool.query('CREATE TABLE ticket_files_' + pid + ' (' +
@@ -147,8 +148,10 @@ function Database(pool) {
 
   this.getTickets = function (pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT t1.*, t2.filename, t2.methodname FROM tickets_' + pid + ' AS t1 LEFT JOIN ticket_files_' + pid +
-          ' AS t2 ON t1.ticket_id = t2.ticket_id ORDER BY t1.ticket_id ASC', [], function(res) {
+      pool.query('SELECT t1.*, t2.filename, t2.methodname, t2.startline, t2.endline, t2.download_url FROM tickets_'
+          + pid + ' AS t1 LEFT JOIN ' + '(SELECT * FROM ticket_files_' + pid +' NATURAL JOIN github_table_' + pid +
+          ') AS t2 ON t1.ticket_id = t2.ticket_id ORDER BY t1.ticket_id ASC',
+          [], function(res) {
         var tickets = [];
         if (res.rows.length > 1) {
           var row = res.rows[0];
@@ -157,11 +160,13 @@ function Database(pool) {
           var column_id = row["column_id"];
           var ticket_description = row["ticket_description"];
           var deadline = row["deadline"];
-          files.push({filename:row.filename, methodname:row.methodname});
+          files.push({filename:row.filename, methodname:row.methodname
+            startline:row.startline, endline:row.endline, gh_url:row.download_url});
           for (var i = 1; i < res.rows.length; i++) {
             row = res.rows[i];
             if (row['ticket_id'] === current_ticket) {
-              files.push({filename:row.filename, methodname:row.methodname});
+              files.push({filename:row.filename, methodname:row.methodname,
+                startline:row.startline, endline:row.endline, gh_url:row.download_url});
             } else {
               tickets.push(new ticket.Ticket(current_ticket, column_id,
                   ticket_description, deadline, files));
@@ -170,7 +175,8 @@ function Database(pool) {
               ticket_description = row["ticket_description"];
               deadline = row["deadline"];
               files = [];
-              files.push({filename:row.filename, methodname:row.methodname});
+              files.push({filename:row.filename, methodname:row.methodname
+                startline:row.startline, endline:row.endline, gh_url:row.download_url});
             }
           }
           tickets.push(new ticket.Ticket(current_ticket, column_id,
@@ -188,9 +194,10 @@ function Database(pool) {
       var hashmap = {};
       ticket.files.forEach(function (file) {
         if (file.filename in hashmap) {
-          hashmap[file.filename].push(file.methodname);
+          hashmap[file.filename].methods.push({methodname:file.methodname, startline:file.startline, endline:file.endline});
         } else {
-          hashmap[file.filename] = [file.methodname];
+          hashmap[file.filename] = {methods:[{methodname:file.methodname, startline:file.startline, endline:file.endline}],
+            download_url:file.download_url};
         }
       });
       ticket.files = hashmap;
