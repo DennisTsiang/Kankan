@@ -78,17 +78,34 @@ app.controller('ProjectDropdownCtrl', function($scope, $sce) {
 
 });
 
-app.controller('AddUsersCtrl', function($uibModal, $log, $document) {
+app.controller('DropdownCtrl', function($uibModal, $log, $document) {
   var $ctrl = this;
   $ctrl.animationsEnabled = true;
 
-  $ctrl.open = function(size, project) {
+  $ctrl.openAddUsers = function(size, project) {
     var modalInstance = $uibModal.open({
       animation: $ctrl.animationsEnabled,
       ariaLabelledBy: 'modal-title',
       ariaDescribedBy: 'modal-body',
       templateUrl: 'AddUsersModal.html',
       controller: 'AddUsersInstanceCtrl',
+      controllerAs: '$ctrl',
+      size: size,
+      resolve: {
+        items: function() {
+          return project;
+        }
+      }
+    });
+  };
+
+  $ctrl.openDeleteProject = function(size, project) {
+    var modalInstance = $uibModal.open({
+      animation: $ctrl.animationsEnabled,
+      ariaLabelledBy: 'modal-title',
+      ariaDescribedBy: 'modal-body',
+      templateUrl: 'DeleteProjectModal.html',
+      controller: 'DeleteProjectInstanceCtrl',
       controllerAs: '$ctrl',
       size: size,
       resolve: {
@@ -111,4 +128,18 @@ app.controller('AddUsersInstanceCtrl', function($uibModalInstance, items, socket
   $ctrl.addUser = function(username) {
     addUserToProject(socket, username, items.project_id);
   }
+});
+
+app.controller('DeleteProjectInstanceCtrl', function($uibModalInstance, items, socket) {
+  var $ctrl = this;
+  $ctrl.title = items.title;
+
+  $ctrl.ok = function() {
+    removeProject(socket, items.project_id);
+    $uibModalInstance.close();
+  };
+
+  $ctrl.cancel = function() {
+    $uibModalInstance.close();
+  };
 });

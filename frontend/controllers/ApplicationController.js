@@ -223,7 +223,7 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
         case "ticket_new" : {
           let ticket_info = reply.object;
           if (ticket_info.tid !== "Maxticketlimitreached") {
-            addTicket(ticket_info.column_id, ticket_info.tid, reply.desc, {});
+            addTicket(ticket_info.column_id, ticket_info.tid, ticket_info.desc, null, {});
           } else {
             console.log("Max ticket limit reached for this column ");
           }
