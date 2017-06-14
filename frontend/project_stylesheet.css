@@ -192,4 +192,12 @@ div {
   text-align: center;
 }
 
+.left-align-text {
+  text-align: left;
+}
+
+.right-align-text {
+  text-align: left;
+}
+
 .pagination, .carousel, .panel-title a { cursor: pointer; }

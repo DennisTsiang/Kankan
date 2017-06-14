@@ -164,7 +164,7 @@ function App (db) {
         //Returns the new ticket id
         db.newTicket(store['pid'], store['column_id'], function (tid) {
           if (tid !== -1) {
-            callback({type: 'ticket_new', object: {tid: tid, column_id: store['column_id'], pid: store['pid']}},
+            callback({type: 'ticket_new', object: {tid: tid, column_id: store['column_id'], pid: store['pid'], desc:'New Ticket'}},
                 store["pid"]);
           } else {
             callback({type: 'ticket_new', object: {tid: "Maxticketlimitreached", column_id: store['column_id'], pid: store['pid']}},
