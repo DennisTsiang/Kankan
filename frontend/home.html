@@ -44,7 +44,7 @@
     <div class="row" ng-repeat="project in projects">
 
       <div class="col-sm-2">
-        <div class="btn-group btn-flex button-centered" ng-controller="AddUsersCtrl as $ctrl">
+        <div class="btn-group btn-flex button-centered" ng-controller="DropdownCtrl as $ctrl">
           <button type="button" class="btn btn-default" ng-click="chooseProject(project.project_id)">
 
                                 <b>{{project.title}}</b>
@@ -54,8 +54,8 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
           <ul class="dropdown-menu pull-right">
-            <li><a ng-click="$ctrl.open('sm', project)">Add Users</a></li>
-            <li><a ng-click="deleteProject(project.project_id)">Delete Project</a></li>
+            <li><a ng-click="$ctrl.openAddUsers('sm', project)">Add Users</a></li>
+            <li><a ng-click="$ctrl.openDeleteProject('sm', project)">Delete Project</a></li>
           </ul>
         </div>
 
@@ -106,5 +106,19 @@
   </form>
   <div class="modal-footer">
     <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">OK</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="DeleteProjectModal.html">
+  <div class="modal-header center-align-text">
+    <h4 class="modal-title" id="modal-title">Are you sure you want to delete {{$ctrl.title}}?</h4>
+  </div>
+  <div class="modal-footer">
+    <div class="col-sm-6 center-align-text">
+      <button class="btn btn-danger " type="button" ng-click="$ctrl.ok()">I'm Sure</button>
+    </div>
+    <div class="col-sm-6 center-align-text">
+      <button class="btn btn-primary " type="button" ng-click="$ctrl.cancel()">NO!</button>
+    </div>
   </div>
 </script>

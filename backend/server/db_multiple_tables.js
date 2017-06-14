@@ -175,7 +175,7 @@ function Database(pool) {
               ticket_description = row["ticket_description"];
               deadline = row["deadline"];
               files = [];
-              files.push({filename:row.filename, methodname:row.methodname, 
+              files.push({filename:row.filename, methodname:row.methodname,
                 startline:row.startline, endline:row.endline, gh_url:row.download_url});
             }
           }
