@@ -1,24 +1,64 @@
 var users = {};
-var userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
+var userpics = {
+  "yianni": "yianni.jpg",
+  "thomas": "tom.jpg"
+};
+//var projects = {};
 
 
 app.controller('HomeController', function($scope, $location, socket) {
+
+  console.log("start projects is " + JSON.stringify($scope.projects));
 
 
   socket.on('requestreply', function(reply_string) {
     let reply = JSON.parse(reply_string);
     if (reply.type === "tickets") {
+      console.log("ticket reply");
 
+      let title = $scope.projects[reply.object.pid].title;
       $scope.projects[reply.object.pid] = new Project(reply.object.pid);
-
       $scope.projects[reply.object.pid].tickets = reply.object.tickets;
-
-      $scope.projects[reply.object.pid].title = "toberequested"
-
+      $scope.projects[reply.object.pid].title = title;
       $scope.showDeadlines($scope.projects[reply.object.pid]);
+
+      console.log("made new " + reply.object.pid);
     }
   });
+/*
+  socket.on('requestreply', function(reply_string) {
 
+    let reply = JSON.parse(reply_string);
+
+    if (reply.type === "user_projects") {
+
+
+      for (project in reply.object) {
+        let proj = reply.object[project];
+
+        console.log("dcheck" + JSON.stringify($scope.projects[proj.project_id]));
+
+
+        if($scope.projects[proj.project_id] === undefined){
+          console.log("making new " + proj.project_id);
+
+        $scope.projects[proj.project_id] = new Project(proj.project_id);
+      }
+      //  $scope.projects[proj.project_id].title = proj.title;
+
+
+
+
+
+      }
+
+    }
+
+    console.log("finished user projects");
+
+  });
+
+  */
   socket.on('requestreply', function(reply_string) {
 
     let reply = JSON.parse(reply_string);
@@ -26,7 +66,7 @@ app.controller('HomeController', function($scope, $location, socket) {
     if (reply.type === "project_users") {
 
       console.log("catching project users");
-      console.log("reply is " + JSON.stringify(reply));
+      console.log("project users reply is " + JSON.stringify(reply));
 
       let project = $scope.projects[reply.object.pid];
 
@@ -35,26 +75,25 @@ app.controller('HomeController', function($scope, $location, socket) {
       for (memberid in project.members) {
         let member = project.members[memberid];
 
-        console.log("member is " + member);
+        console.log("users member is " + JSON.stringify(users[member]));
 
-        if (users[member] === undefined) {
-
-          console.log("adding new user");
+        if (users[member] === {} || users[member] === undefined) {
+          console.log("adding " + member);
 
           let profilepic = userpics[member];
-          console.log("profilepic is " + profilepic);
 
           users[member] = new User(member, profilepic);
           users[member].addProject(reply.object.pid);
+
+
+        } else {
+          //add project to that of the users?
+        }
+
+        if(project.users[member] === undefined){
           project.addUser(users[member]);
 
-          console.log("project users now is " + JSON.stringify(project.users));
-          console.log("users is " + JSON.stringify(users));
 
-
-
-        }else{
-          //add project to that of the users?
         }
 
       }
