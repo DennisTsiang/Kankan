@@ -495,8 +495,19 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     removeMethodFromTicket(socket, get_kanban_scope().pid, filename, method, $scope.getTid());
   };
 
-  $scope.showCode = function (filename, method) {
+  $scope.updateCode = function (filename, method) {
     //TODO: Get line numbers and show code
+    $scope.filename = filename;
+    $scope.methodname = method;
 
+    $scope.showCode = true;
   };
+
+  let code = ['line 1', 'line 2', 'line 3', 'line 4'];
+  $scope.showCode = false; //Default
+  $scope.getCodeData = function () {
+    if ($scope.showCode) {
+      return code;
+    }
+  }
 });
