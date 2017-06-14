@@ -62,6 +62,7 @@
           <ul class="dropdown-menu pull-right">
             <li><a ng-click="$ctrl.openAddUsers('sm', project)">Add Users</a></li>
             <li><a ng-click="$ctrl.openDeleteProject('sm', project)">Delete Project</a></li>
+            <li><a ng-click="$ctrl.openEditURL('sm', project)">Edit Github URL</a></li>
           </ul>
         </div>
 
@@ -114,6 +115,25 @@
     </div>
     <div class="col-sm-6 center-align-text">
       <button class="btn btn-primary " type="button" ng-click="$ctrl.cancel()">NO!</button>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="EditURLModal.html">
+  <div class="modal-header center-align-text">
+    <h4 class="modal-title" id="modal-title">Edit Github URL for {{$ctrl.title}}?</h4>
+  </div>
+  <form class="form-group center-align-text">
+    <label for="usr">User</label>
+    <input type="text" class="form-control username" placeholder="URL" ng-model="$ctrl.url">
+    <br />
+  </form>
+  <div class="modal-footer">
+    <div class="col-sm-6 center-align-text">
+      <button class="btn btn-success " type="button" ng-click="$ctrl.ok($ctrl.url)">Save</button>
+    </div>
+    <div class="col-sm-6 center-align-text">
+      <button class="btn btn-primary " type="button" ng-click="$ctrl.cancel()">Cancel</button>
     </div>
   </div>
 </script>

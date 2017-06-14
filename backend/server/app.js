@@ -264,9 +264,10 @@ function App (db) {
         break;
       case 'gh_url' :
         //Sends it to code server
+          console.log("gh_url update");
         set_gh_url(update.pid, update.gh_url);
         //Updates project_table
-        db.updateGHURl(update.pid, update.gh_url, function (success) {
+        db.updateGHURL(update.pid, update.gh_url, function (success) {
           callback({type : 'gh_url', pid : update.pid, url : update.gh_url}, success, update.pid);
         });
 

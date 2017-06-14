@@ -151,6 +151,23 @@ app.controller('DropdownCtrl', function($uibModal, $log, $document) {
       }
     });
   };
+
+  $ctrl.openEditURL = function(size, project) {
+    var modalInstance = $uibModal.open({
+      animation: $ctrl.animationsEnabled,
+      ariaLabelledBy: 'modal-title',
+      ariaDescribedBy: 'modal-body',
+      templateUrl: 'EditURLModal.html',
+      controller: 'EditURLInstanceCtrl',
+      controllerAs: '$ctrl',
+      size: size,
+      resolve: {
+        items: function() {
+          return project;
+        }
+      }
+    });
+  };
 });
 
 app.controller('AddUsersInstanceCtrl', function($uibModalInstance, items, socket) {
@@ -179,3 +196,23 @@ app.controller('DeleteProjectInstanceCtrl', function($uibModalInstance, items, s
     $uibModalInstance.close();
   };
 });
+
+app.controller('EditURLInstanceCtrl', function($uibModalInstance, items, socket) {
+  var $ctrl = this;
+  $ctrl.title = items.title;
+  if ('gh_url' in items) {
+    $ctrl.url = items.gh_url;
+  } else {
+    $ctrl.url = null;
+  }
+
+  $ctrl.ok = function(url) {
+    sendUpdateGHURL(socket, items.project_id, url);
+    $uibModalInstance.close();
+  };
+
+  $ctrl.cancel = function() {
+    $uibModalInstance.close();
+  };
+});
+
