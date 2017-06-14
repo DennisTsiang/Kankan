@@ -1,5 +1,5 @@
-var users = {};
-var userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
+var users;
+var userpics;
 
 
 app.controller('HomeController', function($scope, $location, socket) {
@@ -9,21 +9,10 @@ app.controller('HomeController', function($scope, $location, socket) {
     let reply = JSON.parse(reply_string);
     if (reply.type === "tickets") {
 
-      $scope.projects[reply.object.pid] = new Project(reply.object.pid);
-
       $scope.projects[reply.object.pid].tickets = reply.object.tickets;
 
-      $scope.projects[reply.object.pid].title = "toberequested"
-
       $scope.showDeadlines($scope.projects[reply.object.pid]);
-    }
-  });
-
-  socket.on('requestreply', function(reply_string) {
-
-    let reply = JSON.parse(reply_string);
-
-    if (reply.type === "project_users") {
+    } else if (reply.type === "project_users") {
 
       console.log("catching project users");
       console.log("reply is " + JSON.stringify(reply));
@@ -31,8 +20,11 @@ app.controller('HomeController', function($scope, $location, socket) {
       let project = $scope.projects[reply.object.pid];
 
       project.members = reply.object.users;
+      if (!('users' in project)) {
+        project.users = {};
+      }
 
-      for (memberid in project.members) {
+      for (var memberid in project.members) {
         let member = project.members[memberid];
 
         console.log("member is " + member);
@@ -46,22 +38,20 @@ app.controller('HomeController', function($scope, $location, socket) {
 
           users[member] = new User(member, profilepic);
           users[member].addProject(reply.object.pid);
-          project.addUser(users[member]);
+          project.users[users[member].username] = users[member];
 
           console.log("project users now is " + JSON.stringify(project.users));
           console.log("users is " + JSON.stringify(users));
 
 
-
-        }else{
+        } else {
           //add project to that of the users?
         }
 
       }
-
     }
-
   });
+
 
   $scope.showDeadlines = function(project) {
 
@@ -84,12 +74,10 @@ app.controller('HomeController', function($scope, $location, socket) {
     $location.path('/login');
   } else {
     $scope.username = get_kanban_scope().username;
-
+    users = {};
+    userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
     getUserProjects(socket, $scope.username);
     $scope.a_k = get_kanban_scope();
-
-
-
   }
 
   //sendAllProjectUserRequest()
