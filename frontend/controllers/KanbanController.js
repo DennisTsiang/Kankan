@@ -495,15 +495,46 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     removeMethodFromTicket(socket, get_kanban_scope().pid, filename, method, $scope.getTid());
   };
 
+  let code = [];
+
+  function trimToLines(lines, startLine, endLine) {
+    let trimmed = lines.slice(startLine - 1, endLine);
+    let numbers = [];
+    for (let i = startLine - 1; i < endLine; i++) {
+      numbers.push([i, trimmed[i-startLine-1]]);
+    }
+    return numbers;
+  }
+
+  function getMethodObject(methods, methodname) {
+    for(let i = 0; i < methods.length; i++) {
+      if (methods[i]['methodname'] === methodname) {
+        return methods[i]['methodname'];
+      }
+    }
+  }
+
   $scope.updateCode = function (filename, method) {
     //TODO: Get line numbers and show code
     $scope.filename = filename;
     $scope.methodname = method;
+    let ticket = $scope.getTicket($scope.getTid());
+
+    let methods = ticket.codeData[filename]['methods'];
+    let methodObject = getMethodObject(methods, method);
+    let startLine = methodObject['startline'];
+    let endLine = methodObject['endline'];
+    let url = methodObject['download_url'];
+
+    $http.get(url).then(function (response) {
+      let data = response.data;
+      data = data.split('\n');
+      code = trimToLines(data, startLine, endLine);
+    });
 
     $scope.showCode = true;
   };
 
-  let code = ['line 1', 'line 2', 'line 3', 'line 4'];
   $scope.showCode = false; //Default
   $scope.getCodeData = function () {
     if ($scope.showCode) {
