@@ -75,9 +75,12 @@ function generate_kanban(received_project) {
 function generate_user_kanbans(projects, socket) {
   let projectsH = {};
 
+  console.log("projects is " + JSON.stringify(projects));
+
   for (let proj in projects) {
     projectsH[projects[proj].project_id] = projects[proj];
       sendTicketsRequest(socket, projects[proj].project_id);
+      console.log("call generate user kan");
       getProjectUsers(socket, projects[proj].project_id);
 
   }

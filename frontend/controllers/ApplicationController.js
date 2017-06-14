@@ -63,6 +63,7 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
           break;
         }
         case "kanban" : {
+          console.log("kanban request handled");
           generate_kanban(request_data);
           //Send for tickets, once received kanban.
           sendTicketsRequest(socket, get_kanban_scope().pid);
@@ -107,7 +108,6 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
           break;
         }
         case "project_users" : {
-          console.log("catch");
           let users = reply.object.users;
           if(get_kanban_scope().project !== undefined){
           get_kanban_scope().project.members = users;

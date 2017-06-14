@@ -9,6 +9,12 @@ function Project(project_id){
   this.members = [];
   this.title = "";
   this.upcomingDeadlines = [];
+  this.users = {};
 
   this.repositoryUrl = "";
+
+  this.addUser = function(user){
+    console.log("user here is " + JSON.stringify(user));
+    this.users[user.username] = user;
+  };
 }

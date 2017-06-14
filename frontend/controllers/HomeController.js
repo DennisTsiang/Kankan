@@ -1,25 +1,61 @@
+var users = {};
+
+
 app.controller('HomeController', function($scope, $location, socket) {
+
 
   socket.on('requestreply', function(reply_string) {
     let reply = JSON.parse(reply_string);
     if (reply.type === "tickets") {
 
+      $scope.projects[reply.object.pid] = new Project(reply.object.pid);
+
       $scope.projects[reply.object.pid].tickets = reply.object.tickets;
+
+      $scope.projects[reply.object.pid].title = "toberequested"
 
       $scope.showDeadlines($scope.projects[reply.object.pid]);
     }
   });
 
-  socket.on('requestreply', function(reply_string){
-    console.log("catching project users");
+  socket.on('requestreply', function(reply_string) {
+
     let reply = JSON.parse(reply_string);
 
-    if(reply.type ==="project_users"){
-      console.log("reply is " + JSON.stringify(reply));
-      console.log("pid is " + reply.object.pid);
-      console.log("members is " + reply.object.members);
+    if (reply.type === "project_users") {
 
-      $scope.projects[reply.object.pid].members = reply.object.users;
+      console.log("catching project users");
+      console.log("reply is " + JSON.stringify(reply));
+
+      let project = $scope.projects[reply.object.pid];
+
+      project.members = reply.object.users;
+
+      for (memberid in project.members) {
+        let member = project.members[memberid];
+
+        console.log("member is " + member);
+
+        if (users[member] === undefined) {
+
+          console.log("adding new user");
+
+          let profilepic = "tom.jpg";
+
+          users[member] = new User(member, profilepic);
+          users[member].addProject(reply.object.pid);
+          project.addUser(users[member]);
+
+          console.log("project users now is " + JSON.stringify(project.users));
+          console.log("users is " + JSON.stringify(users));
+
+
+
+        }else{
+          //add project to that of the users?
+        }
+
+      }
 
     }
 
@@ -51,11 +87,6 @@ app.controller('HomeController', function($scope, $location, socket) {
     $scope.a_k = get_kanban_scope();
 
 
-/*
-    if (get_kanban_scope().project !== undefined) {
-      sendKanbanRequest(socket, get_kanban_scope().pid);
-    }
-    */
 
   }
 
