@@ -1,6 +1,6 @@
 @media screen and (min-width: 768px){
   .ticket {
-    min-width: 200px;
+    width: 200px;
     display: flex;
     flex-direction: column;
     min-height:150px;
@@ -11,13 +11,14 @@
     border-radius: 4px;
     background-color: #e8eaeb;
     float: left;
+
   }
 }
 
 @media only screen and (max-width: 768px) {
 
   .ticket {
-    min-width: 70px;
+    width: 70px;
     display: flex;
     flex-direction: column;
     min-height:40px;
@@ -28,8 +29,54 @@
     border-radius: 4px;
     background-color: #e8eaeb;
     float: left;
+
   }
 
+}
+
+.ticket-upcoming {
+  width: 125px;
+  display: flex;
+  flex-direction: column;
+  min-height:75px;
+  margin: 5px;
+  font-weight: bold;
+  text-align: center;
+  border: 2px solid #26292e;
+  border-radius: 4px;
+  background-color: #e8eaeb;
+  float: left;
+
+}
+
+.row button {
+  margin-top:8px;
+}
+
+.project_overviews {
+  margin-top: 25px;
+  padding: 15px;
+}
+
+.top-menu {
+  margin-top: 20px;
+}
+
+.project_overviews > .row {
+  border-style: solid;
+  border-radius: 8px;
+  border-width: 1px;
+  border-color: grey;
+  padding-bottom: 5px;
+
+}
+
+.project_overviews h2 {
+  font-weight: bold;
+}
+
+textarea {
+  resize: vertical; /* user can resize vertically, but width is fixed */
 }
 
 h1 {
@@ -40,6 +87,11 @@ h1 {
 div {
   word-wrap: break-word;
 
+}
+
+.ticketButtons {
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .project-title {
@@ -110,9 +162,20 @@ div {
   margin:0 auto;
 }
 
+.bottom-border {
+  border-bottom: 1px;
+}
+
 .username-title {
   text-align: center;
   font-size: 30px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.home-title {
+  text-align: center;
+  font-size: 15px;
   margin-top: auto;
   margin-bottom: auto;
 }
@@ -138,6 +201,14 @@ div {
 }
 .center-align-text {
   text-align: center;
+}
+
+.left-align-text {
+  text-align: left;
+}
+
+.right-align-text {
+  text-align: left;
 }
 
 .pagination, .carousel, .panel-title a { cursor: pointer; }

@@ -2,30 +2,13 @@ function get_kanban_scope() {
   return angular.element($('#Application')).scope();
 }
 
-function addBTN(event) {
-  let k_scope = get_kanban_scope();
-  let columns = k_scope.project.columns;
-  //Get column in position 0
-  sendStoreTicket(k_scope.pid, k_scope.project.column_order[0]);
-}
-
-function enableDnDColumns() {
-//Each column has drag and drop event listeners
-  let elems = document.querySelectorAll('.ticket-column');
-  for (let i=0; i < elems.length; i++) {
-    let el = elems[i];
-    el.addEventListener('dragover', handleTicketDragOver, false);
-    el.addEventListener('drop', handleTicketDrop, false);
-    el.addEventListener('dragleave', handleTicketDragLeave, false);
-  }
-}
-
-function addTicket(col_id, ticket_id, desc, deadline) {
+function addTicket(col_id, ticket_id, desc, deadline, codeData) {
   let ticket = new Ticket(ticket_id);
+  ticket.setCodeData(codeData);
   ticket.setDesc(desc);
   ticket.setColumn(col_id);
   if(deadline != null){
-  ticket.setDeadline(deadline);
+    ticket.setDeadline(deadline);
   }
 
   let s = get_kanban_scope();
@@ -33,49 +16,19 @@ function addTicket(col_id, ticket_id, desc, deadline) {
 
   //col_id may not be col position
   s.project.columns[col_id].tickets[ticket_id] = ticket;
-
-  //Update change
-  s.$apply();
 }
-
-function addColumn(title, position, id) {
-  let scope = get_kanban_scope();
-  let column = new Column(id, title, position);
-  scope.project.columns[id] = column;
-  scope.project.column_order[position] = id;
-
-  scope.$apply();
-  enableDnDColumns();
-}
-
-updateColLimitEvent = function (event) {
-  let colId = event.srcElement.attributes['cid'].nodeValue;
-  let limit = event.srcElement.value;
-  if (isNaN(limit)) {
-    alert("Ticket limit must be a number");
-  } else {
-    sendColumnUpdateLimit(get_kanban_scope().pid, colId, limit);
-  }
-};
 
 function move_tickets(to_col_id, from_col_id, tid) {
   let scope = get_kanban_scope();
   let toColumn = scope.project.columns[to_col_id];
   let fromColumn = scope.project.columns[from_col_id];
 
-  let column_limit = toColumn.limit;
-  let to_ticket_number = toColumn.tickets.length;
-  if (column_limit === undefined || to_ticket_number < column_limit) {
-    scope.project.tickets[tid].setColumn(to_col_id);
-    delete fromColumn.tickets[tid];
-    toColumn.tickets[tid] = scope.project.tickets[tid];
-    scope.$apply();
-  } else {
-    alert("Cannot move ticket. Ticket limit reached.")
-  }
+  scope.project.tickets[tid].setColumn(to_col_id);
+  delete fromColumn.tickets[tid];
+  toColumn.tickets[tid] = scope.project.tickets[tid];
 }
 
-function delete_ticket(ticket_id, update) {
+function delete_ticket(ticket_id) {
   let scope = get_kanban_scope();
 
   let ticket = scope.project.tickets[ticket_id];
@@ -83,16 +36,14 @@ function delete_ticket(ticket_id, update) {
     delete scope.project.columns[ticket.col].tickets[ticket_id];
     delete scope.project.tickets[ticket_id];
   }
-  if (update === undefined || update) scope.$apply();
 }
 
 function generateTickets(ticket_info_list) {
   for (let ticket_info of ticket_info_list) {
-    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime);
+    addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime, ticket_info.files);
   }
   updateTicketTimes();
   updateTickets();
-
 }
 
 function generate_kanban(received_project) {
@@ -119,20 +70,18 @@ function generate_kanban(received_project) {
     k_scope.project.column_order[position] = column.column_id;
     k_scope.project.columns[column.column_id] = column;
   }
-
-  k_scope.$apply();
-  enableDnDColumns();
 }
 
-function generate_user_kanbans(projects) {
+function generate_user_kanbans(projects, socket) {
   let projectsH = {};
 
   for (let proj in projects) {
     projectsH[projects[proj].project_id] = projects[proj];
+      sendTicketsRequest(socket, projects[proj].project_id);
+
   }
 
   get_kanban_scope().projects = projectsH;
-  get_kanban_scope().$apply();
 }
 
 function generate_other_user_kanbans() {
@@ -146,17 +95,6 @@ function generate_other_user_kanbans() {
 
   get_kanban_scope().other_projects = other_projects;
 }
-
-/*
-function generateArray(start, end) {
-  let returnArray = [];
-
-  for (let i = start; i <= end; i++) {
-    returnArray.push(i.toString());
-  }
-  return returnArray;
-}
-*/
 
 function updateTickets() {
   setInterval(updateTicketTimes, 10000);
@@ -172,5 +110,4 @@ function updateTicketTimes() {
       tick.updateTimeLeft();
     }
   }
-  s.$apply();
 }

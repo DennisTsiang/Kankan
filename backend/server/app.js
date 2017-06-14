@@ -1,6 +1,3 @@
-/**
- * Created by yianni on 25/05/17.
- */
 module.exports.App = App;
 
 var httpPort = process.argv[3];
@@ -11,41 +8,20 @@ var app = new App(db);
 var ticket = require('./ticket');
 var express = require('express')();
 var http = require('http').Server(express);
-var io = require('socket.io')(http);
-
+const code_server = 'http://146.169.45.29:8008';
+var socket_code = require('socket.io-client')(code_server);
+var io_client = require('socket.io')(http);
 start_server(httpPort);
 
 function App (db) {
 
   var _this = this;
-  var resetLock = require('locks').createMutex();
 
   this.handleFileConnection = function (request, response) {
     var frontend = __dirname;
     frontend = frontend.substring(0, frontend.length - 14);
     if (request.originalUrl === "/") {
       response.sendFile(frontend + 'frontend/kankan.html');
-    } else if (request.originalUrl.match(/DeleteTable\/(\d)/)) {
-      resetLock.lock(function () {
-        var pid = parseInt(request.originalUrl.substring(request.originalUrl.length-1));
-        db.deleteProject(pid, function (successful) {
-          // db.newProject("Kanban", function (newPid) {
-          //   if (newPid === 0) {
-          //     db.newColumn(newPid, "To Do", 0, function (res1) {
-          //       db.newColumn(newPid, "In Progess", 1, function (res2) {
-          //         db.newColumn(newPid, "Done", 2, function (res3) {
-                    resetLock.unlock();
-                    //response.sendFile(frontend + 'frontend/kankan.html');
-                //   });
-                // });
-              });
-            // } else {
-            //   resetLock.unlock();
-            //   console.error("Wrong pid!");
-            // }
-        //   });
-        // });
-      });
     } else {
       response.sendFile(frontend + 'frontend' + request.originalUrl);
     }
@@ -79,7 +55,7 @@ function App (db) {
           socket.emit('storereply', JSON.stringify(response));
           socket.broadcast.emit('storereply', JSON.stringify(response));
         } else {
-          io.sockets.in(pid).emit('storereply', JSON.stringify(response));
+          io_client.sockets.in(pid).emit('storereply', JSON.stringify(response));
         }
         console.log('Replied to store');
       });
@@ -89,7 +65,11 @@ function App (db) {
       console.log('Received Update');
       _this.handleUpdate(JSON.parse(data), function (response, success, pid) {
         if (success) {
-          io.sockets.in(pid).emit('updatereply', JSON.stringify(response));
+          if (pid === null) {
+            socket.emit('updatereply', JSON.stringify(response));
+          } else {
+            io_client.sockets.in(pid).emit('updatereply', JSON.stringify(response));
+          }
           console.log('Replied to update');
         }
       });
@@ -102,7 +82,7 @@ function App (db) {
           socket.emit('removereply', JSON.stringify(response));
           socket.broadcast.emit('removereply', JSON.stringify(response));
         } else {
-          io.sockets.in(pid).emit('removereply', JSON.stringify(response));
+          io_client.sockets.in(pid).emit('removereply', JSON.stringify(response));
         }
         console.log('Replied to delete');
       });
@@ -119,8 +99,8 @@ function App (db) {
         break;
 
       case 'tickets':
-        db.getTickets(request['pid'], function (tickets) {
-          callback({type:'tickets', object:tickets});
+        db.getTickets(request['pid'], function (pid, tickets) {
+          callback({type:'tickets', object:{pid:pid, tickets:tickets}});
         });
         break;
       case 'user_projects':
@@ -160,6 +140,16 @@ function App (db) {
           callback({type: 'project_users', object:users});
         });
         break;
+      case 'project_files' :
+        db.getFilenames(request.pid, request.filename, function (filenames) {
+          callback({type: 'project_files', object:filenames});
+        });
+        break;
+      case 'file_methods' :
+        db.getMethodNames(request.pid, request.filename, request.methodname, function (methodnames) {
+          callback({type:'file_methods', object:methodnames});
+        });
+        break;
       default:
         //TODO: Handle unknown request.
         break;
@@ -174,27 +164,41 @@ function App (db) {
         //Returns the new ticket id
         db.newTicket(store['pid'], store['column_id'], function (tid) {
           if (tid !== -1) {
-            callback({type: 'ticket_new', object: {tid: tid, column_id: store['column_id'], pid: store['pid']}},
+            callback({type: 'ticket_new', object: {tid: tid, column_id: store['column_id'], pid: store['pid'], desc:'New Ticket'}},
                 store["pid"]);
           } else {
             callback({type: 'ticket_new', object: {tid: "Maxticketlimitreached", column_id: store['column_id'], pid: store['pid']}},
-                store["pid"]);
+                null);
           }
         });
         break;
       case 'project_new':
-        db.newProject(store["project_name"], function (pid) {
-          callback({type:'project_new', object:pid}, null);
+        db.newProject(store["project_name"], store["gh_url"], function (pid) {
+          db.newColumn(pid, 'Analyze',0, function () {
+            db.newColumn(pid, 'Development', 1, function () {
+              db.newColumn(pid, 'Testing', 2, function () {
+                db.newColumn(pid, 'Done', 3, function () {
+                  set_gh_url(pid, store['gh_url']);
+                  callback({type:'project_new', object:pid}, null);
+                });
+              });
+            });
+          });
         });
         break;
       case 'column_new':
         db.newColumn(store["pid"], store["column_name"], store["position"], function (cid, column_name, position) {
-          callback({type:'column_new',object: {cid:cid, column_name:column_name, position:position}}, store['pid']);
+          callback({type:'column_new', object:{cid:cid, column_name:column_name, position:position}}, store['pid']);
         });
         break;
       case 'new_user_project':
         db.addUserToProject(store["username"], store["pid"], function(success) {
           callback({type:'new_user_project'}, 'all');
+        });
+        break;
+      case 'add_ticket_method':
+        db.addMethodToTicket(store.pid, store.filename, store.methodname, store.ticket_id, function (res) {
+          callback({type:'add_ticket_method', ticket_id:store.ticket_id, filename:store.filename, methodname:store.methodname}, store.pid);
         });
         break;
       default:
@@ -217,7 +221,10 @@ function App (db) {
               ticket_id: update.ticket.ticket_id
             }, success, update.pid);
           } else {
-            callback({}, success, update.pid);
+            callback({
+              type: 'ticket_moved',
+              ticket_id: "Maxticketlimitreached"
+            }, true, null);
           }
         });
         break;
@@ -254,6 +261,15 @@ function App (db) {
             callback({type: 'column_limit', pid: update['pid'], cid: update['cid'], limit: update['limit']},
                 success, update.pid);
         });
+        break;
+      case 'gh_url' :
+        //Sends it to code server
+        set_gh_url(update.pid, update.gh_url);
+        //Updates project_table
+        db.updateGHURl(update.pid, update.gh_url, function (success) {
+          callback({type : 'gh_url', pid : update.pid, url : update.gh_url}, success, update.pid);
+        });
+
         break;
       default:
         //TODO: Handle unknown update.
@@ -305,26 +321,18 @@ function App (db) {
           });
         });
         break;
+      case 'remove_ticket_method':
+        db.removeMethodFromTicket(remove.pid, remove.filename, remove.methodname, remove.ticket_id, function (res) {
+          callback({type:'remove_ticket_method', ticket_id:remove.ticket_id,
+            filename:remove.filename, methodname:remove.methodname}, remove.pid);
+        });
+        break;
       default:
         //TODO: Handle unknown update.
         break;
     }
   };
 
-  var clientCodePath = 'Client.html';
-  fs = require('fs');
-
-  this.sendClientCode = function (response) {
-    fs.readFile(clientCodePath, 'utf8', function (err, data) {
-      if (err) {
-        response.write("There was an error completing your request.\n");
-      } else {
-        response.write(data);
-      }
-
-      response.end();
-    });
-  };
 }
 
 module.exports.start_server = start_server;
@@ -334,8 +342,14 @@ function start_server (port) {
 
   express.get('/\*', app.handleFileConnection);
 
-  io.on('connection', app.handleConnection);
+  io_client.on('connection', app.handleConnection);
+  socket_code.on('connect', function () {
+    console.log("Connected to code server");
 
+    socket_code.on('set_gh_url', function (reply) {
+      io_client.sockets.in(reply.pid).emit('set_gh_url');
+    });
+  });
   if (!module.parent) {
     http.listen(port);
     console.log("HTTP server listening on port " + port + " at localhost.");
@@ -343,10 +357,12 @@ function start_server (port) {
 }
 
 function stop_server() {
-  io.close();
+  io_client.close();
   console.log('Server was closed');
 }
 
-
-
-
+function set_gh_url(pid, gh_url) {
+  var requestobj = JSON.stringify({type:'set_gh_url', pid:pid, gh_url:gh_url});
+  console.log("sent gh request " + requestobj);
+  socket_code.emit('request', requestobj);
+}

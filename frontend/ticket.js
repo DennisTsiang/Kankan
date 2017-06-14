@@ -4,6 +4,7 @@ function Ticket(ticket_id) {
   this.members = [];
   this.desc = "";
   this.col = -1;
+  this.codeData = {};
   this.deadline = null;
   this.startdate = null;
   //this.progress = 0;
@@ -25,6 +26,10 @@ function Ticket(ticket_id) {
 
   this.setColumn = function(n) {
     this.col = n;
+  };
+
+  this.setCodeData = function (codeData) {
+    this.codeData = codeData;
   };
 
 
@@ -80,10 +85,8 @@ function Ticket(ticket_id) {
 
     this.timeLeft = (endtime - currentDate) / (1000 * 3600);
     if (this.timeLeft <= 0) {
-      console.log("timeleft less than 0");
-
       if (this.deadlineActive == true) {
-        console.log("was active");
+        //console.log("was active");
         this.deadlineActive = false;
         this.isTimeLeft = "Due";
         this.timeFormatter = "";
@@ -98,8 +101,6 @@ function Ticket(ticket_id) {
       this.timeLeft = 0;
 
     } else {
-
-      console.log("time left is " + this.timeLeft);
 
       if (this.timeLeft < 1) {
         this.timeFormatter = "minutes";
@@ -141,7 +142,6 @@ function Ticket(ticket_id) {
 
     */
 
-    console.log("time left is " + this.timeLeft);
     //  console.log("starttime " + starttime);
     //  console.log("endtime is " + endtime);
 

@@ -1,65 +1,122 @@
 <div class="container-fluid">
+
+  <div class="top-menu">
     <div class="row">
-        <div class="col-xs-3"></div>
-        <div class="col-xs-6 button-centered">
-            <br />
-            <h2 class="username-title">Welcome {{username}}</h2>
-            <br />
-                <div>
-                    <ul>
-                        <div class="username" ng-repeat="proj in a_k.projects">
-                            <div class="btn-group btn-flex button-centered" ng-controller="AddUsersCtrl as $ctrl">
-                                <button type="button" ng-click="chooseProject(proj.project_id)"
-                                        class="btn btn-default btn-lg">{{proj.title}}</button>
-                                <button type="button" class="btn btn-default dropdown-toggle btn-lg" data-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false">
-                                    <span class="caret"></span>
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-                                    <ul class="dropdown-menu pull-right">
-                                        <li><a ng-click="$ctrl.open('sm', proj)">Add Users</a></li>
-                                        <li><a ng-click="deleteProject(proj.project_id)">Delete Project</a></li>
-                                    </ul>
-                            </div>
-                            <br />
-                        </div>
-                           <!--class="list-group-item username" ng-repeat="proj in a_k.projects"
-                           >{{proj.title}}-->
-                    </ul>
-                </div>
-                <br />
-                <div ng-controller="NewProjectPopoverCtrl">
-                    <button popover-placement="right" uib-popover-template="dynamicPopover.templateUrl" popover-is-open="isOpen" ng-click="isOpen = true" type="button" class="btn btn-primary">Create New Project</button>
-                </div>
-            <br />
-            <button type="button" class="btn btn-info" ng-click="logOut()">Log Out</button>
+      <div ng-controller="NewProjectPopoverCtrl">
+
+        <div class="col-sm-2 bottom-border">
+          <span class="home-title">{{username}}</span>
         </div>
-        <div class="col-xs-3"></div>
+        <div class="col-sm-9 bottom-border"></div>
+        <div class="col-sm-1 bottom-border">
+          <button type="button" class="btn btn-sm btn-info" ng-click="logOut()">Log Out</button>
+        </div>
+      </div>
     </div>
+    <div class="row">
+      <div class="col-sm-1">
+      <button popover-placement="right-top" popover-trigger="'outsideClick'" uib-popover-template="dynamicPopover.templateUrl" popover-is-open="isOpen"
+              ng-click="isOpen = true" type="button" class="btn btn-primary">Create New Project</button>
+      </div>
+      <div class="col-sm-11"></div>
+    </div>
+  </div>
+
+  <div class="project_overviews">
+
+    <div class="top-headers">
+      <div class="row">
+
+        <div class="col-sm-2">
+          <h2>Project </h2></div>
+        <div class="col-sm-2">
+          <h2>Members</h2></div>
+        <div class="col-sm-6">
+          <h2>Upcoming Deadlines</h2></div>
+        <div class="col-sm-2">
+          <h2>Summary</h2></div>
+
+      </div>
+    </div>
+
+    <div class="row" ng-repeat="project in projects">
+
+      <div class="col-sm-2">
+        <div class="btn-group btn-flex button-centered" ng-controller="DropdownCtrl as $ctrl">
+          <button type="button" class="btn btn-default" ng-click="chooseProject(project.project_id)">
+
+                                <b>{{project.title}}</b>
+                              </button>
+          <button type="button" class="btn btn-default dropdown-toggle btn-lg" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+          <ul class="dropdown-menu pull-right">
+            <li><a ng-click="$ctrl.openAddUsers('sm', project)">Add Users</a></li>
+            <li><a ng-click="$ctrl.openDeleteProject('sm', project)">Delete Project</a></li>
+          </ul>
+        </div>
+
+      </div>
+      <div class="col-sm-2">
+        <div class="projmembers" ng-repeat="member in project.members">
+          <h3>{{member}}</h3></div>
+      </div>
+      <div class="col-sm-6">
+
+        <div class="ticket-upcoming" ng-repeat ="ticket in project.upcomingDeadlines">
+          <h3>{{ticket.desc}}</h3>
+          <h4>{{ticket.isTimeLeft}} {{ticket.timeLeftFormatted}} {{ticket.timeFormatter}}</h4></div>
+
+
+
+      </div>
+    <div class="col-sm-2">Do we even need this? Not sure, will get back to you.</div>
+  </div>
+
+  </div>
+
+</div>
+
 </div>
 
 <script type="text/ng-template" id="NewProjectPopover.html">
-    <form class="form-group">
-        <label>Enter Your New Project Title:</label>
-        <input type="text" placeholder = "Enter here" ng-model="dynamicPopover.content" class="form-control username">
-        <br />
-        <button type="submit" class="btn btn-primary" ng-click="newProject(dynamicPopover.content)">Create</button>
-    </form>
+  <form class="form-group button-centered">
+    <label>Enter Your New Project Title:</label>
+    <input type="text" placeholder="Title" ng-model="projectName" class="form-control username">
+    <br />
+    <label>Enter Your Project Repository URL:</label>
+    <input type="text" placeholder="URL" ng-model="repoUrl" class="form-control username">
+    <br />
+    <button type="submit" class="btn btn-primary" ng-click="newProject(projectName, repoUrl)">Create</button>
+  </form>
 </script>
 
 <script type="text/ng-template" id="AddUsersModal.html">
-    <div class="modal-header center-align-text">
-        <h4 class="modal-title" id="modal-title">Add users to {{$ctrl.title}}</h4>
-    </div>
-    <form class="form-group center-align-text">
-        <label for="usr">User</label>
-        <input type="text" class="form-control username" placeholder="Username" id="usr" ng-model="username">
-        <br />
-        <button type=submit class="btn btn-default" ng-click="$ctrl.addUser(username)">Add</button>
-    </form>
-    <div class="modal-footer">
-        <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">OK</button>
-    </div>
+  <div class="modal-header center-align-text">
+    <h4 class="modal-title" id="modal-title">Add users to {{$ctrl.title}}</h4>
+  </div>
+  <form class="form-group center-align-text">
+    <label for="usr">User</label>
+    <input type="text" class="form-control username" placeholder="Username" id="usr" ng-model="username">
+    <br />
+    <button type=submit class="btn btn-default" ng-click="$ctrl.addUser(username)">Add</button>
+  </form>
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">OK</button>
+  </div>
 </script>
 
-
+<script type="text/ng-template" id="DeleteProjectModal.html">
+  <div class="modal-header center-align-text">
+    <h4 class="modal-title" id="modal-title">Are you sure you want to delete {{$ctrl.title}}?</h4>
+  </div>
+  <div class="modal-footer">
+    <div class="col-sm-6 center-align-text">
+      <button class="btn btn-danger " type="button" ng-click="$ctrl.ok()">I'm Sure</button>
+    </div>
+    <div class="col-sm-6 center-align-text">
+      <button class="btn btn-primary " type="button" ng-click="$ctrl.cancel()">NO!</button>
+    </div>
+  </div>
+</script>

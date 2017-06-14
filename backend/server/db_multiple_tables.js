@@ -8,7 +8,7 @@ function Database(pool) {
   var rwlock = locks.createReadWriteLock();
   var _this = this;
 
-  this.newProject = function (project_name, callback) {
+  this.newProject = function (project_name, gh_url, callback) {
     rwlock.writeLock(function () {
       pool.query('SELECT Max(project_id) FROM project_table', [], function (res) {
         var pid;
@@ -18,7 +18,8 @@ function Database(pool) {
           pid = res.rows[0].max + 1;
         }
         console.log("New project id is " + pid);
-        pool.query('INSERT INTO project_table VALUES($1::int, $2::text)', [pid, project_name], function (insertion) {
+        pool.query('INSERT INTO project_table VALUES($1::int, $2::text, $3::text)',
+            [pid, project_name, gh_url], function (insertion) {
           pool.query('CREATE TABLE columns_' + pid + ' (' +
               'project_id integer, ' +
               'column_id integer, ' +
@@ -34,10 +35,25 @@ function Database(pool) {
                     'ticket_description varchar(255),' +
                     'deadline varchar(30), ' +
                     'PRIMARY KEY (project_id, ticket_id) )',
-                    [], function (finishedCreate) {
-                      rwlock.unlock();
-                      console.log("Created new project " + project_name);
-                      callback(pid);
+                    [], function () {
+                      pool.query('CREATE TABLE github_table_' + pid + ' (' +
+                          'filename varchar(100), ' +
+                          'methodname varchar (100), ' +
+                          'startline integer, ' +
+                          'endline integer , ' +
+                          'download_url varchar (250), ' +
+                          'PRIMARY KEY (filename, methodname) )',
+                          [], function (finishedCreate) {
+                            pool.query('CREATE TABLE ticket_files_' + pid + ' (' +
+                                'filename varchar(100), ' +
+                                'methodname varchar(100), ' +
+                                'ticket_id integer, ' +
+                                'PRIMARY KEY (filename, methodname, ticket_id) )', [], function () {
+                              rwlock.unlock();
+                              console.log("Created new project " + project_name);
+                              callback(pid);
+                            });
+                          })
                     });
               });
         });
@@ -71,9 +87,13 @@ function Database(pool) {
         pool.query('DELETE FROM project_table WHERE project_id = $1::int', [pid], function (err, res2) {
           pool.query('DROP TABLE tickets_' + pid, [], function (err, res3) {
             pool.query('DELETE FROM user_projects WHERE project_id = $1::int', [pid], function(res4) {
-              console.log('Deleted project ' + pid);
-              rwlock.unlock();
-              callback(true);
+              pool.query('DROP TABLE github_table_' + pid, [], function(err, res5) {
+                pool.query('DROP TABLE ticket_files_' + pid, [], function (err, res) {
+                  console.log('Deleted project ' + pid);
+                  rwlock.unlock();
+                  callback(true);
+                })
+              });
             });
           });
         });
@@ -129,30 +149,73 @@ function Database(pool) {
 
   this.getTickets = function (pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT * FROM tickets_' + pid + ' ORDER BY ticket_id ASC', [], function(res) {
+      pool.query('SELECT t1.*, t2.filename, t2.methodname, t2.startline, t2.endline, t2.download_url FROM tickets_'
+          + pid + ' AS t1 LEFT JOIN ' + '(SELECT * FROM ticket_files_' + pid +' NATURAL JOIN github_table_' + pid +
+          ') AS t2 ON t1.ticket_id = t2.ticket_id ORDER BY t1.ticket_id ASC',
+          [], function(res) {
         var tickets = [];
-        res.rows.forEach(function (row) {
-          //Create ticket objects
-          tickets.push(new ticket.Ticket(row["ticket_id"], row["column_id"],
-              row["ticket_description"], row["deadline"]));
-        });
+        if (res.rows.length > 1) {
+          var row = res.rows[0];
+          var current_ticket = row['ticket_id'];
+          var files = [];
+          var column_id = row["column_id"];
+          var ticket_description = row["ticket_description"];
+          var deadline = row["deadline"];
+          files.push({filename:row.filename, methodname:row.methodname,
+            startline:row.startline, endline:row.endline, gh_url:row.download_url});
+          for (var i = 1; i < res.rows.length; i++) {
+            row = res.rows[i];
+            if (row['ticket_id'] === current_ticket) {
+              files.push({filename:row.filename, methodname:row.methodname,
+                startline:row.startline, endline:row.endline, gh_url:row.download_url});
+            } else {
+              tickets.push(new ticket.Ticket(current_ticket, column_id,
+                  ticket_description, deadline, files));
+              current_ticket = row['ticket_id'];
+              column_id = row["column_id"];
+              ticket_description = row["ticket_description"];
+              deadline = row["deadline"];
+              files = [];
+              files.push({filename:row.filename, methodname:row.methodname,
+                startline:row.startline, endline:row.endline, gh_url:row.download_url});
+            }
+          }
+          tickets.push(new ticket.Ticket(current_ticket, column_id,
+              ticket_description, deadline, files));
+        }
         rwlock.unlock();
-        callback(tickets);
+        sortTickets(tickets);
+        callback(pid, tickets);
       });
     });
   };
+
+  function sortTickets(tickets) {
+    tickets.forEach(function(ticket) {
+      var hashmap = {};
+      ticket.files.forEach(function (file) {
+        if (file.filename in hashmap) {
+          hashmap[file.filename].methods.push({methodname:file.methodname, startline:file.startline, endline:file.endline});
+        } else {
+          hashmap[file.filename] = {methods:[{methodname:file.methodname, startline:file.startline, endline:file.endline}],
+            download_url:file.download_url};
+        }
+      });
+      ticket.files = hashmap;
+    });
+  }
 
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
       pool.query('SELECT project_id, project_name FROM project_table WHERE project_id = $1::int', [pid], function(res) {
         if (res.rows.length === 1) {
-          pool.query('SELECT column_id, column_title, column_position FROM columns_' + pid +
+          pool.query('SELECT column_id, column_title, column_position, column_limit FROM columns_' + pid +
               ' WHERE project_id = $1::int', [pid], function (res2) {
             if (res2.rows.length > 0) {
               var columns = [];
               res2.rows.forEach(function (row) {
                 //Get column ordering
-                var c = new column.Column(row["column_id"], row["column_title"], row["column_position"]);
+                var c = new column.Column(row["column_id"], row["column_title"], row["column_position"], row["column_limit"]);
                 columns.push(c);
               });
 
@@ -179,13 +242,13 @@ function Database(pool) {
         tid = res.rows[0].max + 1;
       }
       pool.query('INSERT INTO tickets_' + pid + ' VALUES($1::int, $2::int, $3::int, \'New Ticket\', NULL)',
-          [tid, column_id, pid],
-          function (insertion) {
-            rwlock.unlock();
-            callback(tid);
-          });
+        [tid, column_id, pid],
+        function (insertion) {
+          rwlock.unlock();
+          callback(tid);
+      });
     });
-  };
+  }
 
   this.newTicket = function (pid, column_id, callback) {
     rwlock.writeLock(function () {
@@ -212,8 +275,10 @@ function Database(pool) {
     rwlock.writeLock(function () {
       pool.query('DELETE FROM tickets_' + pid + ' WHERE ticket_id = $1::int',
           [ticket_id], function (res) {
-        rwlock.unlock();
-        callback(true);
+        pool.query('DELETE FROM ticket_files_' + pid + ' WHERE ticket_id=$1::int', [ticket_id], function (res) {
+          rwlock.unlock();
+          callback(true);
+        });
       });
     });
   };
@@ -307,7 +372,7 @@ function Database(pool) {
     });
   };
 
-   this.updateTicketDeadline = function (pid, ticket, datetime, callback) {
+  this.updateTicketDeadline = function (pid, ticket, datetime, callback) {
     rwlock.writeLock(function () {
       pool.query('SELECT ticket_id FROM tickets_' + pid + ' WHERE  ticket_id = $1::int',
           [ticket.ticket_id], function (res) {
@@ -323,6 +388,35 @@ function Database(pool) {
             }
           });
 
+    });
+  };
+
+  this.getFilenames = function (pid, filename, callback) {
+    rwlock.readLock(function () {
+      pool.query('SELECT DISTINCT(filename) FROM github_table_' + pid + ' WHERE filename LIKE \'%' + filename + '%\'',
+        [], function (res) {
+            var filenames = [];
+            for (var row of res.rows) {
+              filenames.push(row.filename);
+            }
+            rwlock.unlock();
+            callback(filenames);
+        });
+    });
+  };
+
+  this.getMethodNames = function (pid, filename, methodname, callback) {
+    rwlock.readLock(function () {
+      pool.query('SELECT DISTINCT(methodname) FROM github_table_' + pid + ' WHERE filename = $1::text ' +
+          'AND methodname LIKE \'%' + methodname + '%\'',
+          [filename], function (res) {
+            var methodnames = [];
+            for (var row of res.rows) {
+              methodnames.push(row.methodname);
+            }
+            rwlock.unlock();
+            callback(methodnames);
+          });
     });
   };
 
@@ -367,18 +461,45 @@ function Database(pool) {
 
   this.addUserToProject = function (username, pid, callback) {
     rwlock.writeLock(function () {
-      pool.query('SELECT username FROM user_projects WHERE username = $1::text AND project_id = $2::int',
-          [username, pid], function (checkRes) {
-        if (checkRes.rows.length === 0 ) {
-          pool.query('INSERT INTO user_projects VALUES($1::text, $2::int)', [username, pid], function (res) {
-            rwlock.unlock();
-            callback(true);
-          });
+      pool.query('SELECT username FROM users WHERE username = $1::text', [username], function (res) {
+        if (res.rows.length !== 0) {
+          pool.query('SELECT username FROM user_projects WHERE username = $1::text AND project_id = $2::int',
+              [username, pid], function (checkRes) {
+                if (checkRes.rows.length === 0) {
+                  pool.query('INSERT INTO user_projects VALUES($1::text, $2::int)', [username, pid], function (res) {
+                    rwlock.unlock();
+                    callback(true);
+                  });
+                } else {
+                  rwlock.unlock();
+                  console.error("User already exists in project");
+                }
+              });
         } else {
           rwlock.unlock();
-          console.error("User already exists in db");
+          console.error("Trying to add a user that does not exist");
         }
       });
+    });
+  };
+
+  this.addMethodToTicket = function (pid, filename, methodname, ticket_id, callback) {
+    rwlock.writeLock(function () {
+      pool.query('INSERT INTO ticket_files_' + pid + ' VALUES($1::text, $2::text, $3::int)',
+          [filename, methodname, ticket_id], function () {
+        rwlock.unlock();
+        callback(true);
+      })
+    })
+  };
+
+  this.removeMethodFromTicket = function (pid, filename, methodname, ticket_id, callback) {
+    rwlock.writeLock(function () {
+      pool.query('DELETE FROM ticket_files_' + pid + ' WHERE filename=$1::text AND methodname=$2::text AND ' +
+          'ticket_id=$3::int',[filename, methodname, ticket_id], function () {
+            rwlock.unlock();
+            callback(true);
+          })
     })
   };
 
@@ -477,9 +598,9 @@ function Database(pool) {
     });
   };
 
-  this.removeUserFromTicket = function (username, pid, tid) {
+  this.removeUserFromTicket = function (username, pid, tid, callback) {
     rwlock.writeLock(function() {
-      pool.query('DELETE FROM user_tickets WHERE username = $1::text " +' +
+      pool.query('DELETE FROM user_tickets WHERE username = $1::text ' +
           'AND project_id = $2::int AND ticket_id = $3::int', [username, pid, tid], function(res) {
         rwlock.unlock();
         callback(true);
@@ -509,6 +630,15 @@ function Database(pool) {
         rwlock.unlock();
         callback(true);
       });
+    });
+  };
+
+  this.updateGHURL = function(pid, gh_url, callback) {
+    rwlock.writeLock(function () {
+      pool.query('UPDATE project_table SET ghurl = $2::text WHERE project_id = $1::int', [pid, gh_url], function (err, res) {
+        rwlock.unlock();
+        callback(true);
+      })
     });
   };
 }
