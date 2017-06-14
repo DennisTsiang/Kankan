@@ -173,9 +173,17 @@ function App (db) {
         });
         break;
       case 'project_new':
-        db.newProject(store["project_name"], function (pid) {
-          set_gh_url(pid, store['project_url']);
-          callback({type:'project_new', object:pid}, null);
+        db.newProject(store["project_name"], store["gh_url"], function (pid) {
+          db.newColumn(pid, 'Analyze',0, function () {
+            db.newColumn(pid, 'Development', 1, function () {
+              db.newColumn(pid, 'Testing', 2, function () {
+                db.newColumn(pid, 'Done', 3, function () {
+                  set_gh_url(pid, store['gh_url']);
+                  callback({type:'project_new', object:pid}, null);
+                });
+              });
+            });
+          });
         });
         break;
       case 'column_new':
@@ -255,7 +263,13 @@ function App (db) {
         });
         break;
       case 'gh_url' :
+        //Sends it to code server
         set_gh_url(update.pid, update.gh_url);
+        //Updates project_table
+        db.updateGHURl(update.pid, update.gh_url, function (success) {
+          callback({type : 'gh_url', pid : update.pid, url : update.gh_url}, success, update.pid);
+        });
+
         break;
       default:
         //TODO: Handle unknown update.

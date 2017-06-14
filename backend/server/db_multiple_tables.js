@@ -8,7 +8,7 @@ function Database(pool) {
   var rwlock = locks.createReadWriteLock();
   var _this = this;
 
-  this.newProject = function (project_name, callback) {
+  this.newProject = function (project_name, gh_url, callback) {
     rwlock.writeLock(function () {
       pool.query('SELECT Max(project_id) FROM project_table', [], function (res) {
         var pid;
@@ -18,7 +18,8 @@ function Database(pool) {
           pid = res.rows[0].max + 1;
         }
         console.log("New project id is " + pid);
-        pool.query('INSERT INTO project_table VALUES($1::int, $2::text)', [pid, project_name], function (insertion) {
+        pool.query('INSERT INTO project_table VALUES($1::int, $2::text, $3::text)',
+            [pid, project_name, gh_url], function (insertion) {
           pool.query('CREATE TABLE columns_' + pid + ' (' +
               'project_id integer, ' +
               'column_id integer, ' +
@@ -628,6 +629,15 @@ function Database(pool) {
         rwlock.unlock();
         callback(true);
       });
+    });
+  };
+
+  this.updateGHURL = function(pid, gh_url, callback) {
+    rwlock.writeLock(function () {
+      pool.query('UPDATE project_table SET ghurl = $2::text WHERE project_id = $1::int', [pid, gh_url], function (err, res) {
+        rwlock.unlock();
+        callback(true);
+      })
     });
   };
 }

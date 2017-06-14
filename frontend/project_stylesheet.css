@@ -162,9 +162,20 @@ div {
   margin:0 auto;
 }
 
+.bottom-border {
+  border-bottom: 1px;
+}
+
 .username-title {
   text-align: center;
   font-size: 30px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.home-title {
+  text-align: center;
+  font-size: 15px;
   margin-top: auto;
   margin-bottom: auto;
 }
