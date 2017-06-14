@@ -623,6 +623,15 @@ function Database(pool) {
       });
     });
   };
+
+  this.updateGHURL = function(pid, gh_url, callback) {
+    rwlock.writeLock(function () {
+      pool.query('UPDATE project_table SET ghurl = $2::text WHERE project_id = $1::int', [pid, gh_url], function (err, res) {
+        rwlock.unlock();
+        callback(true);
+      })
+    });
+  };
 }
 
 module.exports.Database = Database;

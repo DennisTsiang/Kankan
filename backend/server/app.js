@@ -263,7 +263,13 @@ function App (db) {
         });
         break;
       case 'gh_url' :
+        //Sends it to code server
         set_gh_url(update.pid, update.gh_url);
+        //Updates project_table
+        db.updateGHURl(update.pid, update.gh_url, function (success) {
+          callback({type : 'gh_url', pid : update.pid, url : update.gh_url}, success, update.pid);
+        });
+
         break;
       default:
         //TODO: Handle unknown update.

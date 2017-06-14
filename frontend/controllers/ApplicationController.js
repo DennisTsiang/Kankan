@@ -198,6 +198,7 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
           let cid = reply.cid;
           let title = reply.title;
           get_kanban_scope().project.columns[cid].title = title;
+          break;
         }
         case "column_limit" : {
           let cid = reply.cid;
@@ -205,6 +206,12 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
           let limit = reply.limit;
           let column = get_kanban_scope().project.columns[cid];
           column.limit = limit;
+          break;
+        }
+        case "gh_url" : {
+          let pid = reply.pid;
+          let url = reply.url;
+          break;
         }
       }
 

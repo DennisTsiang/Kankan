@@ -150,3 +150,7 @@ function getProjectFiles(socket, pid, partial_filename) {
 function getFileMethods(socket, pid, filename, partial_methodname) {
   socket.emit('request', JSON.stringify({pid:pid, type:'file_methods', filename: filename, methodname: partial_methodname}));
 }
+
+function sendUpdateGHURL(socket, pid, new_ghurl) {
+  socket.emit('update', JSON.stringify({type: 'set_gh_url', pid : pid, gh_url : gh_url}));
+}
