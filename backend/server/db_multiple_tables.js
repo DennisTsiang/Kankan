@@ -450,7 +450,7 @@ function Database(pool) {
             array.push(row.username);
           }
           rwlock.unlock();
-          callback(array);
+          callback(pid, array);
         } else {
           rwlock.unlock();
           console.error("Project with pid: " + pid +" does not exist in db");

@@ -78,6 +78,7 @@ function generate_user_kanbans(projects, socket) {
   for (let proj in projects) {
     projectsH[projects[proj].project_id] = projects[proj];
       sendTicketsRequest(socket, projects[proj].project_id);
+      getProjectUsers(socket, projects[proj].project_id);
 
   }
 

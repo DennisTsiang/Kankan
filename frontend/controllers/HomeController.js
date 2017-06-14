@@ -10,6 +10,21 @@ app.controller('HomeController', function($scope, $location, socket) {
     }
   });
 
+  socket.on('requestreply', function(reply_string){
+    console.log("catching project users");
+    let reply = JSON.parse(reply_string);
+
+    if(reply.type ==="project_users"){
+      console.log("reply is " + JSON.stringify(reply));
+      console.log("pid is " + reply.object.pid);
+      console.log("members is " + reply.object.members);
+
+      $scope.projects[reply.object.pid].members = reply.object.users;
+
+    }
+
+  });
+
   $scope.showDeadlines = function(project) {
 
     project.upcomingDeadlines = [];

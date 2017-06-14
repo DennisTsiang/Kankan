@@ -107,8 +107,11 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
           break;
         }
         case "project_users" : {
-          let users = reply.object;
+          console.log("catch");
+          let users = reply.object.users;
+          if(get_kanban_scope().project !== undefined){
           get_kanban_scope().project.members = users;
+        }
           break;
         }
       }
