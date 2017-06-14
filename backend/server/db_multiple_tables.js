@@ -198,7 +198,7 @@ function Database(pool) {
           hashmap[file.filename].methods.push({methodname:file.methodname, startline:file.startline, endline:file.endline});
         } else {
           hashmap[file.filename] = {methods:[{methodname:file.methodname, startline:file.startline, endline:file.endline}],
-            download_url:file.download_url};
+            download_url:file.gh_url};
         }
       });
       ticket.files = hashmap;

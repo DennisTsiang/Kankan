@@ -497,11 +497,14 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
   let code = [];
 
-  function trimToLines(lines, startLine, endLine) {
-    let trimmed = lines.slice(startLine - 1, endLine);
+  function trimToLines(lines, startLine1Inx, endLine1Inx) {
+    let startLine = startLine1Inx -1;
+    let endLine = endLine1Inx -1;
+
+    let trimmed = lines.slice(startLine, endLine+1);
     let numbers = [];
-    for (let i = startLine - 1; i < endLine; i++) {
-      numbers.push([i, trimmed[i-startLine-1]]);
+    for (let i = startLine; i < endLine+1; i++) {
+      numbers.push([i, trimmed[i-startLine]]);
     }
     return numbers;
   }
@@ -509,13 +512,12 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
   function getMethodObject(methods, methodname) {
     for(let i = 0; i < methods.length; i++) {
       if (methods[i]['methodname'] === methodname) {
-        return methods[i]['methodname'];
+        return methods[i];
       }
     }
   }
 
   $scope.updateCode = function (filename, method) {
-    //TODO: Get line numbers and show code
     $scope.filename = filename;
     $scope.methodname = method;
     let ticket = $scope.getTicket($scope.getTid());
@@ -524,7 +526,8 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     let methodObject = getMethodObject(methods, method);
     let startLine = methodObject['startline'];
     let endLine = methodObject['endline'];
-    let url = methodObject['download_url'];
+
+    let url = ticket.codeData[filename]['download_url'];
 
     $http.get(url).then(function (response) {
       let data = response.data;

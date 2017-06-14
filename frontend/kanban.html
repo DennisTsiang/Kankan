@@ -145,12 +145,12 @@
                       Method: {{methodname}}
                     </th>
                   </tr>
-                  <tr ng-repeat="(line, code) in getCodeData()">
+                  <tr ng-repeat="codeLine in getCodeData()">
                     <td style="width: 10px">
-                      {{line}}
+                      {{codeLine[0]}}
                     </td>
                     <td>
-                      {{code}}
+                      {{codeLine[1]}}
                     </td>
                   </tr>
                 </table>
