@@ -1,7 +1,9 @@
 var users = {};
 var userpics = {
   "yianni": "yianni.jpg",
-  "thomas": "tom.jpg"
+  "thomas": "tom.jpg",
+  "Dennis": "Dennis.jpg",
+  "harry": "harry.jpg"
 };
 //var projects = {};
 

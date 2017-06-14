@@ -68,8 +68,7 @@
       </div>
       <div class="col-sm-2">
         <div class="projmembers" ng-repeat="member in project.users">
-          <h3>{{member.username}}</h3>
-        <img ng-src="{{member.image}}"/></div>
+        <img ng-src="{{member.image}}" ng-attr-title="{{member.username}}"/></div>
       </div>
       <div class="col-sm-6">
 
