@@ -173,8 +173,8 @@ function App (db) {
         });
         break;
       case 'project_new':
-        db.newProject(store["project_name"], function (pid) {
-          set_gh_url(pid, store['project_url']);
+        db.newProject(store["project_name"], store["gh_url"], function (pid) {
+          set_gh_url(pid, store['gh_url']);
           callback({type:'project_new', object:pid}, null);
         });
         break;

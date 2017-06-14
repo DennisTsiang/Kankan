@@ -64,7 +64,7 @@ function sendStoreTicket(socket, pid, col_id) {
 }
 
 function sendStoreProject(socket, project_name, url) {
-  var jsonString = {type:'project_new', project_name:project_name, project_url: url};
+  var jsonString = {type:'project_new', project_name:project_name, gh_url: url};
   socket.emit("store", JSON.stringify(jsonString));
 }
 
