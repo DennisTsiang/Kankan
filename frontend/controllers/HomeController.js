@@ -1,4 +1,5 @@
 var users = {};
+var userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
 
 
 app.controller('HomeController', function($scope, $location, socket) {
@@ -40,7 +41,8 @@ app.controller('HomeController', function($scope, $location, socket) {
 
           console.log("adding new user");
 
-          let profilepic = "tom.jpg";
+          let profilepic = userpics[member];
+          console.log("profilepic is " + profilepic);
 
           users[member] = new User(member, profilepic);
           users[member].addProject(reply.object.pid);
