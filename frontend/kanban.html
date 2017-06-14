@@ -115,18 +115,18 @@
                       <th>File names</th>
                       <th>Method names</th>
                     </tr>
-                    <tr ng-repeat="(filename, methodnames) in getTicketCodeData()">
+                    <tr ng-repeat="(filename, methodsinfo) in getTicketCodeData()">
                       <td>{{filename}}</td>
                       <td>
                         <div class="container-fluid">
-                          <div class="row" ng-repeat="method in methodnames">
+                          <div class="row" ng-repeat="method in methodsinfo.methods">
                             <div class="col-xs-6">
-                              <a ng-click="updateCode(filename, method)">
-                                {{method}}
+                              <a ng-click="updateCode(filename, method.methodname)">
+                                {{method.methodname}}
                               </a>
                             </div>
                             <div class="col-xs-6">
-                              <button type="button" class="btn btn-warning btn-sm" style="margin-top: 0" ng-click="removeMethod(filename, method)">Remove method</button>
+                              <button type="button" class="btn btn-warning btn-sm" style="margin-top: 0" ng-click="removeMethod(filename, method.methodname)">Remove method</button>
                             </div>
                           </div>
                         </div>
@@ -144,7 +144,10 @@
                       Method: {{methodname}}
                     </th>
                   </tr>
-                  <tr ng-repeat="code in getCodeData()">
+                  <tr ng-repeat="(line, code) in getCodeData()">
+                    <td style="width: 10px">
+                      {{line}}
+                    </td>
                     <td>
                       {{code}}
                     </td>
