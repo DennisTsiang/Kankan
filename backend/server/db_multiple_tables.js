@@ -160,7 +160,7 @@ function Database(pool) {
           var column_id = row["column_id"];
           var ticket_description = row["ticket_description"];
           var deadline = row["deadline"];
-          files.push({filename:row.filename, methodname:row.methodname
+          files.push({filename:row.filename, methodname:row.methodname,
             startline:row.startline, endline:row.endline, gh_url:row.download_url});
           for (var i = 1; i < res.rows.length; i++) {
             row = res.rows[i];
@@ -175,7 +175,7 @@ function Database(pool) {
               ticket_description = row["ticket_description"];
               deadline = row["deadline"];
               files = [];
-              files.push({filename:row.filename, methodname:row.methodname
+              files.push({filename:row.filename, methodname:row.methodname, 
                 startline:row.startline, endline:row.endline, gh_url:row.download_url});
             }
           }
