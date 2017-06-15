@@ -72,31 +72,6 @@ function generate_kanban(received_project) {
   }
 }
 
-function generate_user_kanbans(projects, socket) {
-  let projectsH = {};
-
-  for (let proj in projects) {
-    projectsH[projects[proj].project_id] = projects[proj];
-    sendTicketsRequest(socket, projects[proj].project_id);
-    getProjectUsers(socket, projects[proj].project_id);
-
-  }
-
-  get_kanban_scope().projects = projectsH;
-}
-
-function generate_other_user_kanbans() {
-  let projects = get_kanban_scope().projects;
-  let other_projects = {};
-
-  for (let proj in projects) {
-    other_projects[projects[proj].project_id] = projects[proj];
-  }
-  delete other_projects[get_kanban_scope().pid];
-
-  get_kanban_scope().other_projects = other_projects;
-}
-
 function updateTickets() {
   setInterval(updateTicketTimes, 10000);
   //updateProgressBars();

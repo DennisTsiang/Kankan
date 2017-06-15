@@ -207,7 +207,7 @@ function Database(pool) {
 
   this.getKanban = function (pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_id, project_name FROM project_table WHERE project_id = $1::int', [pid], function(res) {
+      pool.query('SELECT project_id, project_name, ghurl FROM project_table WHERE project_id = $1::int', [pid], function(res) {
         if (res.rows.length === 1) {
           pool.query('SELECT column_id, column_title, column_position, column_limit FROM columns_' + pid +
               ' WHERE project_id = $1::int', [pid], function (res2) {
@@ -220,10 +220,10 @@ function Database(pool) {
               });
 
               rwlock.unlock();
-              callback(new kanban.Kanban(res.rows[0].project_id, res.rows[0].project_name, columns));
+              callback(new kanban.Kanban(res.rows[0].project_id, res.rows[0].project_name, columns, res.rows[0].ghurl));
             } else {
               rwlock.unlock();
-              callback(new kanban.Kanban(res.rows[0].project_id, res.rows[0].project_name, []));
+              callback(new kanban.Kanban(res.rows[0].project_id, res.rows[0].project_name, [], res.rows[0].gh_url));
             }
           });
         } else {

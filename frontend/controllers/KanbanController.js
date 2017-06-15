@@ -1,4 +1,6 @@
 app.controller('KanbanCtrl', function($scope, $location, socket) {
+  $scope.project = undefined;
+
   if (get_kanban_scope().pid === undefined) {
     $location.path('/login');
   } else {
@@ -11,6 +13,36 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
     $scope.sendKanbanRequest = function(pid) {
       sendKanbanRequest(socket, pid);
     };
+  }
+
+  socket.on('requestreply', function (reply_string) {
+    var reply = JSON.parse(reply_string);
+    if(reply.type === "kanban") {
+      var request_data = reply.object;
+      console.log("kanban request handled");
+      generate_kanban(request_data);
+      //Send for tickets, once received kanban.
+      sendTicketsRequest(socket, project.project_id);
+      generate_other_user_kanbans();
+      getProjectUsers(socket, project.project_id);
+    }  else if (reply.type === "project_users") {
+      let users = reply.object.users;
+      if (project !== undefined) {
+        project.members = users;
+      }
+    }
+  });
+
+
+  function generate_other_user_kanbans() {
+    let other_projects = {};
+
+    for (let proj in projects) {
+      other_projects[projects[proj].project_id] = projects[proj];
+    }
+    delete other_projects[project.project_id];
+
+    $scope.other_projects = other_projects;
   }
 
   $scope.goHome = function () {
@@ -258,6 +290,15 @@ app.controller('editTicketCtrl', function($scope, socket) {
   $scope.isMemberAddedToTicket = function (member) {
     return $scope.getTicket($scope.getTid()).members.includes(member);
   };
+
+  socket.on('requestreply', function(reply_string) {
+    var reply = JSON.parse(reply_string);
+    if (reply.type === "ticket_users") {
+      let users = reply.object.users;
+      let tid = reply.object.tid;
+      $scope.project.tickets[tid].members = users;
+    }
+  });
 
   $scope.toggleMemberToTicket = function (member) {
     if ($scope.isMemberAddedToTicket(member)) {
