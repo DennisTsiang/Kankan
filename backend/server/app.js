@@ -197,8 +197,9 @@ function App (db) {
         });
         break;
       case 'add_ticket_method':
-        db.addMethodToTicket(store.pid, store.filename, store.methodname, store.ticket_id, function (res) {
-          callback({type:'add_ticket_method', ticket_id:store.ticket_id, filename:store.filename, methodname:store.methodname}, store.pid);
+        db.addMethodToTicket(store.pid, store.filename, store.methodname, store.ticket_id, function (startline, endline) {
+          callback({type:'add_ticket_method', ticket_id:store.ticket_id, startline:startline, endline:endline,
+            filename:store.filename, methodname:store.methodname}, store.pid);
         });
         break;
       default:
