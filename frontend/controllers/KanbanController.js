@@ -15,8 +15,6 @@ app.controller('KanbanCtrl', function($scope, $location, socket, currentProject)
     };
   }
 
-  var test = currentProject.get();
-
     socket.on('requestreply', function (reply_string) {
       var reply = JSON.parse(reply_string);
       if (reply.type === "project_users") {
@@ -549,62 +547,70 @@ app.controller('DeadlineCollapseCtrl', function ($scope) {
   $scope.isCollapsed = true;
 });
 
+
+let server_response = {'filenames':[], 'methodnames': []};
+
+let requestreplyF = function (reply_string) {
+  let reply = JSON.parse(reply_string);
+  if (reply.type === 'project_files') {
+    server_response['filenames'] = reply.object;
+  } else if (reply.type === 'file_methods') {
+    server_response['methodnames'] = reply.object;
+  }
+};
+let storereplyF = function ($scope) {return function(reply_string) {
+  let reply = JSON.parse(reply_string);
+
+  if (reply.type === 'add_ticket_method') {
+    console.log("shgdjfhg");
+    let tid = reply.ticket_id;
+    let filename = reply.filename;
+    let methodname = reply.methodname;
+    let endline = reply.endline;
+    let startline = reply.startline;
+
+    let methodObject = {methodname: methodname, startline: startline, endline:endline};
+
+    if (filename in $scope.getTicket(tid).codeData) {
+      $scope.getTicket(tid).codeData[filename]['methods'].push(methodObject);
+    } else {
+      let url = reply.fileurl;
+      $scope.getTicket(tid).codeData[filename] = {};
+      $scope.getTicket(tid).codeData[filename]['methods'] = [methodObject];
+      $scope.getTicket(tid).codeData[filename]['download_url'] = url;
+    }
+  }
+}};
+let removereplyF = function ($scope) {return function(reply_string) {
+  let reply = JSON.parse(reply_string);
+
+  if (reply.type === 'remove_ticket_method') {
+    let tid = reply.ticket_id;
+    let filename = reply.filename;
+    let methodname = reply.methodname;
+
+    if (filename in $scope.getTicket(tid).codeData) {
+      removeMethod($scope.getTicket(tid).codeData, filename, methodname);
+    }
+  }
+}};
+
+let sf = null;
+let rrf = null;
+
 app.controller('CodeCtrl', function ($scope, $http, socket, currentProject) {
   $scope.wholeFile = false; //Default
 
-  let server_response = {'filenames':[], 'methodnames': []};
-  var requestreplyF = function (reply_string) {
-    let reply = JSON.parse(reply_string);
-    if (reply.type === 'project_files') {
-      server_response['filenames'] = reply.object;
-    } else if (reply.type === 'file_methods') {
-      server_response['methodnames'] = reply.object;
-    }
-  };
-  var storereplyF = function(reply_string) {
-    let reply = JSON.parse(reply_string);
-
-    if (reply.type === 'add_ticket_method') {
-      console.log("shgdjfhg");
-      let tid = reply.ticket_id;
-      let filename = reply.filename;
-      let methodname = reply.methodname;
-      let endline = reply.endline;
-      let startline = reply.startline;
-
-      let methodObject = {methodname: methodname, startline: startline, endline:endline};
-
-      if (filename in $scope.getTicket(tid).codeData) {
-        $scope.getTicket(tid).codeData[filename]['methods'].push(methodObject);
-      } else {
-        let url = reply.fileurl;
-        $scope.getTicket(tid).codeData[filename] = {};
-        $scope.getTicket(tid).codeData[filename]['methods'] = [methodObject];
-        $scope.getTicket(tid).codeData[filename]['download_url'] = url;
-      }
-    }
-  };
-  var removereplyF = function(reply_string) {
-    let reply = JSON.parse(reply_string);
-
-    if (reply.type === 'remove_ticket_method') {
-      let tid = reply.ticket_id;
-      let filename = reply.filename;
-      let methodname = reply.methodname;
-
-      if (filename in $scope.getTicket(tid).codeData) {
-        removeMethod($scope.getTicket(tid).codeData, filename, methodname);
-      }
-    }
-  };
-
   socket.removeEventListener('requestreply', requestreplyF);
-  socket.removeEventListener('storereply', storereplyF);
-  socket.removeEventListener('removereply', removereplyF);
+  socket.removeEventListener('storereply', sf);
+  socket.removeEventListener('removereply', rrf);
+
+  sf = storereplyF($scope);
+  rrf = removereplyF($scope);
 
   socket.on('requestreply', requestreplyF);
-  socket.on('storereply', storereplyF);
-  socket.on('removereply', removereplyF);
+  socket.on('storereply', sf);
+  socket.on('removereply', rrf);
 
 
   $scope.getFile = function(file) {

@@ -10,11 +10,6 @@ app.controller('LoginController', function($scope, $location, socket, user) {
     storeNewUser(socket, username);
   };
 
-  socket.removeAllListeners('requestreply');
-  socket.removeAllListeners('storereply');
-  socket.removeAllListeners('updatereply');
-  socket.removeAllListeners('removereply');
-
     socket.on('storereply', function (reply_string) {
       let reply = JSON.parse(reply_string);
       if (reply.type === "new_user_project") {

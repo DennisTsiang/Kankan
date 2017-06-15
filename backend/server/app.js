@@ -195,7 +195,9 @@ function App (db) {
         break;
       case 'new_user_project':
         db.addUserToProject(store["username"], store["pid"], function(success) {
-          userSockets[store.username].join('home_' + store.pid);
+          if (store.username in userSockets) {
+            userSockets[store.username].join('home_' + store.pid);
+          }
           io_client.sockets.in(store.pid).emit('storereply', JSON.stringify({type:'new_user_project'}));
           io_client.sockets.in('home_' + store.pid).emit('storereply', JSON.stringify({type:'new_user_project'}));
 

@@ -16,11 +16,6 @@ app.controller('HomeController', function($scope, $location, socket, currentProj
     getUserProjects(socket, user.get().username);
   }
 
-  socket.removeAllListeners('requestreply');
-  socket.removeAllListeners('storereply');
-  socket.removeAllListeners('updatereply');
-  socket.removeAllListeners('removereply');
-
   socket.on('requestreply', function (reply_string) {
       let reply = JSON.parse(reply_string);
       /*if (reply.type === "tickets") {
