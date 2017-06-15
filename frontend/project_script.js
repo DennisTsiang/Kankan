@@ -1,15 +1,3 @@
-
-
-function delete_ticket(ticket_id) {
-  let scope = get_kanban_scope();
-
-  let ticket = scope.project.tickets[ticket_id];
-  if (ticket != null) {
-    delete scope.project.columns[ticket.col].tickets[ticket_id];
-    delete scope.project.tickets[ticket_id];
-  }
-}
-
 function addTicket(col_id, ticket_id, desc, deadline, codeData, currentProject) {
   let ticket = new Ticket(ticket_id);
   ticket.setCodeData(codeData);

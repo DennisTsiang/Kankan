@@ -68,6 +68,7 @@ function App (db) {
           if (pid === null) {
             socket.emit('updatereply', JSON.stringify(response));
           } else {
+            socket.emit('updatereply', JSON.stringify(response));
             io_client.sockets.in(pid).emit('updatereply', JSON.stringify(response));
           }
           console.log('Replied to update');

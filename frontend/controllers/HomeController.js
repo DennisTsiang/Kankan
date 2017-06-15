@@ -81,6 +81,14 @@ app.controller('HomeController', function($scope, $location, socket, currentProj
     }*/
   });
 
+  socket.on('updatereply', function (reply_string) {
+    let reply = JSON.parse(reply_string);
+    if (reply.type === "gh_url") {
+      let pid = reply.pid;
+      let url = reply.url;
+      $scope.projects[pid].gh_url = url;
+    }
+  });
 
   $scope.showDeadlines = function(project) {
 
@@ -156,7 +164,7 @@ app.controller('HomeController', function($scope, $location, socket, currentProj
 
 });
 
-app.controller('NewProjectPopoverCtrl', function($scope, $sce, socket) {
+app.controller('NewProjectPopoverCtrl', function($scope, $sce, socket, user) {
   $scope.dynamicPopover = {
     templateUrl: 'NewProjectPopover.html'
   };
@@ -236,6 +244,7 @@ app.controller('DropdownCtrl', function($uibModal, $log, $document) {
 
 app.controller('AddUsersInstanceCtrl', function($uibModalInstance, items, socket) {
   var $ctrl = this;
+  console.log(items);
   $ctrl.title = items.title;
 
   $ctrl.ok = function() {
@@ -264,11 +273,7 @@ app.controller('DeleteProjectInstanceCtrl', function($uibModalInstance, items, s
 app.controller('EditURLInstanceCtrl', function($uibModalInstance, items, socket) {
   var $ctrl = this;
   $ctrl.title = items.title;
-  if ('gh_url' in items) {
-    $ctrl.url = items.gh_url;
-  } else {
-    $ctrl.url = null;
-  }
+  $ctrl.url = items.gh_url;
 
   $ctrl.ok = function(url) {
     sendUpdateGHURL(socket, items.project_id, url);

@@ -211,7 +211,7 @@
                       <tr>
                         <td class="column-title" style="text-align: center;">
                           <div class="form-group">
-                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" ng-model="newLimit" ng-init="newLimit = getProject().columns[col].limit" placeholder="Ticket limit" ng-change="updateColLimitEvent(col, newLimit)">
+                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" ng-model="getProject().columns[col].limit" placeholder="Ticket limit" ng-change="updateColLimitEvent(col, getProject().columns[col].limit)">
                           </div>
                         </td>
                       </tr>
@@ -250,18 +250,21 @@
       <li>
         <div class="btn-group btn-lg" uib-dropdown=>
           <button type="button" ng-click="goHome()" class="btn btn-link btn-md">Home</button>
-          <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
+          <!--<button type="button" class="btn btn-link btn" uib-dropdown-toggle>
               <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
             <li role="menuitem">
               <a ng-click="sendKanbanRequest(getProject().project_id)">{{getProject().title}}</a>
             </li>
+            -->
 
             <!-- Go to other projects -->
+            <!--
             <li class="divider" ng-repeat-start="proj in other_projects"></li>
             <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
           </ul>
+            -->
         </div>
       </li>
       <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
@@ -275,9 +278,9 @@
           <span class="sr-only">Toggle Dropdown</span>
         </button>
         <ul class="dropdown-menu pull-right">
-          <li><a ng-click="$ctrl.openAddUsers('sm', project)">Add Users</a></li>
-          <li><a ng-click="$ctrl.openDeleteProject('sm', project)">Delete Project</a></li>
-          <li><a ng-click="$ctrl.openEditURL('lg', project)">Edit Github URL</a></li>
+          <li><a ng-click="$ctrl.openAddUsers('sm', getProject())">Add Users</a></li>
+          <li><a ng-click="$ctrl.openDeleteProject('sm', getProject())">Delete Project</a></li>
+          <li><a ng-click="$ctrl.openEditURL('lg', getProject())">Edit Github URL</a></li>
         </ul>
       </div>
     </ul>

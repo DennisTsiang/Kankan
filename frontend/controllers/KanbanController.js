@@ -157,7 +157,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket, currentProject)
       ticket.setDeadline(reply.deadline);
 
     } else if (reply.type === "column_moved") {
-      generate_kanban(reply.object);
+      currentProject.set(generate_kanban(reply.object));
 
       //Send for tickets, once received kanban.
       sendTicketsRequest(socket, currentProject.get().project_id);
@@ -178,6 +178,10 @@ app.controller('KanbanCtrl', function($scope, $location, socket, currentProject)
     } else if (reply.type === "gh_url") {
       let pid = reply.pid;
       let url = reply.url;
+      if (currentProject.get().project_id === pid) {
+        //console.log($scope.projects);
+        currentProject.get().gh_url = url;
+      }
     }
   });
 });
@@ -281,10 +285,10 @@ app.controller('editColumnCtrl', function($scope, socket, currentProject) {
   socket.on('removereply', function (reply_string) {
     let reply = JSON.parse(reply_string);
     if (reply.type === "column_remove") {
-      generate_kanban(reply.object);
+      currentProject.set(generate_kanban(reply.object));
 
       //Send for tickets, once received kanban.
-      sendTicketsRequest(socket, currentProject.get().pid);
+      sendTicketsRequest(socket, currentProject.get().project_id);
     }
   });
 
@@ -381,7 +385,7 @@ app.controller('editTicketCtrl', function($scope, socket, currentProject) {
     let reply = JSON.parse(reply_string);
     if(reply.type === "userOfTicket_remove") {
       //remove a user from a ticket
-      generate_kanban(reply.object);
+      currentProject.set(generate_kanban(reply.object));
 
       //Send for tickets, once received kanban.
       sendTicketsRequest(socket, currentProject.get().project_id);
@@ -525,6 +529,14 @@ app.controller('deleteTicketCtrl', function($scope, $sce, socket, currentProject
       }
     }
   });
+
+  function delete_ticket(ticket_id) {
+    let ticket = currentProject.get().tickets[ticket_id];
+    if (ticket != null) {
+      delete currentProject.get().columns[ticket.col].tickets[ticket_id];
+      delete currentProject.get().tickets[ticket_id];
+    }
+  }
 });
 
 app.controller('DeadlineCollapseCtrl', function ($scope) {
@@ -601,8 +613,11 @@ app.controller('CodeCtrl', function ($scope, $http, socket, currentProject) {
 
   $scope.getTicketCodeData = function () {
     let ticket = $scope.getTicket($scope.getTid());
-    //See if ticket contains no data
-    return ticket.codeData;
+    if (ticket !== undefined) {
+      //See if ticket contains no data
+      return ticket.codeData;
+    }
+    return undefined;
   };
 
   socket.on('removereply', function(reply_string) {
