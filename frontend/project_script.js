@@ -59,6 +59,10 @@ function generate_kanban(received_project) {
   k_scope.project.title = received_project.project_name;
   k_scope.project.columns = {};
   k_scope.project.column_order = {};
+  k_scope.project.tickets = {};
+  k_scope.project.members = {};
+  k_scope.project.upcomingDeadlines = [];
+
 
   for (let i = 0; i < received_project.columns.length; i++) {
     let received_column = received_project.columns[i];

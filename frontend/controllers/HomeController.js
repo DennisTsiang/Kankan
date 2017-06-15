@@ -112,6 +112,19 @@ app.controller('HomeController', function($scope, $location, socket) {
     removeProject(socket, proj_id)
   };
 
+  socket.on('removereply', function (reply_string) {
+    let reply = JSON.parse(reply_string);
+    if (reply.type === "project_remove") {
+      //Kick out of kanban view, take back to home page?
+      var pid = reply.pid;
+      var currentpath = $location.path();
+      if (currentpath === '/kanban' && get_kanban_scope().pid === pid) {
+        $location.path('/home');
+      }
+      delete $scope.projects[pid];
+    }
+  });
+
   $scope.logOut = function() {
     $location.path('/login');
     //$scope.a_k = get_kanban_scope();
@@ -126,7 +139,15 @@ app.controller('NewProjectPopoverCtrl', function($scope, $sce, socket) {
   $scope.newProject = function(project_name, url) {
     $scope.isOpen = false;
     sendStoreProject(socket, project_name, url);
-  }
+  };
+
+  socket.on('storereply', function (reply_string) {
+    let reply = JSON.parse(reply_string);
+    if (reply.type === "project_new") {
+      let pid = reply.object;
+      addUserToProject(socket, $scope.username, pid);
+    }
+  });
 });
 
 app.controller('ProjectDropdownCtrl', function($scope, $sce) {
