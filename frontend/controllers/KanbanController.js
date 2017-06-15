@@ -469,6 +469,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
   $scope.getTicketCodeData = function () {
     let ticket = $scope.getTicket($scope.getTid());
+    //See if ticket contains no data
     return ticket.codeData;
   };
 
