@@ -67,9 +67,16 @@ app.controller('HomeController', function($scope, $location, socket, currentProj
         console.log("Received Ticket request");
 
         if (currentProject.get() !== null) {
+          console.log("current project not null");
 
           generateTickets(reply.object.tickets, currentProject);
           $location.path('/kanban');
+
+        }else{
+          console.log("sort upcoing");
+          console.log("tickets is " + JSON.stringify(reply.object.tickets));
+          $scope.projects[reply.object.pid].tickets = reply.object.tickets;
+          $scope.showDeadlines($scope.projects[reply.object.pid]);
 
         }
       }
@@ -144,6 +151,7 @@ app.controller('HomeController', function($scope, $location, socket, currentProj
       //$scope.projects[projects[proj].project_id] = new Project(projects[proj].project_id);
       $scope.projects[projects[proj].project_id] = projects[proj];
       getProjectUsers(socket, projects[proj].project_id);
+      //sendTicketsRequest(socket, projects[proj].project_id);
 
 
     }
