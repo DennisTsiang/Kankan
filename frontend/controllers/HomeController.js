@@ -8,56 +8,21 @@ var userpics = {
 
 app.controller('HomeController', function($scope, $location, socket, currentProject, user) {
 
+  $scope.projects = {};
+
   if (user.get() === null) {
     $location.path('/login');
   } else {
     users = {};
-    userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
+    //userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
     getUserProjects(socket, user.get().username);
   }
 
   socket.on('requestreply', function (reply_string) {
       let reply = JSON.parse(reply_string);
-      /*if (reply.type === "tickets") {
 
-       let title = $scope.projects[reply.object.pid].title;
-       let gh_url = $scope.projects[reply.object.pid].gh_url;
-       let project = new Project(reply.object.pid);
-       project.tickets = reply.object.tickets;
-       project.title = title;
-       project.gh_url = gh_url;
-       $scope.projects[reply.object.pid] = project;
-       $scope.showDeadlines(project);
-       } else  if (reply.type === "project_users") {
-
-       let project = $scope.projects[reply.object.pid];
-
-       project.members = reply.object.users;
-       if (!('users' in project)) {
-       project.users = {};
-       }
-
-       for (var memberid in project.members) {
-       let member = project.members[memberid];
-
-       if (users[member] === {} || users[member] === undefined) {
-
-       let profilepic = userpics[member];
-
-       users[member] = new User(member, profilepic);
-       users[member].addProject(reply.object.pid);
-
-
-       } else {
-       //add project to that of the users?
-       }
-
-       if(project.users[member] === undefined){
-       project.users[users[member].username] = users[member];
-       }
-       }
-       }  else */
       if (reply.type === "kanban") {
+
         var request_data = reply.object;
         console.log("kanban request handled");
         currentProject.set(generate_kanban(request_data));
@@ -65,14 +30,47 @@ app.controller('HomeController', function($scope, $location, socket, currentProj
         sendTicketsRequest(socket, currentProject.get().project_id);
         generate_other_user_kanbans();
         getProjectUsers(socket, currentProject.get().project_id);
+
+      } else if (reply.type === "project_users") {
+
+        console.log("project users reply");
+
+        console.log("reply for project users was " + JSON.stringify(reply));
+
+        let users = reply.object.users;
+        let pid = reply.object.pid;
+        $scope.projects[pid].users = {};
+
+        for(user in users){
+          let username = users[user];
+
+          console.log("user is " + username);
+
+          $scope.projects[pid].users[username] = new User(username);
+          $scope.projects[pid].users[username].image = userpics[username];
+
+
+        }
+
+        console.log("projects users is " + $scope.projects[pid].users);
+
+
       } else if (reply.type === "user_projects") {
+
+        console.log("reply was user projects");
+
         let projects = reply.object;
         generate_user_kanbans(projects, socket);
+
       } else if (reply.type === "tickets") {
+
         console.log("Received Ticket request");
+
         if (currentProject.get() !== null) {
+
           generateTickets(reply.object.tickets, currentProject);
           $location.path('/kanban');
+
         }
       }
       /*else if (reply.type === "project_users") {
@@ -83,14 +81,18 @@ app.controller('HomeController', function($scope, $location, socket, currentProj
        }*/
     });
   socket.on('updatereply', function (reply_string) {
+
       let reply = JSON.parse(reply_string);
       if (reply.type === "gh_url") {
+
         let pid = reply.pid;
         let url = reply.url;
         $scope.projects[pid].gh_url = url;
+
       }
     });
   socket.on('removereply', function (reply_string) {
+
       let reply = JSON.parse(reply_string);
       if (reply.type === "project_remove") {
         //Kick out of kanban view, take back to home page?
@@ -135,13 +137,20 @@ app.controller('HomeController', function($scope, $location, socket, currentProj
     let projectsH = {};
 
     for (let proj in projects) {
-      projectsH[projects[proj].project_id] = projects[proj];
+      //projectsH[projects[proj].project_id] = projects[proj];
       //sendTicketsRequest(socket, projects[proj].project_id);
       //getProjectUsers(socket, projects[proj].project_id);
 
+      //$scope.projects[projects[proj].project_id] = new Project(projects[proj].project_id);
+      $scope.projects[projects[proj].project_id] = projects[proj];
+      getProjectUsers(socket, projects[proj].project_id);
+
+
     }
 
-    $scope.projects = projectsH;
+    //$scope.projects = projectsH;
+
+    console.log("scope projects is " + JSON.stringify($scope.projects));
   }
 
   //sendAllProjectUserRequest()
@@ -286,4 +295,3 @@ app.controller('EditURLInstanceCtrl', function($uibModalInstance, items, socket)
     $uibModalInstance.close();
   };
 });
-
