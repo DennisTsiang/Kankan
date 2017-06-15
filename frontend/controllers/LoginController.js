@@ -17,5 +17,23 @@ app.controller('LoginController', function($scope, $location, socket) {
     getUserProjects(socket, get_kanban_scope().username);
     }
   });
+
+  socket.on('requestreply', function (reply_string) {
+    let reply = JSON.parse(reply_string);
+
+    if (reply.type === "user_new") {
+      if (reply.success) {
+        $location.path('/home');
+      } else {
+        $location.path('/login');
+      }
+    } else if (reply.type === "user_check") {
+      if (reply.result) {
+        $location.path('/home');
+      } else {
+        $location.path('/login');
+      }
+    }
+  });
 });
 

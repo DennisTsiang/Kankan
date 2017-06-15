@@ -8,10 +8,6 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
         alert("Disconnected");
       });
 
-      socket.on('requestreply', function (reply) {
-        requestHandler(socket, JSON.parse(reply));
-      });
-
       printSocketStatus();
     }
 
@@ -26,29 +22,6 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
     //check socket status
     function isSocketConnected() {
       return socket.connected;
-    }
-
-    function requestHandler(socket, reply) {
-      var type = reply.type;
-
-      switch (type) {
-        case "user_new" : {
-          if (reply.success) {
-            $location.path('/home');
-          } else {
-            $location.path('/login');
-          }
-          break;
-        }
-        case "user_check" : {
-          if (reply.result) {
-            $location.path('/home');
-          } else {
-            $location.path('/login');
-          }
-          break;
-        }
-      }
     }
   });
 });
