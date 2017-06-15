@@ -89,6 +89,38 @@ app.controller('HomeController', function($scope, $location, socket) {
     }
   };
 
+  socket.on('requestreply', function (reply_string) {
+    var reply = JSON.parse(reply_string);
+    if (reply.type === "user_projects") {
+      let projects = reply.object;
+      generate_user_kanbans(projects, socket);
+    } else if (reply.type === "tickets") {
+      if(project !== undefined){
+        generateTickets(reply.object.tickets);
+      }
+    } else if (reply.type === "project_users") {
+      let users = reply.object.users;
+      if (project !== undefined) {
+        project.members = users;
+      }
+    }
+  });
+
+
+
+  function generate_user_kanbans(projects, socket) {
+    let projectsH = {};
+
+    for (let proj in projects) {
+      projectsH[projects[proj].project_id] = projects[proj];
+      sendTicketsRequest(socket, projects[proj].project_id);
+      getProjectUsers(socket, projects[proj].project_id);
+
+    }
+
+    projects = projectsH;
+  }
+
   if (get_kanban_scope().username === undefined) {
     $location.path('/login');
   } else {
