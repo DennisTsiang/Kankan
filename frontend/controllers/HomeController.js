@@ -264,6 +264,7 @@ app.controller('AddUsersInstanceCtrl', function($uibModalInstance, items, socket
 
   $ctrl.addUser = function(username) {
     addUserToProject(socket, username, items.project_id);
+    getProjectUsers(socket, items.project_id);
   }
 });
 
