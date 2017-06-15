@@ -1,7 +1,5 @@
 
-function sendKanbanRequest(socket, pid, old_pid) {
-  socket.emit('leaveroom', old_pid);
-  socket.emit('joinroom', pid);
+function sendKanbanRequest(socket, pid) {
   sendKanbanRequestHelper(socket, pid);
 }
 

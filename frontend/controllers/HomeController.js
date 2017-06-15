@@ -137,6 +137,7 @@ app.controller('HomeController', function($scope, $location, socket, currentProj
 
   $scope.chooseProject = function(proj_id) {
     console.log("Hit choose project");
+    socket.emit('joinroom', proj_id);
     sendKanbanRequest(socket, proj_id, null);
   };
 
