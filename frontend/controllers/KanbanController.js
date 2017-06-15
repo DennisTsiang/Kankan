@@ -446,11 +446,17 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
       let tid = reply.ticket_id;
       let filename = reply.filename;
       let methodname = reply.methodname;
+      let endline = reply.endline;
+      let startline = reply.startline;
+
+      let methodObject = {methodname: methodname, startline: startline, endline:endline};
 
       if (filename in $scope.getTicket(tid).codeData) {
-        $scope.getTicket(tid).codeData[filename].push(methodname);
+        $scope.getTicket(tid).codeData[filename]['methods'].push(methodObject);
       } else {
-        $scope.getTicket(tid).codeData[filename] = [methodname];
+        let url = reply.fileurl;
+        $scope.getTicket(tid).codeData[filename]['methods'] = [methodObject];
+        $scope.getTicket(tid).codeData[filename]['download_url'] = url;
       }
     }
   });
@@ -463,6 +469,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
   $scope.getTicketCodeData = function () {
     let ticket = $scope.getTicket($scope.getTid());
+    //See if ticket contains no data
     return ticket.codeData;
   };
 

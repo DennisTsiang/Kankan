@@ -1,7 +1,7 @@
 var users = {};
 var userpics = {
   "yianni": "yianni.jpg",
-  "thomas": "tom.jpg",
+  "thomas": "tom_derp.jpg",
   "Dennis": "Dennis.jpg",
   "harry": "harry.jpg"
 };

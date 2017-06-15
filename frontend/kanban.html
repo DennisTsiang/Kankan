@@ -138,22 +138,30 @@
               </div>
               <div class="col-xs-6">
                 <!-- Code -->
-                <table class="table">
-                  <tr>
-                    <th ng-show="showCode">
-                      File: {{filename}}
-                      Method: {{methodname}}
-                    </th>
-                  </tr>
-                  <tr ng-repeat="codeLine in getCodeData()">
-                    <td style="width: 10px">
-                      {{codeLine[0]}}
-                    </td>
-                    <td>
-                      {{codeLine[1]}}
-                    </td>
-                  </tr>
-                </table>
+                <div ng-show="showCode">
+                  <h3 style="margin:0">
+                    File: {{filename}}
+                    Method: {{methodname}}
+                  </h3>
+                  <pre class="pre-scrollable .h1 .lead">
+                    <p ng-repeat="codeLine in getCodeData()">{{codeLine[0]}} {{codeLine[1]}}</p>
+                    <!--
+                    <table>
+                      <tr>
+                        <th style="padding: 15px"></th>
+                        <th style=""></th>
+                      </tr>
+                      <tr ng-repeat="codeLine in getCodeData()">
+                        <td>
+                          {{codeLine[0]}}
+                        </td>
+                        <td>
+                          {{codeLine[1]}}
+                        </td>
+                      </tr>
+                    </table>-->
+                  </pre>
+                </div>
               </div>
             </div>
           </div>
