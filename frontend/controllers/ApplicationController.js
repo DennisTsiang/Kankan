@@ -1,5 +1,6 @@
 app.controller('ApplicationCtrl', function($scope, $location, socket) {
   $scope.projects = [];
+  $scope.username = undefined;
 
   socket.on('connect', function () {
     setOnEvents();

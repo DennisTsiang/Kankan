@@ -49,3 +49,27 @@ app.factory('socket', function ($rootScope) {
     }
   };
 });
+
+app.factory('currentProject', function () {
+  let project = null;
+  return {
+    set: function (new_project) {
+      project = new_project;
+    },
+    get: function () {
+      return project;
+    }
+  };
+});
+
+app.factory('user', function () {
+  let user = null;
+  return {
+    set: function (new_user) {
+      user = new_user;
+    },
+    get: function () {
+      return user;
+    }
+  };
+});

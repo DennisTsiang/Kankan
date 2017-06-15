@@ -1,54 +1,46 @@
-app.controller('KanbanCtrl', function($scope, $location, socket) {
-  $scope.project = undefined;
+app.controller('KanbanCtrl', function($scope, $location, socket, currentProject) {
 
-  if (get_kanban_scope().pid === undefined) {
+  $scope.getProject = function() {return currentProject.get()};
+
+  if (currentProject.get() === null) {
     $location.path('/login');
   } else {
 
     //Enable popovers
     $('[data-toggle="popover"]').popover();
 
-    sendKanbanRequest(socket, get_kanban_scope().pid);
 
     $scope.sendKanbanRequest = function(pid) {
-      sendKanbanRequest(socket, pid);
+      sendKanbanRequest(socket, pid, currentProject.get().project_id);
     };
   }
 
+  var test = currentProject.get();
+
   socket.on('requestreply', function (reply_string) {
     var reply = JSON.parse(reply_string);
-    if(reply.type === "kanban") {
-      var request_data = reply.object;
-      console.log("kanban request handled");
-      generate_kanban(request_data);
-      //Send for tickets, once received kanban.
-      sendTicketsRequest(socket, project.project_id);
-      generate_other_user_kanbans();
-      getProjectUsers(socket, project.project_id);
-    }  else if (reply.type === "project_users") {
+    if (reply.type === "project_users") {
       let users = reply.object.users;
-      if (project !== undefined) {
-        project.members = users;
+      if (currentProject.get() !== undefined) {
+        currentProject.get().users = users;
       }
+    } else if (reply.type === "tickets") {
+      //generateTickets(reply.object.tickets, currentProject);
     }
   });
-
-
-  function generate_other_user_kanbans() {
-    let other_projects = {};
-
-    for (let proj in projects) {
-      other_projects[projects[proj].project_id] = projects[proj];
-    }
-    delete other_projects[project.project_id];
-
-    $scope.other_projects = other_projects;
-  }
 
   $scope.goHome = function () {
     $location.path('/home');
   };
 
+  function move_tickets(to_col_id, from_col_id, tid) {
+    let toColumn = currentProject.get().columns[to_col_id];
+    let fromColumn = currentProject.get().columns[from_col_id];
+
+    currentProject.get().tickets[tid].setColumn(to_col_id);
+    delete fromColumn.tickets[tid];
+    toColumn.tickets[tid] = currentProject.get().tickets[tid];
+  }
 
   $scope.getBorderColour = function(timeLeft, deadlineActive) {
     let css;
@@ -119,7 +111,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
     if (reply.type === "ticket_new") {
       let ticket_info = reply.object;
       if (ticket_info.tid !== "Maxticketlimitreached") {
-        addTicket(ticket_info.column_id, ticket_info.tid, ticket_info.desc, null, {});
+        addTicket(ticket_info.column_id, ticket_info.tid, ticket_info.desc, null, {}, currentProject);
       } else {
         console.log("Max ticket limit reached for this column ");
       }
@@ -128,14 +120,14 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
 
   $scope.handleTicketDrop = function (e) {
     e.preventDefault();
-
-    let scope = get_kanban_scope();
-    let start_col_id = scope.project.tickets[id].col;
+    
+    let start_col_id = currentProject.get().tickets[id].col;
 
     let cell = $(e.toElement).closest('td');
     let end_col_id = cell[0].getAttribute('cid');
 
-    sendTicketUpdateMoved(socket, scope.project.tickets[id], get_kanban_scope().pid, end_col_id, start_col_id);
+    sendTicketUpdateMoved(socket, currentProject.get().tickets[id], currentProject.get().project_id,
+        end_col_id, start_col_id);
 
     $(e.toElement).closest('.ticket-column')[0].style.border = "";
     e.srcElement.style.border = "";
@@ -144,7 +136,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
 
   $scope.addBTN = function () {
     //Get column in position 0
-    sendStoreTicket(socket, $scope.project.project_id, $scope.project.column_order[0]);
+    sendStoreTicket(socket, currentProject.get().project_id, currentProject.get().column_order[0]);
   };
 
   socket.on('updatereply', function (reply_string) {
@@ -157,30 +149,30 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
         alert("Cannot move ticket. Ticket limit reached.")
       }
     } else if (reply.type === "ticket_info") {
-      let ticket = $scope.project.columns[reply.col].tickets[reply.ticket_id];
+      let ticket = currentProject.get().columns[reply.col].tickets[reply.ticket_id];
       ticket.setDesc(reply.desc);
 
     } else if (reply.type === "ticket_deadline") {
-      let ticket = scope.project.columns[reply.col].tickets[reply.ticket_id];
+      let ticket = currentProject.get().columns[reply.col].tickets[reply.ticket_id];
       ticket.setDeadline(reply.deadline);
 
     } else if (reply.type === "column_moved") {
       generate_kanban(reply.object);
 
       //Send for tickets, once received kanban.
-      sendTicketsRequest(socket, get_kanban_scope().pid);
+      sendTicketsRequest(socket, currentProject.get().project_id);
 
     } else if (reply.type === "column_title") {
       let pid = reply.pid;
       let cid = reply.cid;
       let title = reply.title;
-      $scope.project.columns[cid].title = title;
+      currentProject.get().columns[cid].title = title;
 
     } else if (reply.type === "column_limit") {
       let cid = reply.cid;
       let pid = reply.pid;
       let limit = reply.limit;
-      let column = $scope.project.columns[cid];
+      let column = currentProject.get().columns[cid];
       column.limit = limit;
 
     } else if (reply.type === "gh_url") {
@@ -239,7 +231,7 @@ app.controller('ColumnModalInstanceCtrl', function($scope, $uibModalInstance) {
   };
 });
 
-app.controller('TicketModalInstanceCtrl', function($scope, $uibModalInstance) {
+app.controller('TicketModalInstanceCtrl', function($scope, $uibModalInstance, currentProject) {
   let $ctrl = this;
   $ctrl.close = function() {
     $uibModalInstance.close($ctrl.selected);
@@ -250,7 +242,7 @@ app.controller('TicketModalInstanceCtrl', function($scope, $uibModalInstance) {
   };
 
   $scope.getTicket = function (id) {
-    return $scope.project.tickets[id];
+    return currentProject.get().tickets[id];
   };
 
   $scope.getTid = function () {
@@ -259,7 +251,11 @@ app.controller('TicketModalInstanceCtrl', function($scope, $uibModalInstance) {
   };
 });
 
-app.controller('editColumnCtrl', function($scope, socket) {
+app.controller('editColumnCtrl', function($scope, socket, currentProject) {
+  $scope.getProject = function () {
+    return currentProject.get();
+  };
+
   socket.on('storereply', function (reply_string) {
     let reply = JSON.parse(reply_string);
     if (reply.type === "column_new") {
@@ -270,16 +266,16 @@ app.controller('editColumnCtrl', function($scope, socket) {
 
   function addColumn(title, position, id) {
     let column = new Column(id, title, position);
-    $scope.project.columns[id] = column;
-    $scope.project.column_order[position] = id;
+    currentProject.get().columns[id] = column;
+    currentProject.get().column_order[position] = id;
   }
 
   $scope.addColumn = function() {
-    sendStoreColumn(socket, $scope.project.project_id, "New column", Object.keys($scope.project.columns).length);
+    sendStoreColumn(socket, currentProject.get().project_id, "New column", Object.keys(currentProject.get().columns).length);
   };
 
   $scope.removeColumn = function(col) {
-    removeColumn(socket, $scope.project.project_id, col.column_id, col.position);
+    removeColumn(socket, currentProject.get().project_id, col.column_id, col.position);
   };
 
   socket.on('removereply', function (reply_string) {
@@ -288,12 +284,12 @@ app.controller('editColumnCtrl', function($scope, socket) {
       generate_kanban(reply.object);
 
       //Send for tickets, once received kanban.
-      sendTicketsRequest(socket, $scope.project.pid);
+      sendTicketsRequest(socket, currentProject.get().pid);
     }
   });
 
   $scope.updateColTitle = function(col, title) {
-    updateColumnTitle(socket, col.column_id, get_kanban_scope().pid, title);
+    updateColumnTitle(socket, col.column_id, currentProject.get().project_id, title);
   };
 
   let start_column_id;
@@ -320,8 +316,8 @@ app.controller('editColumnCtrl', function($scope, socket) {
       let cell = $(event.toElement).closest('table');
       let end_column_id = cell[0].getAttribute('column_id');
 
-      let columns = get_kanban_scope().project.columns;
-      sendColumnUpdateMoved(socket, get_kanban_scope().pid, start_column_id, columns[end_column_id].position, columns[start_column_id].position);
+      let columns = currentProject.get().columns;
+      sendColumnUpdateMoved(socket, currentProject.get().project_id, start_column_id, columns[end_column_id].position, columns[start_column_id].position);
       drag_started = false;
     }
   };
@@ -337,7 +333,7 @@ app.controller('editColumnCtrl', function($scope, socket) {
       alert("Ticket limit must not exceed 100");
 
     } else {
-      sendColumnUpdateLimit(socket, get_kanban_scope().pid, colId, newLimit);
+      sendColumnUpdateLimit(socket, currentProject.get().project_id, colId, newLimit);
     }
   };
 });
@@ -346,7 +342,7 @@ app.controller('DeadlineCtrl', function ($scope) {
 
 });
 
-app.controller('editTicketCtrl', function($scope, socket) {
+app.controller('editTicketCtrl', function($scope, socket, currentProject) {
 
   $scope.dynamicPopover = {
     content: 'Hello world!',
@@ -355,7 +351,7 @@ app.controller('editTicketCtrl', function($scope, socket) {
   };
 
   $scope.getProjectMembers = function() {
-    return get_kanban_scope().project.members;
+    return currentProject.get().members;
   };
 
   $scope.isMemberAddedToTicket = function (member) {
@@ -367,17 +363,17 @@ app.controller('editTicketCtrl', function($scope, socket) {
     if (reply.type === "ticket_users") {
       let users = reply.object.users;
       let tid = reply.object.tid;
-      $scope.project.tickets[tid].members = users;
+      currentProject.get().tickets[tid].members = users;
     }
   });
 
   $scope.toggleMemberToTicket = function (member) {
     if ($scope.isMemberAddedToTicket(member)) {
       //remove member
-      removeUserFromTicket(socket, get_kanban_scope().pid, member, $scope.getTid());
+      removeUserFromTicket(socket, currentProject.get().project_id, member, $scope.getTid());
     } else {
       //add member
-      addUserToTicket(socket, member, get_kanban_scope().pid, $scope.getTid());
+      addUserToTicket(socket, member, currentProject.get().project_id, $scope.getTid());
     }
   };
 
@@ -388,18 +384,18 @@ app.controller('editTicketCtrl', function($scope, socket) {
       generate_kanban(reply.object);
 
       //Send for tickets, once received kanban.
-      sendTicketsRequest(socket, get_kanban_scope().pid);
+      sendTicketsRequest(socket, currentProject.get().project_id);
     }
   });
 
   $scope.addUser = function (username) {
-    addUserToTicket(socket, username, get_kanban_scope().pid, $scope.tid);
+    addUserToTicket(socket, username, currentProject.get().project_id, $scope.tid);
   };
 
   $scope.saveEditDeadline = function(deadline) {
     let ticket = $scope.getTicket($scope.tid);
     ticket.deadline = deadline;
-    sendTicketUpdateDeadline(socket, ticket, get_kanban_scope().pid, deadline);
+    sendTicketUpdateDeadline(socket, ticket, currentProject.get().project_id, deadline);
     updateTicketTimes()
 
 
@@ -409,13 +405,13 @@ app.controller('editTicketCtrl', function($scope, socket) {
     let ticket = $scope.getTicket($scope.tid);
 
     ticket.resetDeadline();
-    sendTicketUpdateDeadline(socket, ticket, get_kanban_scope().pid, ticket.deadline);
+    sendTicketUpdateDeadline(socket, ticket, currentProject.get().project_id, ticket.deadline);
   };
 
   $scope.saveEditDesc = function(text) {
     let ticket = $scope.getTicket($scope.tid);
     if (ticket !== undefined) {
-      sendTicketUpdateDesc(socket, ticket, get_kanban_scope().pid, text);
+      sendTicketUpdateDesc(socket, ticket, currentProject.get().project_id, text);
     }
   };
 
@@ -483,7 +479,7 @@ app.controller('editTicketCtrl', function($scope, socket) {
   $('[data-toggle="popover"]').popover();
 
   //Get users for this ticket.
-  getTicketUsers(socket, get_kanban_scope().pid, $scope.getTid());
+  getTicketUsers(socket, currentProject.get().project_id, $scope.getTid());
 
   $scope.tid = $scope.getTid();
   $scope.ticket = $scope.getTicket($scope.tid);
@@ -502,7 +498,7 @@ app.controller('editTicketCtrl', function($scope, socket) {
   $scope.ismeridian = true;
 });
 
-app.controller('deleteTicketCtrl', function($scope, $sce, socket) {
+app.controller('deleteTicketCtrl', function($scope, $sce, socket, currentProject) {
   $scope.dynamicPopover = {
     content: 'Hello world!',
     templateUrl: 'yousurebutton.html',
@@ -514,7 +510,7 @@ app.controller('deleteTicketCtrl', function($scope, $sce, socket) {
     //DIRTY - done to close modal.
     $scope.$parent.$close();
 
-    removeTicket(socket, get_kanban_scope().pid, id);
+    removeTicket(socket, currentProject.get().project_id, id);
   };
 
   socket.on('removereply', function (reply_string) {
@@ -522,7 +518,7 @@ app.controller('deleteTicketCtrl', function($scope, $sce, socket) {
     if (reply.type === "ticket_remove") {
       let ticket_id = reply.ticket_id;
       let project_id = reply.pid;
-      if (project_id == get_kanban_scope().pid) {
+      if (project_id === currentProject.get().project_id) {
         delete_ticket(ticket_id);
       } else {
         console.error("Getting deletion info for different project.")
@@ -535,7 +531,7 @@ app.controller('DeadlineCollapseCtrl', function ($scope) {
   $scope.isCollapsed = true;
 });
 
-app.controller('CodeCtrl', function ($scope, $http, socket) {
+app.controller('CodeCtrl', function ($scope, $http, socket, currentProject) {
   $scope.wholeFile = false; //Default
 
   let server_response = {'filenames':[], 'methodnames': []};
@@ -549,7 +545,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
   $scope.getFile = function(file) {
     $scope.selectedFile = false;
-    getProjectFiles(socket, get_kanban_scope().pid, file);
+    getProjectFiles(socket, currentProject.get().project_id, file);
 
     return server_response['filenames'];
   };
@@ -570,7 +566,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
   $scope.getMethod = function(file, method) {
     $scope.selectedMethod = false;
 
-    getFileMethods(socket, get_kanban_scope().pid, file, method);
+    getFileMethods(socket, currentProject.get().project_id, file, method);
 
     return server_response['methodnames'];
   };
@@ -598,7 +594,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
   });
 
   $scope.selectMethod = function (method, $model, $label, $event, file) {
-    addMethodToTicket(socket, get_kanban_scope().pid, file, method, $scope.getTid());
+    addMethodToTicket(socket, currentProject.get().project_id, file, method, $scope.getTid());
 
     $scope.selectedMethod = true;
   };
@@ -643,7 +639,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
   }
 
   $scope.removeMethod = function (filename, method) {
-    removeMethodFromTicket(socket, get_kanban_scope().pid, filename, method, $scope.getTid());
+    removeMethodFromTicket(socket, currentProject.get().project_id, filename, method, $scope.getTid());
   };
 
   let code = [];

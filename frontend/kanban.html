@@ -198,26 +198,26 @@
             <div class="col-xs-11">
               <table>
                 <tr>
-                  <td ng-repeat="col in project.column_order">
-                    <table class="table table-bordered" column_id="{{project.columns[col].column_id}}" draggable="true"
+                  <td ng-repeat="col in getProject().column_order">
+                    <table class="table table-bordered" column_id="{{getProject().columns[col].column_id}}" draggable="true"
                            ondragleave="angular.element(this).scope().handleColumnDragStart(event)"
                            ondragover="angular.element(this).scope().handleColumnDragOver(event)"
                            ondrop="angular.element(this).scope().handleColumnDrop(event)">
                       <tr>
                         <th class="column-title">
-                          <p editable-textarea="project.columns[col].title" onaftersave="updateColTitle(project.columns[col], project.columns[col].title)">{{project.columns[col].title || 'empty'}}</p>
+                          <p editable-textarea="getProject().columns[col].title" onaftersave="updateColTitle(getProject().columns[col], getProject().columns[col].title)">{{getProject().columns[col].title || 'empty'}}</p>
                         </th>
                       </tr>
                       <tr>
                         <td class="column-title" style="text-align: center;">
                           <div class="form-group">
-                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" ng-model="newLimit" ng-init="newLimit = project.columns[col].limit" placeholder="Ticket limit" ng-change="updateColLimitEvent(col, newLimit)">
+                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" ng-model="newLimit" ng-init="newLimit = getProject().columns[col].limit" placeholder="Ticket limit" ng-change="updateColLimitEvent(col, newLimit)">
                           </div>
                         </td>
                       </tr>
                       <tr>
                         <td class="center-align-text">
-                          <button type="button" class="btn btn-warning" ng-click="removeColumn(project.columns[col])">Remove</button>
+                          <button type="button" class="btn btn-warning" ng-click="removeColumn(getProject().columns[col])">Remove</button>
                         </td>
                       </tr>
                     </table>
@@ -255,7 +255,7 @@
           </button>
           <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
             <li role="menuitem">
-              <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
+              <a ng-click="sendKanbanRequest(getProject().project_id)">{{getProject().title}}</a>
             </li>
 
             <!-- Go to other projects -->
@@ -283,7 +283,7 @@
     </ul>
     <a class="navbar-brand navbar-right project-title" id="project_title">
       <!-- Project title -->
-      {{project.title}}
+      {{getProject().title}}
     </a>
 
     <!-- //TODO: Make project title a drop down - with project options. -->
@@ -295,17 +295,17 @@
       <div class="col-xs-12">
         <table id="kanban" class="table table-bordered">
           <tr>
-            <th class="column-title" ng-repeat="col in project.column_order">{{project.columns[col].title}}</th>
+            <th class="column-title" ng-repeat="col in getProject().column_order">{{getProject().columns[col].title}}</th>
           </tr>
 
           <tr>
-            <td ng-repeat="col in project.column_order" class="ticket-column"
+            <td ng-repeat="col in getProject().column_order" class="ticket-column"
                 ondragleave="angular.element(this).scope().handleTicketDragLeave(event)"
                 ondragover="angular.element(this).scope().handleTicketDragOver(event)"
                 ondrop="angular.element(this).scope().handleTicketDrop(event)"
-                cid="{{project.columns[col].column_id}}">
+                cid="{{getProject().columns[col].column_id}}">
               <!-- Tickets -->
-              <div ng-repeat="ticket in project.columns[col].tickets" ng-click="$ctrl.open_ticket_editor(ticket.ticket_id)"
+              <div ng-repeat="ticket in getProject().columns[col].tickets" ng-click="$ctrl.open_ticket_editor(ticket.ticket_id)"
                    ng-style="border = getBorderColour(ticket.timeLeft, ticket.deadlineActive)"
                    draggable="true" id="{{ticket.ticket_id}}" ondragstart="angular.element(this).scope().handleTicketDragStart(event)" class="ticket">
                 <h3>{{ticket.desc}}</h3>

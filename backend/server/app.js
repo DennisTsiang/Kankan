@@ -94,12 +94,14 @@ function App (db) {
     switch (request['type']) {
       case 'kanban':
         db.getKanban(request['pid'], function (kanban) {
+          console.error("Replying to getKanban");
           callback({type:'kanban', object:kanban});
         });
         break;
 
       case 'tickets':
         db.getTickets(request['pid'], function (pid, tickets) {
+          console.error("Replied to tickets request");
           callback({type:'tickets', object:{pid:pid, tickets:tickets}});
         });
         break;

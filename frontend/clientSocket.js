@@ -1,6 +1,6 @@
 
-function sendKanbanRequest(socket, pid) {
-  socket.emit('leaveroom', get_kanban_scope().pid);
+function sendKanbanRequest(socket, pid, old_pid) {
+  socket.emit('leaveroom', old_pid);
   socket.emit('joinroom', pid);
   sendKanbanRequestHelper(socket, pid);
 }
@@ -16,11 +16,13 @@ function removeMethodFromTicket(socket, pid, filename, methodname, ticket_id) {
 }
 
 function sendKanbanRequestHelper(socket, pid) {
+  console.log("Sending kanban request");
   var ticketObj = {type : "kanban", pid : pid};
   socket.emit("request", JSON.stringify(ticketObj));
 }
 
 function sendTicketsRequest(socket, pid) {
+  console.log("Sending ticket request");
   var ticketObj = {type : "tickets", pid : pid};
   socket.emit("request", JSON.stringify(ticketObj));
 }

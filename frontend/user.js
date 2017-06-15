@@ -1,7 +1,7 @@
-function User(username, image) {
+function User(username) {
 
   this.username = username;
-  this.image = image;
+  this.image = null;
 
   //List of projects by pid
   this.projects = [];

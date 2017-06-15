@@ -6,15 +6,19 @@ var userpics = {
   "harry": "harry.jpg"
 };
 
-app.controller('HomeController', function($scope, $location, socket) {
+app.controller('HomeController', function($scope, $location, socket, currentProject, user) {
 
-  console.log("start projects is " + JSON.stringify($scope.projects));
-
+  if (user.get() === null) {
+    $location.path('/login');
+  } else {
+    users = {};
+    userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
+    getUserProjects(socket, user.get().username);
+  }
 
   socket.on('requestreply', function(reply_string) {
     let reply = JSON.parse(reply_string);
-    if (reply.type === "tickets") {
-      console.log("ticket reply");
+    /*if (reply.type === "tickets") {
 
       let title = $scope.projects[reply.object.pid].title;
       let gh_url = $scope.projects[reply.object.pid].gh_url;
@@ -24,19 +28,7 @@ app.controller('HomeController', function($scope, $location, socket) {
       project.gh_url = gh_url;
       $scope.projects[reply.object.pid] = project;
       $scope.showDeadlines(project);
-
-    } else if (reply.type === "project_users") {
-      console.log("made new " + reply.object.pid);
-    }
-  });
-  socket.on('requestreply', function(reply_string) {
-
-    let reply = JSON.parse(reply_string);
-
-    if (reply.type === "project_users") {
-
-      console.log("catching project users");
-      console.log("project users reply is " + JSON.stringify(reply));
+    } else  if (reply.type === "project_users") {
 
       let project = $scope.projects[reply.object.pid];
 
@@ -48,16 +40,12 @@ app.controller('HomeController', function($scope, $location, socket) {
       for (var memberid in project.members) {
         let member = project.members[memberid];
 
-        console.log("users member is " + JSON.stringify(users[member]));
-
         if (users[member] === {} || users[member] === undefined) {
-          console.log("adding " + member);
 
           let profilepic = userpics[member];
 
           users[member] = new User(member, profilepic);
           users[member].addProject(reply.object.pid);
-          //project.users[users[member].username] = users[member];
 
 
         } else {
@@ -65,10 +53,32 @@ app.controller('HomeController', function($scope, $location, socket) {
         }
 
         if(project.users[member] === undefined){
-          project.addUser(users[member]);
+          project.users[users[member].username] = users[member];
         }
       }
-    }
+    }  else */ if(reply.type === "kanban") {
+      var request_data = reply.object;
+      console.log("kanban request handled");
+      currentProject.set(generate_kanban(request_data));
+      //Send for tickets, once received kanban.
+      sendTicketsRequest(socket, currentProject.get().project_id);
+      generate_other_user_kanbans();
+      getProjectUsers(socket, currentProject.get().project_id);
+    } else if (reply.type === "user_projects") {
+      let projects = reply.object;
+      generate_user_kanbans(projects, socket);
+    } else if (reply.type === "tickets") {
+      console.log("Received Ticket request");
+      if(currentProject.get() !== null){
+        generateTickets(reply.object.tickets, currentProject);
+        $location.path('/kanban');
+      }
+    } /*else if (reply.type === "project_users") {
+       let users = reply.object.users;
+       if (project !== undefined) {
+       project.members = users;
+       }
+    }*/
   });
 
 
@@ -89,46 +99,28 @@ app.controller('HomeController', function($scope, $location, socket) {
     }
   };
 
-  socket.on('requestreply', function (reply_string) {
-    var reply = JSON.parse(reply_string);
-    if (reply.type === "user_projects") {
-      let projects = reply.object;
-      generate_user_kanbans(projects, socket);
-    } else if (reply.type === "tickets") {
-      if(project !== undefined){
-        generateTickets(reply.object.tickets);
-      }
-    } else if (reply.type === "project_users") {
-      let users = reply.object.users;
-      if (project !== undefined) {
-        project.members = users;
-      }
+  function generate_other_user_kanbans() {
+    let other_projects = {};
+
+    for (let proj in $scope.projects) {
+      other_projects[$scope.projects[proj].project_id] = $scope.projects[proj];
     }
-  });
+    delete other_projects[currentProject.get().project_id];
 
-
+    $scope.other_projects = other_projects;
+  }
 
   function generate_user_kanbans(projects, socket) {
     let projectsH = {};
 
     for (let proj in projects) {
       projectsH[projects[proj].project_id] = projects[proj];
-      sendTicketsRequest(socket, projects[proj].project_id);
-      getProjectUsers(socket, projects[proj].project_id);
+      //sendTicketsRequest(socket, projects[proj].project_id);
+      //getProjectUsers(socket, projects[proj].project_id);
 
     }
 
-    projects = projectsH;
-  }
-
-  if (get_kanban_scope().username === undefined) {
-    $location.path('/login');
-  } else {
-    $scope.username = get_kanban_scope().username;
-    users = {};
-    userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
-    getUserProjects(socket, $scope.username);
-    $scope.a_k = get_kanban_scope();
+    $scope.projects = projectsH;
   }
 
   //sendAllProjectUserRequest()
@@ -136,8 +128,8 @@ app.controller('HomeController', function($scope, $location, socket) {
 
 
   $scope.chooseProject = function(proj_id) {
-    get_kanban_scope().pid = proj_id;
-    $location.path('/kanban');
+    console.log("Hit choose project");
+    sendKanbanRequest(socket, proj_id, null);
   };
 
   $scope.deleteProject = function(proj_id) {
@@ -150,7 +142,7 @@ app.controller('HomeController', function($scope, $location, socket) {
       //Kick out of kanban view, take back to home page?
       var pid = reply.pid;
       var currentpath = $location.path();
-      if (currentpath === '/kanban' && get_kanban_scope().pid === pid) {
+      if (currentpath === '/kanban' && currentProject.get().project_id === pid) {
         $location.path('/home');
       }
       delete $scope.projects[pid];
@@ -177,7 +169,7 @@ app.controller('NewProjectPopoverCtrl', function($scope, $sce, socket) {
     let reply = JSON.parse(reply_string);
     if (reply.type === "project_new") {
       let pid = reply.object;
-      addUserToProject(socket, $scope.username, pid);
+      addUserToProject(socket, user.get().username, pid);
     }
   });
 });
