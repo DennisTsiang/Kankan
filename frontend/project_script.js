@@ -40,6 +40,7 @@ function generate_kanban(received_project) {
   }
 
 function updateTickets(currentProject) {
+  updateTicketTimes(currentProject)();
   setInterval(updateTicketTimes(currentProject), 10000);
   //updateProgressBars();
 }
