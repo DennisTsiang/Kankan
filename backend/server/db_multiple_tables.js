@@ -422,12 +422,12 @@ function Database(pool) {
 
   this.getUsersProjects = function (username, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT project_id, project_name FROM user_projects NATURAL JOIN project_table ' +
+      pool.query('SELECT project_id, project_name, ghurl FROM user_projects NATURAL JOIN project_table ' +
           'WHERE username = $1::text', [username], function (res) {
         if (res.rows.length > 0) {
           var array = [];
           for (var row of res.rows) {
-            array.push({project_id:row.project_id, title:row.project_name});
+            array.push({project_id:row.project_id, title:row.project_name, gh_url:row.ghurl});
           }
           rwlock.unlock();
           callback(array);
@@ -487,8 +487,14 @@ function Database(pool) {
     rwlock.writeLock(function () {
       pool.query('INSERT INTO ticket_files_' + pid + ' VALUES($1::text, $2::text, $3::int)',
           [filename, methodname, ticket_id], function () {
+        pool.query('SELECT startline, endline FROM ticket_files_' + pid +
+            ' WHERE filename=$1::text, methodname=$2::text', [filename, methodname], function (res) {
+          if (res.rows.length === 1) {
+            rwlock.unlock();
+            callback(res.rows[0].startline, res.rows[0].endline);
+          }
+        });
         rwlock.unlock();
-        callback(true);
       })
     })
   };

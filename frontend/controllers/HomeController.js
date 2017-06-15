@@ -1,24 +1,34 @@
 var users = {};
-var userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
-
+var userpics = {
+  "yianni": "yianni.jpg",
+  "thomas": "tom.jpg",
+  "Dennis": "Dennis.jpg",
+  "harry": "harry.jpg"
+};
 
 app.controller('HomeController', function($scope, $location, socket) {
+
+  console.log("start projects is " + JSON.stringify($scope.projects));
 
 
   socket.on('requestreply', function(reply_string) {
     let reply = JSON.parse(reply_string);
     if (reply.type === "tickets") {
+      console.log("ticket reply");
 
-      $scope.projects[reply.object.pid] = new Project(reply.object.pid);
+      let title = $scope.projects[reply.object.pid].title;
+      let gh_url = $scope.projects[reply.object.pid].gh_url;
+      let project = new Project(reply.object.pid);
+      project.tickets = reply.object.tickets;
+      project.title = title;
+      project.gh_url = gh_url;
+      $scope.projects[reply.object.pid] = project;
+      $scope.showDeadlines(project);
 
-      $scope.projects[reply.object.pid].tickets = reply.object.tickets;
-
-      $scope.projects[reply.object.pid].title = "toberequested"
-
-      $scope.showDeadlines($scope.projects[reply.object.pid]);
+    } else if (reply.type === "project_users") {
+      console.log("made new " + reply.object.pid);
     }
   });
-
   socket.on('requestreply', function(reply_string) {
 
     let reply = JSON.parse(reply_string);
@@ -26,42 +36,41 @@ app.controller('HomeController', function($scope, $location, socket) {
     if (reply.type === "project_users") {
 
       console.log("catching project users");
-      console.log("reply is " + JSON.stringify(reply));
+      console.log("project users reply is " + JSON.stringify(reply));
 
       let project = $scope.projects[reply.object.pid];
 
       project.members = reply.object.users;
+      if (!('users' in project)) {
+        project.users = {};
+      }
 
-      for (memberid in project.members) {
+      for (var memberid in project.members) {
         let member = project.members[memberid];
 
-        console.log("member is " + member);
+        console.log("users member is " + JSON.stringify(users[member]));
 
-        if (users[member] === undefined) {
-
-          console.log("adding new user");
+        if (users[member] === {} || users[member] === undefined) {
+          console.log("adding " + member);
 
           let profilepic = userpics[member];
-          console.log("profilepic is " + profilepic);
 
           users[member] = new User(member, profilepic);
           users[member].addProject(reply.object.pid);
-          project.addUser(users[member]);
-
-          console.log("project users now is " + JSON.stringify(project.users));
-          console.log("users is " + JSON.stringify(users));
+          //project.users[users[member].username] = users[member];
 
 
-
-        }else{
+        } else {
           //add project to that of the users?
         }
 
+        if(project.users[member] === undefined){
+          project.addUser(users[member]);
+        }
       }
-
     }
-
   });
+
 
   $scope.showDeadlines = function(project) {
 
@@ -84,12 +93,10 @@ app.controller('HomeController', function($scope, $location, socket) {
     $location.path('/login');
   } else {
     $scope.username = get_kanban_scope().username;
-
+    users = {};
+    userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
     getUserProjects(socket, $scope.username);
     $scope.a_k = get_kanban_scope();
-
-
-
   }
 
   //sendAllProjectUserRequest()
@@ -163,6 +170,23 @@ app.controller('DropdownCtrl', function($uibModal, $log, $document) {
       }
     });
   };
+
+  $ctrl.openEditURL = function(size, project) {
+    var modalInstance = $uibModal.open({
+      animation: $ctrl.animationsEnabled,
+      ariaLabelledBy: 'modal-title',
+      ariaDescribedBy: 'modal-body',
+      templateUrl: 'EditURLModal.html',
+      controller: 'EditURLInstanceCtrl',
+      controllerAs: '$ctrl',
+      size: size,
+      resolve: {
+        items: function() {
+          return project;
+        }
+      }
+    });
+  };
 });
 
 app.controller('AddUsersInstanceCtrl', function($uibModalInstance, items, socket) {
@@ -191,3 +215,23 @@ app.controller('DeleteProjectInstanceCtrl', function($uibModalInstance, items, s
     $uibModalInstance.close();
   };
 });
+
+app.controller('EditURLInstanceCtrl', function($uibModalInstance, items, socket) {
+  var $ctrl = this;
+  $ctrl.title = items.title;
+  if ('gh_url' in items) {
+    $ctrl.url = items.gh_url;
+  } else {
+    $ctrl.url = null;
+  }
+
+  $ctrl.ok = function(url) {
+    sendUpdateGHURL(socket, items.project_id, url);
+    $uibModalInstance.close();
+  };
+
+  $ctrl.cancel = function() {
+    $uibModalInstance.close();
+  };
+});
+
