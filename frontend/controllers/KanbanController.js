@@ -17,17 +17,74 @@ app.controller('KanbanCtrl', function($scope, $location, socket, currentProject)
 
   var test = currentProject.get();
 
-  socket.on('requestreply', function (reply_string) {
-    var reply = JSON.parse(reply_string);
-    if (reply.type === "project_users") {
-      let users = reply.object.users;
-      if (currentProject.get() !== undefined) {
-        currentProject.get().users = users;
+    socket.on('requestreply', function (reply_string) {
+      var reply = JSON.parse(reply_string);
+      if (reply.type === "project_users") {
+        let users = reply.object.users;
+        if (currentProject.get() !== undefined) {
+          currentProject.get().users = users;
+        }
+      } else if (reply.type === "tickets") {
+        //generateTickets(reply.object.tickets, currentProject);
       }
-    } else if (reply.type === "tickets") {
-      //generateTickets(reply.object.tickets, currentProject);
-    }
-  });
+    });
+    socket.on('storereply', function (reply_string) {
+      let reply = JSON.parse(reply_string);
+      if (reply.type === "ticket_new") {
+        let ticket_info = reply.object;
+        if (ticket_info.tid !== "Maxticketlimitreached") {
+          addTicket(ticket_info.column_id, ticket_info.tid, ticket_info.desc, null, {}, currentProject);
+        } else {
+          console.log("Max ticket limit reached for this column ");
+        }
+      }
+    });
+    socket.on('updatereply', function (reply_string) {
+      let reply = JSON.parse(reply_string);
+      if (reply.type === "ticket_moved") {
+        if (reply.ticket_id !== "Maxticketlimitreached") {
+          move_tickets(reply.to_col, reply.from_col, reply.ticket_id);
+        } else {
+          console.log("Max ticket limit reached for this column ");
+          alert("Cannot move ticket. Ticket limit reached.")
+        }
+      } else if (reply.type === "ticket_info") {
+        let ticket = currentProject.get().columns[reply.col].tickets[reply.ticket_id];
+        ticket.setDesc(reply.desc);
+
+      } else if (reply.type === "ticket_deadline") {
+        let ticket = currentProject.get().columns[reply.col].tickets[reply.ticket_id];
+        ticket.setDeadline(reply.deadline);
+
+      } else if (reply.type === "column_moved") {
+        currentProject.set(generate_kanban(reply.object));
+
+        //Send for tickets, once received kanban.
+        sendTicketsRequest(socket, currentProject.get().project_id);
+
+      } else if (reply.type === "column_title") {
+        let pid = reply.pid;
+        let cid = reply.cid;
+        let title = reply.title;
+        currentProject.get().columns[cid].title = title;
+
+      } else if (reply.type === "column_limit") {
+        let cid = reply.cid;
+        let pid = reply.pid;
+        let limit = reply.limit;
+        let column = currentProject.get().columns[cid];
+        column.limit = limit;
+
+      } else if (reply.type === "gh_url") {
+        let pid = reply.pid;
+        let url = reply.url;
+        if (currentProject.get().project_id === pid) {
+          //console.log($scope.projects);
+          currentProject.get().gh_url = url;
+        }
+      }
+    });
+
 
   $scope.goHome = function () {
     socket.emit('leaveroom', currentProject.get().project_id);
@@ -107,18 +164,6 @@ app.controller('KanbanCtrl', function($scope, $location, socket, currentProject)
     $(e.toElement).closest('.ticket-column')[0].style.border = "thick solid #0000FF"
   };
 
-  socket.on('storereply', function (reply_string) {
-    let reply = JSON.parse(reply_string);
-    if (reply.type === "ticket_new") {
-      let ticket_info = reply.object;
-      if (ticket_info.tid !== "Maxticketlimitreached") {
-        addTicket(ticket_info.column_id, ticket_info.tid, ticket_info.desc, null, {}, currentProject);
-      } else {
-        console.log("Max ticket limit reached for this column ");
-      }
-    }
-  });
-
   $scope.handleTicketDrop = function (e) {
     e.preventDefault();
     
@@ -140,51 +185,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket, currentProject)
     sendStoreTicket(socket, currentProject.get().project_id, currentProject.get().column_order[0]);
   };
 
-  socket.on('updatereply', function (reply_string) {
-    let reply = JSON.parse(reply_string);
-    if (reply.type === "ticket_moved") {
-      if (reply.ticket_id !== "Maxticketlimitreached") {
-        move_tickets(reply.to_col, reply.from_col, reply.ticket_id);
-      } else {
-        console.log("Max ticket limit reached for this column ");
-        alert("Cannot move ticket. Ticket limit reached.")
-      }
-    } else if (reply.type === "ticket_info") {
-      let ticket = currentProject.get().columns[reply.col].tickets[reply.ticket_id];
-      ticket.setDesc(reply.desc);
 
-    } else if (reply.type === "ticket_deadline") {
-      let ticket = currentProject.get().columns[reply.col].tickets[reply.ticket_id];
-      ticket.setDeadline(reply.deadline);
-
-    } else if (reply.type === "column_moved") {
-      currentProject.set(generate_kanban(reply.object));
-
-      //Send for tickets, once received kanban.
-      sendTicketsRequest(socket, currentProject.get().project_id);
-
-    } else if (reply.type === "column_title") {
-      let pid = reply.pid;
-      let cid = reply.cid;
-      let title = reply.title;
-      currentProject.get().columns[cid].title = title;
-
-    } else if (reply.type === "column_limit") {
-      let cid = reply.cid;
-      let pid = reply.pid;
-      let limit = reply.limit;
-      let column = currentProject.get().columns[cid];
-      column.limit = limit;
-
-    } else if (reply.type === "gh_url") {
-      let pid = reply.pid;
-      let url = reply.url;
-      if (currentProject.get().project_id === pid) {
-        //console.log($scope.projects);
-        currentProject.get().gh_url = url;
-      }
-    }
-  });
 });
 
 app.controller('ModalCtrl', function($compile, $scope, $uibModal, $log, $document) {
@@ -261,13 +262,23 @@ app.controller('editColumnCtrl', function($scope, socket, currentProject) {
     return currentProject.get();
   };
 
-  socket.on('storereply', function (reply_string) {
-    let reply = JSON.parse(reply_string);
-    if (reply.type === "column_new") {
-      let col_info = reply.object;
-      addColumn(col_info.column_name, col_info.position, col_info.cid);
-    }
-  });
+
+    socket.on('storereply', function (reply_string) {
+      let reply = JSON.parse(reply_string);
+      if (reply.type === "column_new") {
+        let col_info = reply.object;
+        addColumn(col_info.column_name, col_info.position, col_info.cid);
+      }
+    });
+    socket.on('removereply', function (reply_string) {
+      let reply = JSON.parse(reply_string);
+      if (reply.type === "column_remove") {
+        currentProject.set(generate_kanban(reply.object));
+
+        //Send for tickets, once received kanban.
+        sendTicketsRequest(socket, currentProject.get().project_id);
+      }
+    });
 
   function addColumn(title, position, id) {
     let column = new Column(id, title, position);
@@ -282,16 +293,6 @@ app.controller('editColumnCtrl', function($scope, socket, currentProject) {
   $scope.removeColumn = function(col) {
     removeColumn(socket, currentProject.get().project_id, col.column_id, col.position);
   };
-
-  socket.on('removereply', function (reply_string) {
-    let reply = JSON.parse(reply_string);
-    if (reply.type === "column_remove") {
-      currentProject.set(generate_kanban(reply.object));
-
-      //Send for tickets, once received kanban.
-      sendTicketsRequest(socket, currentProject.get().project_id);
-    }
-  });
 
   $scope.updateColTitle = function(col, title) {
     updateColumnTitle(socket, col.column_id, currentProject.get().project_id, title);
@@ -363,14 +364,25 @@ app.controller('editTicketCtrl', function($scope, socket, currentProject) {
     return $scope.getTicket($scope.getTid()).members.includes(member);
   };
 
-  socket.on('requestreply', function(reply_string) {
-    var reply = JSON.parse(reply_string);
-    if (reply.type === "ticket_users") {
-      let users = reply.object.users;
-      let tid = reply.object.tid;
-      currentProject.get().tickets[tid].members = users;
-    }
-  });
+    socket.on('requestreply', function (reply_string) {
+      var reply = JSON.parse(reply_string);
+      if (reply.type === "ticket_users") {
+        let users = reply.object.users;
+        let tid = reply.object.tid;
+        currentProject.get().tickets[tid].members = users;
+      }
+    });
+    socket.on('removereply', function (reply_string) {
+      let reply = JSON.parse(reply_string);
+      if(reply.type === "userOfTicket_remove") {
+        //remove a user from a ticket
+        currentProject.set(generate_kanban(reply.object));
+
+        //Send for tickets, once received kanban.
+        sendTicketsRequest(socket, currentProject.get().project_id);
+      }
+    });
+
 
   $scope.toggleMemberToTicket = function (member) {
     if ($scope.isMemberAddedToTicket(member)) {
@@ -382,16 +394,7 @@ app.controller('editTicketCtrl', function($scope, socket, currentProject) {
     }
   };
 
-  socket.on('removereply', function (reply_string) {
-    let reply = JSON.parse(reply_string);
-    if(reply.type === "userOfTicket_remove") {
-      //remove a user from a ticket
-      currentProject.set(generate_kanban(reply.object));
 
-      //Send for tickets, once received kanban.
-      sendTicketsRequest(socket, currentProject.get().project_id);
-    }
-  });
 
   $scope.addUser = function (username) {
     addUserToTicket(socket, username, currentProject.get().project_id, $scope.tid);
@@ -503,6 +506,7 @@ app.controller('editTicketCtrl', function($scope, socket, currentProject) {
   $scope.ismeridian = true;
 });
 
+
 app.controller('deleteTicketCtrl', function($scope, $sce, socket, currentProject) {
   $scope.dynamicPopover = {
     content: 'Hello world!',
@@ -518,18 +522,19 @@ app.controller('deleteTicketCtrl', function($scope, $sce, socket, currentProject
     removeTicket(socket, currentProject.get().project_id, id);
   };
 
-  socket.on('removereply', function (reply_string) {
-    let reply = JSON.parse(reply_string);
-    if (reply.type === "ticket_remove") {
-      let ticket_id = reply.ticket_id;
-      let project_id = reply.pid;
-      if (project_id === currentProject.get().project_id) {
-        delete_ticket(ticket_id);
-      } else {
-        console.error("Getting deletion info for different project.")
+    socket.on('removereply', function (reply_string) {
+      let reply = JSON.parse(reply_string);
+      if (reply.type === "ticket_remove") {
+        let ticket_id = reply.ticket_id;
+        let project_id = reply.pid;
+        if (project_id === currentProject.get().project_id) {
+          delete_ticket(ticket_id);
+        } else {
+          console.error("Getting deletion info for different project.")
+        }
       }
-    }
-  });
+    });
+
 
   function delete_ticket(ticket_id) {
     let ticket = currentProject.get().tickets[ticket_id];
@@ -548,13 +553,59 @@ app.controller('CodeCtrl', function ($scope, $http, socket, currentProject) {
   $scope.wholeFile = false; //Default
 
   let server_response = {'filenames':[], 'methodnames': []};
-
-  socket.on('requestreply', function(reply_string) {
+  var requestreplyF = function (reply_string) {
     let reply = JSON.parse(reply_string);
     if (reply.type === 'project_files') {
       server_response['filenames'] = reply.object;
+    } else if (reply.type === 'file_methods') {
+      server_response['methodnames'] = reply.object;
     }
-  });
+  };
+  var storereplyF = function(reply_string) {
+    let reply = JSON.parse(reply_string);
+
+    if (reply.type === 'add_ticket_method') {
+      console.log("shgdjfhg");
+      let tid = reply.ticket_id;
+      let filename = reply.filename;
+      let methodname = reply.methodname;
+      let endline = reply.endline;
+      let startline = reply.startline;
+
+      let methodObject = {methodname: methodname, startline: startline, endline:endline};
+
+      if (filename in $scope.getTicket(tid).codeData) {
+        $scope.getTicket(tid).codeData[filename]['methods'].push(methodObject);
+      } else {
+        let url = reply.fileurl;
+        $scope.getTicket(tid).codeData[filename] = {};
+        $scope.getTicket(tid).codeData[filename]['methods'] = [methodObject];
+        $scope.getTicket(tid).codeData[filename]['download_url'] = url;
+      }
+    }
+  };
+  var removereplyF = function(reply_string) {
+    let reply = JSON.parse(reply_string);
+
+    if (reply.type === 'remove_ticket_method') {
+      let tid = reply.ticket_id;
+      let filename = reply.filename;
+      let methodname = reply.methodname;
+
+      if (filename in $scope.getTicket(tid).codeData) {
+        removeMethod($scope.getTicket(tid).codeData, filename, methodname);
+      }
+    }
+  };
+
+  socket.removeEventListener('requestreply', requestreplyF);
+  socket.removeEventListener('storereply', storereplyF);
+  socket.removeEventListener('removereply', removereplyF);
+
+  socket.on('requestreply', requestreplyF);
+  socket.on('storereply', storereplyF);
+  socket.on('removereply', removereplyF);
+
 
   $scope.getFile = function(file) {
     $scope.selectedFile = false;
@@ -569,13 +620,6 @@ app.controller('CodeCtrl', function ($scope, $http, socket, currentProject) {
     $scope.selectedFile = true;
   };
 
-  socket.on('requestreply', function(reply_string) {
-    let reply = JSON.parse(reply_string);
-    if (reply.type === 'file_methods') {
-      server_response['methodnames'] = reply.object;
-    }
-  });
-
   $scope.getMethod = function(file, method) {
     $scope.selectedMethod = false;
 
@@ -584,27 +628,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket, currentProject) {
     return server_response['methodnames'];
   };
 
-  socket.on('storereply', function(reply_string) {
-    let reply = JSON.parse(reply_string);
 
-    if (reply.type === 'add_ticket_method') {
-      let tid = reply.ticket_id;
-      let filename = reply.filename;
-      let methodname = reply.methodname;
-      let endline = reply.endline;
-      let startline = reply.startline;
-
-      let methodObject = {methodname: methodname, startline: startline, endline:endline};
-
-      if (filename in $scope.getTicket(tid).codeData) {
-        $scope.getTicket(tid).codeData[filename]['methods'].push(methodObject);
-      } else {
-        let url = reply.fileurl;
-        $scope.getTicket(tid).codeData[filename]['methods'] = [methodObject];
-        $scope.getTicket(tid).codeData[filename]['download_url'] = url;
-      }
-    }
-  });
 
   $scope.selectMethod = function (method, $model, $label, $event, file) {
     addMethodToTicket(socket, currentProject.get().project_id, file, method, $scope.getTid());
@@ -620,20 +644,6 @@ app.controller('CodeCtrl', function ($scope, $http, socket, currentProject) {
     }
     return undefined;
   };
-
-  socket.on('removereply', function(reply_string) {
-    let reply = JSON.parse(reply_string);
-
-    if (reply.type === 'remove_ticket_method') {
-      let tid = reply.ticket_id;
-      let filename = reply.filename;
-      let methodname = reply.methodname;
-
-      if (filename in $scope.getTicket(tid).codeData) {
-        removeMethod($scope.getTicket(tid).codeData, filename, methodname);
-      }
-    }
-  });
 
   function removeMethod(files, filename, method) {
     console.log(files);

@@ -46,6 +46,12 @@ app.factory('socket', function ($rootScope) {
     },
     connected: function () {
       return socket.connected;
+    },
+    removeAllListeners: function (type) {
+      socket.removeAllListeners(type);
+    },
+    removeEventListener: function (type, callback) {
+      socket.removeEventListener(type, callback);
     }
   };
 });

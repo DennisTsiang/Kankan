@@ -11,6 +11,9 @@ var http = require('http').Server(express);
 const code_server = 'http://146.169.45.29:8008';
 var socket_code = require('socket.io-client')(code_server);
 var io_client = require('socket.io')(http);
+
+var userSockets = {};
+
 start_server(httpPort);
 
 function App (db) {
@@ -28,19 +31,27 @@ function App (db) {
   };
 
   this.handleConnection = function (socket) {
-    socket.on('joinroom', function (room) {
+    socket.on('joinroom', function (room, username) {
+      socket.leave('home_' + room);
       socket.join(room);
       console.log("Socket joined room " + room);
     });
 
     socket.on('leaveroom', function (room) {
       socket.leave(room);
+      socket.join('home_' + room);
       console.log("Socket left room " + room);
     });
 
     socket.on('request', function (data) {
       console.log('Received request');
-      _this.handleRequest(JSON.parse(data), function (response) {
+      _this.handleRequest(JSON.parse(data), function (response, pids) {
+        if (pids !== undefined) {
+          for (var i = 0; i < pids.length; i++) {
+            socket.join('home_' + pids[i]);
+          }
+          userSockets[JSON.parse(data).username] = socket;
+        }
         socket.emit('requestreply', JSON.stringify(response));
         console.log('Replied to request');
       });
@@ -48,45 +59,29 @@ function App (db) {
 
     socket.on('store', function (data) {
       console.log('Received Store');
-      _this.handleStore(JSON.parse(data), function (response, pid) {
-        if (pid === null) {
-          socket.emit('storereply', JSON.stringify(response));
-        } else if (pid === 'all') {
-          socket.emit('storereply', JSON.stringify(response));
-          socket.broadcast.emit('storereply', JSON.stringify(response));
-        } else {
-          io_client.sockets.in(pid).emit('storereply', JSON.stringify(response));
-        }
-        console.log('Replied to store');
-      });
+      _this.handleStore(JSON.parse(data), socket);
+    console.log('Replied to store');
     });
 
     socket.on('update', function(data) {
       console.log('Received Update');
-      _this.handleUpdate(JSON.parse(data), function (response, success, pid) {
-        if (success) {
-          if (pid === null) {
-            socket.emit('updatereply', JSON.stringify(response));
-          } else {
-            socket.emit('updatereply', JSON.stringify(response));
-            io_client.sockets.in(pid).emit('updatereply', JSON.stringify(response));
-          }
-          console.log('Replied to update');
-        }
-      });
+      _this.handleUpdate(JSON.parse(data), socket);
+      console.log('Replied to update');
     });
 
     socket.on('remove', function (data) {
       console.log('Received Remove');
-      _this.handleRemove(JSON.parse(data), function (response, pid) {
-        if (pid === null) {
-          socket.emit('removereply', JSON.stringify(response));
-          socket.broadcast.emit('removereply', JSON.stringify(response));
-        } else {
-          io_client.sockets.in(pid).emit('removereply', JSON.stringify(response));
+      _this.handleRemove(JSON.parse(data), socket);
+      console.log('Replied to delete');
+    });
+
+    socket.on('disconnect', function () {
+      var keys = Object.keys(userSockets);
+      for (var i = 0; i < keys.length; i++) {
+        if (userSockets[keys[i]] === socket) {
+          delete userSockets[keys[i]];
         }
-        console.log('Replied to delete');
-      });
+      }
     });
   };
 
@@ -135,7 +130,10 @@ function App (db) {
         break;
       case 'user_check' :
         db.checkUserExists(request['username'], function(result){
-          callback({type : 'user_check', result : result});
+          db.getUsersProjects(request['username'], function (pids) {
+
+            callback({type : 'user_check', result : result}, result ? pids : undefined);
+          });
         });
         break;
       case 'project_users' :
@@ -159,7 +157,7 @@ function App (db) {
     }
   };
 
-  this.handleStore = function (store, callback) {
+  this.handleStore = function (store, socket) {
     //TODO: Handle correct store data - not blow up
     //TODO: catch errors and report to client
     switch (store['type']) {
@@ -167,11 +165,11 @@ function App (db) {
         //Returns the new ticket id
         db.newTicket(store['pid'], store['column_id'], function (tid) {
           if (tid !== -1) {
-            callback({type: 'ticket_new', object: {tid: tid, column_id: store['column_id'], pid: store['pid'], desc:'New Ticket'}},
-                store["pid"]);
+            //valid new ticket
+            io_client.sockets.in(store.pid).emit('storereply', JSON.stringify({type: 'ticket_new', object: {tid: tid, column_id: store['column_id'], pid: store['pid'], desc:'New Ticket'}}));
           } else {
-            callback({type: 'ticket_new', object: {tid: "Maxticketlimitreached", column_id: store['column_id'], pid: store['pid']}},
-                null);
+            //invalid
+            socket.emit('storereply', JSON.stringify({type: 'ticket_new', object: {tid: "Maxticketlimitreached", column_id: store['column_id'], pid: store['pid']}}));
           }
         });
         break;
@@ -182,7 +180,8 @@ function App (db) {
               db.newColumn(pid, 'Testing', 2, function () {
                 db.newColumn(pid, 'Done', 3, function () {
                   set_gh_url(pid, store['gh_url']);
-                  callback({type:'project_new', object:pid}, null);
+                  socket.join('home_' + pid);
+                  socket.emit('storereply', JSON.stringify({type:'project_new', object:pid}));
                 });
               });
             });
@@ -191,18 +190,22 @@ function App (db) {
         break;
       case 'column_new':
         db.newColumn(store["pid"], store["column_name"], store["position"], function (cid, column_name, position) {
-          callback({type:'column_new', object:{cid:cid, column_name:column_name, position:position}}, store['pid']);
+          io_client.sockets.in(store.pid).emit('storereply', JSON.stringify({type:'column_new', object:{cid:cid, column_name:column_name, position:position}}));
         });
         break;
       case 'new_user_project':
         db.addUserToProject(store["username"], store["pid"], function(success) {
-          callback({type:'new_user_project'}, 'all');
+          userSockets[store.username].join('home_' + store.pid);
+          io_client.sockets.in(store.pid).emit('storereply', JSON.stringify({type:'new_user_project'}));
+          io_client.sockets.in('home_' + store.pid).emit('storereply', JSON.stringify({type:'new_user_project'}));
+
         });
         break;
       case 'add_ticket_method':
         db.addMethodToTicket(store.pid, store.filename, store.methodname, store.ticket_id, function (startline, endline) {
-          callback({type:'add_ticket_method', ticket_id:store.ticket_id, startline:startline, endline:endline,
-            filename:store.filename, methodname:store.methodname}, store.pid);
+          console.log("sent once");
+          io_client.sockets.in(store.pid).emit('storereply', JSON.stringify({type:'add_ticket_method', ticket_id:store.ticket_id, startline:startline, endline:endline,
+            filename:store.filename, methodname:store.methodname}));
         });
         break;
       default:
@@ -211,59 +214,64 @@ function App (db) {
     }
   };
 
-  this.handleUpdate = function (update, callback) {
+  this.handleUpdate = function (update, socket) {
     //TODO: Handle correct update data - not blow up
     //TODO: catch errors and report to client
     switch (update['type']) {
       case 'ticket_moved':
         db.moveTicket(update['pid'], update['ticket'], update['to'], update['from'], function (success) {
           if (success) {
-            callback({
+            io_client.sockets.in(update.pid).emit('updatereply', JSON.stringify({
               type: 'ticket_moved',
               to_col: update.to,
               from_col: update.from,
               ticket_id: update.ticket.ticket_id
-            }, success, update.pid);
+            }));
+
+            /*socket.emit(JSON.stringify({
+              type: 'ticket_moved',
+              to_col: update.to,
+              from_col: update.from,
+              ticket_id: update.ticket.ticket_id
+            }));*/
           } else {
-            callback({
+            socket.emit('updatereply', JSON.stringify({
               type: 'ticket_moved',
               ticket_id: "Maxticketlimitreached"
-            }, true, null);
+            }));
           }
         });
         break;
 
       case 'ticket_info':
         db.updateTicketDesc(update['pid'], update['ticket'], update['new_description'], function (info) {
-          callback({type:'ticket_info', ticket_id:update.ticket.ticket_id, desc:update.new_description, col:update.ticket.col} ,
-          true, update.pid);
+          io_client.sockets.in(update.pid).emit('updatereply', JSON.stringify({type:'ticket_info', ticket_id:update.ticket.ticket_id, desc:update.new_description, col:update.ticket.col}));
         });
         break;
 
       case 'column_title':
         db.updateColumnTitle(update['cid'], update['pid'], update['new_title'], function (info) {
-          callback({type:'column_title', cid:update.cid, pid:update.pid, title:update.new_title},
-              true, update.pid);
+          io_client.sockets.in(update.pid).emit('updatereply', JSON.stringify({type:'column_title', cid:update.cid, pid:update.pid, title:update.new_title}));
+          io_client.sockets.in('home_' + update.pid).emit('updatereply', JSON.stringify({type:'column_title', cid:update.cid, pid:update.pid, title:update.new_title}));
         });
         break;
 
       case 'ticket_deadline':
         db.updateTicketDeadline(update['pid'], update['ticket'], update['deadline'], function (info) {
-          callback({type:'ticket_deadline', ticket_id:update.ticket.ticket_id, deadline:update.deadline, col:update.ticket.col} ,
-              true, update.pid);
+          io_client.sockets.in(update.pid).emit('updatereply', JSON.stringify({type:'ticket_deadline', ticket_id:update.ticket.ticket_id, deadline:update.deadline, col:update.ticket.col}));
+          io_client.sockets.in('home_' + update.pid).emit('updatereply', JSON.stringify({type:'ticket_deadline', ticket_id:update.ticket.ticket_id, deadline:update.deadline, col:update.ticket.col}));
         });
         break;
       case 'column_moved' :
         db.moveColumn(update['pid'], update['cid'], update['from'], update['to'], function (success) {
           db.getKanban(update['pid'], function (kanban) {
-            callback({type:'column_moved', object:kanban}, success, update.pid);
+            io_client.sockets.in(update.pid).emit('updatereply', JSON.stringify({type:'column_moved', object:kanban}));
           });
         });
         break;
       case 'column_limit' :
         db.updateColumnLimit(update['pid'], update['cid'], update['limit'], function (success) {
-            callback({type: 'column_limit', pid: update['pid'], cid: update['cid'], limit: update['limit']},
-                success, update.pid);
+            io_client.sockets.in(update.pid).emit('updatereply', JSON.stringify({type: 'column_limit', pid: update['pid'], cid: update['cid'], limit: update['limit']}));
         });
         break;
       case 'gh_url' :
@@ -272,7 +280,8 @@ function App (db) {
         set_gh_url(update.pid, update.gh_url);
         //Updates project_table
         db.updateGHURL(update.pid, update.gh_url, function (success) {
-          callback({type : 'gh_url', pid : update.pid, url : update.gh_url}, success, update.pid);
+          io_client.sockets.in(update.pid).emit('updatereply', JSON.stringify({type : 'gh_url', pid : update.pid, url : update.gh_url}, success, update.pid));
+          io_client.sockets.in('home_' + update.pid).emit('updatereply', JSON.stringify({type : 'gh_url', pid : update.pid, url : update.gh_url}, success, update.pid));
         });
 
         break;
@@ -282,54 +291,60 @@ function App (db) {
     }
   };
 
-  this.handleRemove = function (remove, callback) {
+  this.handleRemove = function (remove, socket) {
     //TODO: Handle correct delete data - not blow up
     //TODO: catch errors and report to client
     switch (remove['type']) {
       case 'ticket_remove':
         db.deleteTicket(remove.pid, remove.ticket_id, function (success) {
-              callback({type: 'ticket_remove', pid: remove.pid, ticket_id: remove.ticket_id}, remove.pid);
-            }
-        );
+          io_client.sockets.in(remove.pid).emit('removereply', JSON.stringify({type: 'ticket_remove', pid: remove.pid, ticket_id: remove.ticket_id}));
+          io_client.sockets.in('home_' + remove.pid).emit('removereply', JSON.stringify({type: 'ticket_remove', pid: remove.pid, ticket_id: remove.ticket_id}));
+        });
         break;
       case 'column_remove':
         db.deleteColumn(remove.pid, remove.column_id, remove.column_position, function (success) {
           console.log("Delete column success: " + success);
           db.getKanban(remove['pid'], function (kanban) {
-            callback({type:'column_remove', object:kanban}, remove.pid);
+            io_client.sockets.in(remove.pid).emit('removereply', JSON.stringify({type:'column_remove', object:kanban}, remove.pid));
           });
         });
         break;
       case 'project_remove':
         db.deleteProject(remove.pid, function (success) {
-          callback({type:'project_remove', pid:remove.pid}, null);
+          io_client.sockets.in(remove.pid).emit('removereply', JSON.stringify({type:'project_remove', pid:remove.pid}));
+          io_client.sockets.in('home_' + remove.pid).emit('removereply', JSON.stringify({type:'project_remove', pid:remove.pid}));
         });
         break;
       case 'user_remove' :
         db.removeUser(remove.pid, remove.username, function(success) {
           db.getKanban(remove['pid'], function (kanban) {
-            callback({type:'user_remove', object:kanban}, remove.pid);
+            io_client.sockets.in(remove.pid).emit('removereply', JSON.stringify({type:'user_remove', object:kanban}));
+            io_client.sockets.in('home_' + remove.pid).emit('removereply', JSON.stringify({type:'user_remove', object:kanban}));
           });
         });
         break;
       case "userOfProject_remove" :
         db.removeUserFromProject(remove.username, remove.pid, function (success) {
           db.getKanban(remove['pid'], function (kanban) {
-            callback({type: 'userOfProject_remove', object: kanban}, remove.pid);
+            io_client.sockets.in(remove.pid).emit('removereply', JSON.stringify({type: 'userOfProject_remove', object: kanban}));
+            io_client.sockets.in('home_' + remove.pid).emit('removereply', JSON.stringify({type: 'userOfProject_remove', object: kanban}));
           });
         });
         break;
       case "userOfTicket_remove" :
         db.removeUserFromTicket(remove.username, remove.pid, remove.tid, function(success) {
           db.getKanban(remove['pid'], function (kanban) {
-            callback({type:'userOfTicket_remove', object:kanban}, remove.pid);
+            io_client.sockets.in(remove.pid).emit('removereply', JSON.stringify({type: 'userOfTicket_remove', object: kanban}));
+            io_client.sockets.in('home_' + remove.pid).emit('removereply', JSON.stringify({type: 'userOfTicket_remove', object: kanban}));
           });
         });
         break;
       case 'remove_ticket_method':
         db.removeMethodFromTicket(remove.pid, remove.filename, remove.methodname, remove.ticket_id, function (res) {
-          callback({type:'remove_ticket_method', ticket_id:remove.ticket_id,
-            filename:remove.filename, methodname:remove.methodname}, remove.pid);
+          io_client.sockets.in(remove.pid).emit('removereply', JSON.stringify({type:'remove_ticket_method', ticket_id:remove.ticket_id,
+            filename:remove.filename, methodname:remove.methodname}));
+          io_client.sockets.in('home_' + remove.pid).emit('removereply', JSON.stringify({type:'remove_ticket_method', ticket_id:remove.ticket_id,
+            filename:remove.filename, methodname:remove.methodname}));
         });
         break;
       default:
