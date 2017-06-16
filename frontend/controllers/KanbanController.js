@@ -14,6 +14,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
   }
 
   $scope.goHome = function () {
+    socket.emit('leaveroom', get_kanban_scope().pid);
     $location.path('/home');
   };
 

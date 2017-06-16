@@ -105,6 +105,7 @@ app.controller('HomeController', function($scope, $location, socket) {
 
   $scope.chooseProject = function(proj_id) {
     get_kanban_scope().pid = proj_id;
+    socket.emit('joinroom', proj_id);
     $location.path('/kanban');
   };
 
