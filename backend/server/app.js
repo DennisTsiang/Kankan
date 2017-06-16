@@ -48,7 +48,8 @@ function App (db) {
       _this.handleRequest(JSON.parse(data), function (response, pids) {
         if (pids !== undefined) {
           for (var i = 0; i < pids.length; i++) {
-            socket.join('home_' + pids[i]);
+            console.log("Joined room home_" + pids[i].project_id);
+            socket.join('home_' + pids[i].project_id);
           }
           userSockets[JSON.parse(data).username] = socket;
         }
@@ -313,6 +314,7 @@ function App (db) {
         break;
       case 'project_remove':
         db.deleteProject(remove.pid, function (success) {
+          console.log("Sent delete project " + remove.pid);
           io_client.sockets.in(remove.pid).emit('removereply', JSON.stringify({type:'project_remove', pid:remove.pid}));
           io_client.sockets.in('home_' + remove.pid).emit('removereply', JSON.stringify({type:'project_remove', pid:remove.pid}));
         });

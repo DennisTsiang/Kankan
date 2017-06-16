@@ -84,14 +84,6 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
     }
 
 
-
-    function sendKanbanRequest(pid) {
-      socket.emit('leaveroom', get_kanban_scope().pid);
-      socket.emit('joinroom', pid);
-      sendKanbanRequestHelper(pid);
-    }
-
-
     function printSocketStatus() {
       if (isSocketConnected()) {
         console.log("Client has successfully connected");
@@ -176,6 +168,7 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
       switch (type) {
         case "project_remove" : {
           //Kick out of kanban view, take back to home page?
+          console.log("Received ProjectRemove");
           var pid = reply.pid;
           var currentpath = get_kanban_scope().l.path();
           if (currentpath === '/kanban' && get_kanban_scope().pid === pid) {
