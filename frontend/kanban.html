@@ -252,18 +252,6 @@
       <li>
         <div class="btn-group btn-lg" uib-dropdown=>
           <button type="button" ng-click="goHome()" class="btn btn-link btn-md">Home</button>
-          <button type="button" class="btn btn-link btn" uib-dropdown-toggle>
-              <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
-            <li role="menuitem">
-              <a ng-click="sendKanbanRequest(project.project_id)">{{project.title}}</a>
-            </li>
-
-            <!-- Go to other projects -->
-            <li class="divider" ng-repeat-start="proj in other_projects"></li>
-            <li role="menuitem" ng-repeat-end><a ng-click="sendKanbanRequest(proj.project_id)">{{proj.title}}</a></li>
-          </ul>
         </div>
       </li>
       <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
