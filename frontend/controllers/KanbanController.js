@@ -401,21 +401,17 @@ app.controller('DeadlineCollapseCtrl', function ($scope) {
 
 app.controller('CodeCtrl', function ($scope, $http, socket) {
   $scope.wholeFile = false; //Default
+  editcodescope = $scope;
 
-  let server_response = {'filenames':[], 'methodnames': []};
+  $scope.server_response = {'filenames':[], 'methodnames': []};
 
-  socket.on('requestreply', function(reply_string) {
-    let reply = JSON.parse(reply_string);
-    if (reply.type === 'project_files') {
-      server_response['filenames'] = reply.object;
-    }
-  });
+
 
   $scope.getFile = function(file) {
     $scope.selectedFile = false;
     getProjectFiles(socket, get_kanban_scope().pid, file);
 
-    return server_response['filenames'];
+    return $scope.server_response['filenames'];
   };
 
   $scope.selectFile = function (file, $model, $label, $event) {
@@ -424,42 +420,17 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     $scope.selectedFile = true;
   };
 
-  socket.on('requestreply', function(reply_string) {
-    let reply = JSON.parse(reply_string);
-    if (reply.type === 'file_methods') {
-      server_response['methodnames'] = reply.object;
-    }
-  });
+
 
   $scope.getMethod = function(file, method) {
     $scope.selectedMethod = false;
 
     getFileMethods(socket, get_kanban_scope().pid, file, method);
 
-    return server_response['methodnames'];
+    return $scope.server_response['methodnames'];
   };
 
-  socket.on('storereply', function(reply_string) {
-    let reply = JSON.parse(reply_string);
 
-    if (reply.type === 'add_ticket_method') {
-      let tid = reply.ticket_id;
-      let filename = reply.filename;
-      let methodname = reply.methodname;
-      let endline = reply.endline;
-      let startline = reply.startline;
-
-      let methodObject = {methodname: methodname, startline: startline, endline:endline};
-
-      if (filename in $scope.getTicket(tid).codeData) {
-        $scope.getTicket(tid).codeData[filename]['methods'].push(methodObject);
-      } else {
-        let url = reply.fileurl;
-        $scope.getTicket(tid).codeData[filename]['methods'] = [methodObject];
-        $scope.getTicket(tid).codeData[filename]['download_url'] = url;
-      }
-    }
-  });
 
   $scope.selectMethod = function (method, $model, $label, $event, file) {
     addMethodToTicket(socket, get_kanban_scope().pid, file, method, $scope.getTid());
@@ -473,21 +444,9 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     return ticket.codeData;
   };
 
-  socket.on('removereply', function(reply_string) {
-    let reply = JSON.parse(reply_string);
 
-    if (reply.type === 'remove_ticket_method') {
-      let tid = reply.ticket_id;
-      let filename = reply.filename;
-      let methodname = reply.methodname;
 
-      if (filename in $scope.getTicket(tid).codeData) {
-        removeMethod($scope.getTicket(tid).codeData, filename, methodname);
-      }
-    }
-  });
-
-  function removeMethod(files, filename, method) {
+  $scope.removeMethodT = function(files, filename, method) {
     let methodnames = [];
     for (let i = 0; i < files[filename].length; i++) {
       let indexedmethodname = files[filename][i];
@@ -496,7 +455,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
       }
     }
     files[filename] = methodnames;
-  }
+  };
 
   $scope.removeMethod = function (filename, method) {
     removeMethodFromTicket(socket, get_kanban_scope().pid, filename, method, $scope.getTid());

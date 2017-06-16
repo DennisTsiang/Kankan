@@ -1,8 +1,9 @@
+var editcodescope;
+
 app.controller('ApplicationCtrl', function($scope, $location, socket) {
   $scope.projects = [];
   $scope.project = undefined;
   $scope.pid = undefined;
-
   $scope.l = $location;
 
   socket.on('connect', function () {
@@ -28,8 +29,61 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
         removeHandler(socket, JSON.parse(reply));
       });
 
-      printSocketStatus();
+      socket.on('requestreply', function(reply_string) {
+        let reply = JSON.parse(reply_string);
+        if (reply.type === 'file_methods') {
+          editcodescope.server_response['methodnames'] = reply.object;
+        }
+      });
+
+      socket.on('requestreply', function(reply_string) {
+        let reply = JSON.parse(reply_string);
+        if (reply.type === 'project_files') {
+          editcodescope.server_response['filenames'] = reply.object;
+        }
+      });
+
+      socket.on('storereply', function(reply_string) {
+        let reply = JSON.parse(reply_string);
+
+        if (reply.type === 'add_ticket_method') {
+          let tid = reply.ticket_id;
+          let filename = reply.filename;
+          let methodname = reply.methodname;
+          let endline = reply.endline;
+          let startline = reply.startline;
+
+          let methodObject = {methodname: methodname, startline: startline, endline:endline};
+
+          if (filename in editcodescope.getTicket(tid).codeData) {
+            editcodescope.getTicket(tid).codeData[filename]['methods'].push(methodObject);
+          } else {
+            let url = reply.fileurl;
+            editcodescope.getTicket(tid).codeData[filename] = {};
+            editcodescope.getTicket(tid).codeData[filename]['methods'] = [methodObject];
+            editcodescope.getTicket(tid).codeData[filename]['download_url'] = url;
+          }
+        }
+      });
+
+      socket.on('removereply', function(reply_string) {
+        let reply = JSON.parse(reply_string);
+
+        if (reply.type === 'remove_ticket_method') {
+          let tid = reply.ticket_id;
+          let filename = reply.filename;
+          let methodname = reply.methodname;
+
+          if (filename in editcodescope.getTicket(tid).codeData) {
+            editcodescope.removeMethodT(editcodescope.getTicket(tid).codeData, filename, methodname);
+          }
+        }
+      });
+
+        printSocketStatus();
     }
+
+
 
     function sendKanbanRequest(pid) {
       socket.emit('leaveroom', get_kanban_scope().pid);
