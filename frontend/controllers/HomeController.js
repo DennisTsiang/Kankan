@@ -1,7 +1,7 @@
 var users = {};
 var userpics = {
   "yianni": "yianni.jpg",
-  "thomas": "tom_derp.jpg",
+  "thomas": "tom.jpg",
   "Dennis": "Dennis.jpg",
   "harry": "harry.jpg"
 };
@@ -94,7 +94,6 @@ app.controller('HomeController', function($scope, $location, socket) {
   } else {
     $scope.username = get_kanban_scope().username;
     users = {};
-    userpics = {"yianni": "yianni.jpg","thomas": "tom.jpg"};
     getUserProjects(socket, $scope.username);
     $scope.a_k = get_kanban_scope();
   }
