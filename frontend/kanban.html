@@ -205,7 +205,9 @@
                            ondrop="angular.element(this).scope().handleColumnDrop(event)">
                       <tr>
                         <th class="column-title">
-                          <p editable-textarea="project.columns[col].title" onaftersave="updateColTitle(project.columns[col], project.columns[col].title)">{{project.columns[col].title || 'empty'}}</p>
+                          <div class="form-group">
+                            <input type="text" style="text-align: center" class="form-control" ng-model="project.columns[col].title" ng-change="updateColTitle(project.columns[col], project.columns[col].title)" placeholder="Column title">
+                          </div>
                         </th>
                       </tr>
                       <tr>

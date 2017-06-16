@@ -449,13 +449,18 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
   $scope.removeMethodT = function(files, filename, method) {
     let methodnames = [];
-    for (let i = 0; i < files[filename].length; i++) {
-      let indexedmethodname = files[filename][i];
+    for (let i = 0; i < files[filename].methods.length; i++) {
+      console.log(files[filename].methods);
+      let indexedmethodname = files[filename].methods[i].methodname;
       if (indexedmethodname !== method) {
-        methodnames.push(indexedmethodname);
+        methodnames.push(files[filename].methods[i]);
       }
     }
-    files[filename] = methodnames;
+    if (methodnames.length === 0) {
+      delete files[filename];
+    } else {
+      files[filename].methods = methodnames;
+    }
   };
 
   $scope.removeMethod = function (filename, method) {

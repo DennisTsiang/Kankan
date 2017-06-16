@@ -38,6 +38,8 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
 
       socket.on('requestreply', function(reply_string) {
         let reply = JSON.parse(reply_string);
+
+        console.log(get_kanban_scope().project);
         if (reply.type === 'project_files') {
           editcodescope.server_response['filenames'] = reply.object;
         }
@@ -68,7 +70,6 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
 
       socket.on('removereply', function(reply_string) {
         let reply = JSON.parse(reply_string);
-
         if (reply.type === 'remove_ticket_method') {
           let tid = reply.ticket_id;
           let filename = reply.filename;
