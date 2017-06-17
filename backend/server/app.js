@@ -205,10 +205,10 @@ function App (db) {
         });
         break;
       case 'add_ticket_method':
-        db.addMethodToTicket(store.pid, store.filename, store.methodname, store.ticket_id, function (startline, endline) {
+        db.addMethodToTicket(store.pid, store.filename, store.methodname, store.ticket_id, function (startline, endline, fileurl) {
           console.log("sent once");
           io_client.sockets.in(store.pid).emit('storereply', JSON.stringify({type:'add_ticket_method', ticket_id:store.ticket_id, startline:startline, endline:endline,
-            filename:store.filename, methodname:store.methodname}));
+            filename:store.filename, methodname:store.methodname, fileurl:fileurl}));
         });
         break;
       default:

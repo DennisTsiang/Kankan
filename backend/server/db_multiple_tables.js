@@ -487,11 +487,11 @@ function Database(pool) {
     rwlock.writeLock(function () {
       pool.query('INSERT INTO ticket_files_' + pid + ' VALUES($1::text, $2::text, $3::int)',
           [filename, methodname, ticket_id], function () {
-        pool.query('SELECT startline, endline FROM github_table_' + pid +
+        pool.query('SELECT startline, endline, download_url FROM github_table_' + pid +
             ' WHERE filename=$1::text AND methodname=$2::text', [filename, methodname], function (res) {
           if (res.rows.length === 1) {
             rwlock.unlock();
-            callback(res.rows[0].startline, res.rows[0].endline);
+            callback(res.rows[0].startline, res.rows[0].endline, res.rows[0].download_url);
           } else {
             rwlock.unlock();
           }
