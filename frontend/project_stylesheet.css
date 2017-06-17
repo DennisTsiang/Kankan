@@ -34,6 +34,23 @@
 
 }
 
+.top-login-nav nav {
+  border-style: solid;
+  border-color: black;
+  border-bottom-width: 1px;
+  padding-right: 17px;
+}
+
+.top-login-nav {
+  margin-bottom: 30px;
+  overflow: auto;
+  clear: both;
+}
+
+.below-nav .jumbotron {
+   height: 100vh;
+}
+
 img {
   border-radius: 10px;
 }
@@ -177,9 +194,10 @@ div {
   border-bottom: 1px;
 }
 
+
 .username-title {
   text-align: center;
-  font-size: 30px;
+  font-size: 15x;
   margin-top: auto;
   margin-bottom: auto;
 }
