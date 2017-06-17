@@ -73,7 +73,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
     }
   };
 
-  $scope.onlyUserTickets = false; //Default
+  $scope.onlyUserTickets = true; //Default
   $scope.toggleOnlyUserTickets(); //Set default message
 
   for (let ticket in $scope.project.tickets) {
