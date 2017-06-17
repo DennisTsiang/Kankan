@@ -56,6 +56,7 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
 
           let methodObject = {methodname: methodname, startline: startline, endline:endline};
 
+          console.log(reply);
           if (filename in editcodescope.getTicket(tid).codeData) {
             editcodescope.getTicket(tid).codeData[filename]['methods'].push(methodObject);
           } else {

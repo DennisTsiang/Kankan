@@ -486,7 +486,10 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
   $scope.getTicketCodeData = function () {
     let ticket = $scope.getTicket($scope.getTid());
-    //See if ticket contains no data
+
+    //Remove null data
+    delete ticket.codeData.null;
+
     return ticket.codeData;
   };
 
