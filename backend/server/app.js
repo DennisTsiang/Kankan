@@ -116,7 +116,7 @@ function App (db) {
         break;
       case 'user_tickets':
         db.getUserTickets(request["username"], request["pid"], function (tickets) {
-          callback({type:'user_tickets', object:tickets});
+          callback({type:'user_tickets', object:{pid:request.pid, tickets:tickets}});
         });
         break;
       case 'ticket_users':

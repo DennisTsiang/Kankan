@@ -6,7 +6,6 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
     //Enable popovers
     $('[data-toggle="popover"]').popover();
 
-    sendKanbanRequest(socket, get_kanban_scope().pid);
 
     $scope.sendKanbanRequest = function(pid) {
       sendKanbanRequest(socket, pid);

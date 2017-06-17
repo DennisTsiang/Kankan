@@ -39,7 +39,6 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
       socket.on('requestreply', function(reply_string) {
         let reply = JSON.parse(reply_string);
 
-        console.log(get_kanban_scope().project);
         if (reply.type === 'project_files') {
           editcodescope.server_response['filenames'] = reply.object;
         }
@@ -105,8 +104,12 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
       switch (type) {
         case "tickets" : {
           if(get_kanban_scope().project !== undefined){
-          generateTickets(request_data.tickets);
-        }
+            var currentpath = get_kanban_scope().l.path();
+            generateTickets(request_data.tickets);
+            if (currentpath === '/home') {
+              get_kanban_scope().l.path('/kanban');
+            }
+          }
           break;
         }
         case "kanban" : {
@@ -125,7 +128,7 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
           break;
         }
         case "user_tickets": {
-          var tickets = reply.object.tickets;
+          //generateTickets(request_data);
           break;
         }
         case "ticket_users": {
@@ -169,7 +172,6 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
       switch (type) {
         case "project_remove" : {
           //Kick out of kanban view, take back to home page?
-          console.log("Received ProjectRemove");
           var pid = reply.pid;
           var currentpath = get_kanban_scope().l.path();
           if (currentpath === '/kanban' && get_kanban_scope().pid === pid) {
@@ -191,7 +193,7 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
           if (project_id == get_kanban_scope().pid) {
             delete_ticket(ticket_id);
           } else {
-            console.error("Getting deletion info for different project.")
+
           }
           break;
         }

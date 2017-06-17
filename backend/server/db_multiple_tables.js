@@ -154,7 +154,7 @@ function Database(pool) {
           ') AS t2 ON t1.ticket_id = t2.ticket_id ORDER BY t1.ticket_id ASC',
           [], function(res) {
         var tickets = [];
-        if (res.rows.length > 1) {
+        if (res.rows.length >= 1) {
           var row = res.rows[0];
           var current_ticket = row['ticket_id'];
           var files = [];
@@ -530,17 +530,23 @@ function Database(pool) {
 
   this.getUserTickets = function (username, pid, callback) {
     rwlock.readLock(function () {
-      pool.query('SELECT ticket_id FROM user_tickets WHERE username = $1::text AND ' +
-          'project_id = $2::int', [username, pid], function (res) {
+      pool.query('SELECT * FROM (SELECT * FROM user_tickets where username = $1::text AND project_id = $2::int) as t1 ' +
+          'natural join tickets_' + pid, [username, pid], function (res) {
         if (res.rows.length > 0) {
-          var array = [];
+          var tickets = [];
           for (var row of res.rows) {
-            array.push(row.ticket_id);
+            var current_ticket = row['ticket_id'];
+            var column_id = row["column_id"];
+            var ticket_description = row["ticket_description"];
+            var deadline = row["deadline"];
+            tickets.push(new ticket.Ticket(current_ticket, column_id,
+                ticket_description, deadline, []));
           }
           rwlock.unlock();
-          callback(array);
+          callback(tickets);
         } else {
           rwlock.unlock();
+          callback([]);
           console.error("User does not have any tickets assigned to it with pid: " + pid);
         }
       });

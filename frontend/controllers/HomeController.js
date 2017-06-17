@@ -8,13 +8,12 @@ var userpics = {
 
 app.controller('HomeController', function($scope, $location, socket) {
 
-  console.log("start projects is " + JSON.stringify($scope.projects));
+
 
 
   socket.on('requestreply', function(reply_string) {
     let reply = JSON.parse(reply_string);
-    if (reply.type === "tickets") {
-      console.log("ticket reply");
+    if (reply.type === "user_tickets") {
 
       let title = $scope.projects[reply.object.pid].title;
       let gh_url = $scope.projects[reply.object.pid].gh_url;
@@ -26,17 +25,6 @@ app.controller('HomeController', function($scope, $location, socket) {
       $scope.showDeadlines(project);
 
     } else if (reply.type === "project_users") {
-      console.log("made new " + reply.object.pid);
-    }
-  });
-  socket.on('requestreply', function(reply_string) {
-
-    let reply = JSON.parse(reply_string);
-
-    if (reply.type === "project_users") {
-
-      console.log("catching project users");
-      console.log("project users reply is " + JSON.stringify(reply));
 
       let project = $scope.projects[reply.object.pid];
 
@@ -48,11 +36,7 @@ app.controller('HomeController', function($scope, $location, socket) {
       for (var memberid in project.members) {
         let member = project.members[memberid];
 
-        console.log("users member is " + JSON.stringify(users[member]));
-
         if (users[member] === {} || users[member] === undefined) {
-          console.log("adding " + member);
-
           let profilepic = userpics[member];
 
           users[member] = new User(member, profilepic);
@@ -71,12 +55,10 @@ app.controller('HomeController', function($scope, $location, socket) {
     }
   });
 
-
   $scope.showDeadlines = function(project) {
-
     project.upcomingDeadlines = [];
 
-    for (tickethash in project.tickets) {
+    for (var tickethash in project.tickets) {
       let ticket = project.tickets[tickethash];
 
       if (ticket.datetime != null) {
@@ -99,13 +81,13 @@ app.controller('HomeController', function($scope, $location, socket) {
   }
 
   //sendAllProjectUserRequest()
-  //Do this because the other one is dependend on get kanban scope
+  //Do this because the other one is depended on get kanban scope
 
 
   $scope.chooseProject = function(proj_id) {
     get_kanban_scope().pid = proj_id;
     socket.emit('joinroom', proj_id);
-    $location.path('/kanban');
+    sendKanbanRequest(socket, proj_id);
   };
 
   $scope.deleteProject = function(proj_id) {
