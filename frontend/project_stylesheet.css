@@ -13,6 +13,10 @@
     float: left;
 
   }
+
+  .top-login-nav {
+    margin-bottom: 30px;
+  }
 }
 
 @media only screen and (max-width: 768px) {
@@ -32,6 +36,10 @@
 
   }
 
+  .top-login-nav {
+    margin-bottom: 150px;
+  }
+
 }
 
 .top-login-nav nav {
@@ -42,7 +50,6 @@
 }
 
 .top-login-nav {
-  margin-bottom: 30px;
   overflow: auto;
   clear: both;
 }
