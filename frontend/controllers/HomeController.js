@@ -1,16 +1,12 @@
 var users = {};
 var userpics = {
   "yianni": "yianni.jpg",
-  "thomas": "tom.jpg",
+  "thomas": "tom_derp.jpg",
   "Dennis": "Dennis.jpg",
   "harry": "harry.jpg"
 };
 
 app.controller('HomeController', function($scope, $location, socket) {
-
-
-
-
   socket.on('requestreply', function(reply_string) {
     let reply = JSON.parse(reply_string);
     if (reply.type === "user_tickets") {
@@ -18,7 +14,12 @@ app.controller('HomeController', function($scope, $location, socket) {
       let title = $scope.projects[reply.object.pid].title;
       let gh_url = $scope.projects[reply.object.pid].gh_url;
       let project = new Project(reply.object.pid);
-      project.tickets = reply.object.tickets;
+      let replyTickets = reply.object.tickets;
+
+      for (let i = 0; i < replyTickets.length; i++) {
+        project.tickets[replyTickets[i].id] = replyTickets[i];
+      }
+
       project.title = title;
       project.gh_url = gh_url;
       $scope.projects[reply.object.pid] = project;
@@ -33,7 +34,7 @@ app.controller('HomeController', function($scope, $location, socket) {
         project.users = {};
       }
 
-      for (var memberid in project.members) {
+      for (let memberid in project.members) {
         let member = project.members[memberid];
 
         if (users[member] === {} || users[member] === undefined) {

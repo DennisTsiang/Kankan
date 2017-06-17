@@ -256,6 +256,8 @@
       </li>
       <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
 
+      <li><a href="" ng-click="toggleOnlyUserTickets()">{{ticketsToggle}}</a></li>
+
     </ul>
     <ul class="nav navbar-right"></ul>
     <ul class="nav navbar-right">
@@ -295,11 +297,14 @@
                 ondrop="angular.element(this).scope().handleTicketDrop(event)"
                 cid="{{project.columns[col].column_id}}">
               <!-- Tickets -->
-              <div ng-repeat="ticket in project.columns[col].tickets" ng-click="$ctrl.open_ticket_editor(ticket.ticket_id)"
+              <div ng-repeat="ticket in (onlyUserTickets ? getColumnUserTickets(col) : project.columns[col].tickets)" ng-click="$ctrl.open_ticket_editor(ticket.ticket_id)"
                    ng-style="border = getBorderColour(ticket.timeLeft, ticket.deadlineActive)"
                    draggable="true" id="{{ticket.ticket_id}}" ondragstart="angular.element(this).scope().handleTicketDragStart(event)" class="ticket">
                 <h3>{{ticket.desc}}</h3>
                 <h4>{{ticket.isTimeLeft}} {{ticket.timeLeftFormatted}} {{ticket.timeFormatter}}</h4>
+                <div>
+                  <img class="projmembers" ng-repeat="member in getTicketMembers(pid, ticket.ticket_id)" ng-src="{{member.image}}" ng-attr-title="{{member.username}}"/>
+                </div>
                 <!--
                   <uib-progressbar class="progress-striped active" value="ticket.progress" type="{{ticket.deadlineState}}">{{ticket.progress}} <i ng-show="showWarning">Close to Deadline</i></uib-progressbar>
                   -->

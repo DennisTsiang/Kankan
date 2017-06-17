@@ -63,6 +63,52 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
 
   };
 
+  $scope.toggleOnlyUserTickets = function () {
+    $scope.onlyUserTickets = !$scope.onlyUserTickets;
+
+    if ($scope.onlyUserTickets) {
+      $scope.ticketsToggle = "Show all tickets";
+    } else {
+      $scope.ticketsToggle = "Show my tickets";
+    }
+  };
+
+  $scope.onlyUserTickets = false; //Default
+  $scope.toggleOnlyUserTickets(); //Set default message
+
+  for (let ticket in $scope.project.tickets) {
+    getTicketUsers(socket, get_kanban_scope().pid, ticket);
+  }
+
+  $scope.getColumnUserTickets = function (cid) {
+    let column = $scope.project.columns[cid];
+
+    let userTickets = {};
+
+    for (let ticket in column.tickets) {
+      for (let i = 0; i < column.tickets[ticket].members.length; i++) {
+        if ($scope.username === column.tickets[ticket].members[i]) {
+          userTickets[ticket] = column.tickets[ticket];
+        }
+      }
+    }
+
+    return userTickets;
+  };
+
+  $scope.getTicketMembers = function (pid, tid) {
+    let projectMembers = $scope.projects[pid].users;
+    let ticketMembers = $scope.project.tickets[tid].members;
+
+    let ticketUsers = {};
+
+    for (let i = 0; i < ticketMembers.length; i++) {
+      ticketUsers[ticketMembers[i]] = projectMembers[ticketMembers[i]];
+    }
+
+    return ticketUsers;
+  };
+
   let id = null;
   let dragSrcEl = null;
   $scope.handleTicketDragStart = function (e) {
@@ -449,7 +495,6 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
   $scope.removeMethodT = function(files, filename, method) {
     let methodnames = [];
     for (let i = 0; i < files[filename].methods.length; i++) {
-      console.log(files[filename].methods);
       let indexedmethodname = files[filename].methods[i].methodname;
       if (indexedmethodname !== method) {
         methodnames.push(files[filename].methods[i]);
