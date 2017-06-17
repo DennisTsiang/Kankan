@@ -48,7 +48,9 @@
 }
 
 .below-nav .jumbotron {
-   height: 100vh;
+
+  margin-bottom:0px;
+  padding-bottom: 0px;
 }
 
 img {
