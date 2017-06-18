@@ -100,6 +100,27 @@ app.controller('HomeController', function($scope, $location, socket) {
 
 });
 
+app.controller('CarouselCtrl', function($scope){
+
+  $scope.pics = [];
+
+  $scope.urls = ["kankan-example-1.png", "tom_derp.jpg"];
+  $scope.descs = ["kankan", "tom"];
+
+  $scope.addPic = function(index){
+
+    $scope.pics.push({image:$scope.urls[index],desc:$scope.descs[index], id:index});
+
+  }
+
+  for(var i = 0; i < $scope.urls.length; i++){
+    $scope.addPic(i);
+
+  }
+
+
+});
+
 app.controller('NewProjectPopoverCtrl', function($scope, $sce, socket) {
   $scope.dynamicPopover = {
     templateUrl: 'NewProjectPopover.html'

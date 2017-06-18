@@ -3,9 +3,9 @@
   <div class="top-login-nav">
     <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
       <div class="navbar-header">
-             <a class="navbar-brand" href="#">
-             <img src="KanKan.png"></a>
-           </div>
+        <a class="navbar-brand" href="#">
+          <img src="KanKan.png"></a>
+      </div>
 
 
 
@@ -27,20 +27,48 @@
 
   <div class="jumbotron">
 
-    <img class="img-responsive" src="kankan-example-1.png"></div>
+    <div ng-controller="CarouselCtrl">
+        <div uib-carousel active="active">
+          <div uib-slide ng-repeat="pic in pics track by pic.id" index="pic.id">
+            <img ng-src="{{pic.image}}" style="margin:auto;">
+            <div class="carousel-caption">
+              <h4>{{pic.desc}}</h4>
+            </div>
+          </div>
+        </div>
+
+    </div>
+
+
+
+
+  </div>
 
   <div class="kankan-description">
     <div class="row">
       <div class="col-sm-1"></div>
       <div class="col-sm-4">
         <h2>What is Kankan?</h2>
-        <p>Kankan is a project management system based on the use of a kanban</p>
+        <p>Kankan is a project management system based on the use of a kanban.</p>
+        <p>Kankan offers a an easy way to make sure you meet all of your deadlines for any kind of tasks. You can share your projects with friends and co-workers easily and control which tasks they are assigned to!</p>
       </div>
 
       <div class="col-sm-2"></div>
       <div class="col-sm-4">
         <h2>Who is Kankan for?</h2>
+        <p>Kankan is for everyone who has something to do. You could be a teacher, student, developer or even just someone who has chores to do, we can help you manage your work.</p>
       </div>
+      <div class="col-sm-1"></div>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-1"></div>
+      <div class="col-sm-4">
+        <h2>Developers</h2>
+        <p>Kankan offers support for github, here you can link in a gitbug repository andconnect to all of your files and different functions in your code.</p>
+      </div>
+      <div class="col-sm-2"></div>
+      <div class="col-sm-4"></div>
       <div class="col-sm-1"></div>
 
     </div>

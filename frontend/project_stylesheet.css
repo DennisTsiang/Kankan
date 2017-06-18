@@ -15,7 +15,7 @@
   }
 
   .top-login-nav {
-    margin-bottom: 150px;
+    margin-bottom: 50px;
   }
 }
 
@@ -49,6 +49,15 @@
   padding-right: 17px;
 }
 
+h2 ~ p {
+  font-style: normal;
+  font-size: 22px;
+}
+
+h2 {
+  font-weight: bold;
+}
+
 .top-login-nav {
   overflow: auto;
   clear: both;
@@ -58,6 +67,7 @@
 
   margin-bottom:0px;
   padding-bottom: 0px;
+  background-color: white;
 }
 
 img {
