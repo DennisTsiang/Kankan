@@ -15,7 +15,7 @@
   }
 
   .top-login-nav {
-    margin-bottom: 30px;
+    margin-bottom: 150px;
   }
 }
 
@@ -65,7 +65,7 @@ img {
 }
 
 .ticket-upcoming {
-  width: 125px;
+  width: 120px;
   display: flex;
   flex-direction: column;
   min-height:75px;
