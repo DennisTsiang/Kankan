@@ -89,7 +89,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
 
   $scope.handleTicketDragOver = function(e) {
     e.preventDefault();
-    $(e.toElement).closest('.ticket-column')[0].style.border = "thick solid #0000FF";
+    $(e.toElement).closest('.ticket-column')[0].style.border = "6px solid #0000FF";
   };
 
   $scope.handleTicketDrop = function(e) {
@@ -109,7 +109,6 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
       e.toElement.style.border = "";
       $(e.toElement).closest('.ticket-column')[0].style.border = "5px solid white";
     }
-
   };
 
   $scope.addBTN = function() {
