@@ -103,9 +103,13 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
 
     sendTicketUpdateMoved(socket, scope.project.tickets[id], get_kanban_scope().pid, end_col_id, start_col_id);
 
-    $(e.toElement).closest('.ticket-column')[0].style.border = "5px solid white";
-    e.srcElement.style.border = "";
-    e.toElement.style.border = "";
+    var isTicket = e.toElement.className.includes('ticket ');
+    if (!isTicket) {
+      e.srcElement.style.border = "";
+      e.toElement.style.border = "";
+      $(e.toElement).closest('.ticket-column')[0].style.border = "5px solid white";
+    }
+
   };
 
   $scope.addBTN = function() {
