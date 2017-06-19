@@ -291,7 +291,7 @@
                 cid="{{project.columns[col].column_id}}">
               <!-- Tickets -->
               <div ng-repeat="ticket in (onlyUserTickets ? getColumnUserTickets(col) : project.columns[col].tickets)" ng-click="$ctrl.open_ticket_editor(ticket.ticket_id)"
-                   ng-style="border = getBorderColour(ticket.timeLeft, ticket.deadlineActive)"
+                   ng-style="{border: ticket.borderColour }"
                    draggable="true" id="{{ticket.ticket_id}}" ondragstart="angular.element(this).scope().handleTicketDragStart(event)" class="ticket">
                 <h3>{{ticket.desc}}</h3>
                 <h4>{{ticket.isTimeLeft}} {{ticket.timeLeftFormatted}} {{ticket.timeFormatter}}</h4>
