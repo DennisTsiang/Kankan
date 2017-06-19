@@ -213,7 +213,7 @@
                       <tr>
                         <td class="column-title" style="text-align: center;">
                           <div class="form-group">
-                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" ng-model="newLimit" ng-init="newLimit = project.columns[col].limit" placeholder="Ticket limit" ng-change="updateColLimitEvent(col, newLimit)">
+                            <input type="text" class="form-control" style="text-align: center" cid="{{col}}" ng-model="project.columns[col].limit" placeholder="Ticket limit" ng-change="updateColLimitEvent(col, project.columns[col].limit)">
                           </div>
                         </td>
                       </tr>
