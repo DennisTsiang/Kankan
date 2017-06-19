@@ -1,18 +1,16 @@
 <div class="container-fluid">
 
   <div class="top-login-nav">
-    <nav id="optionsbar" class="nav navbar-default navbar-fixed-top" style="background-color:#65aed6">
+    <nav id="optionsbar" class="nav navbar-default navbar-fixed-top transparent">
       <div class="navbar-header">
         <a class="navbar-brand" href="#">
-          <!--<img src="KanKan.png">-->KanKan</a>
+          <img src="KanKanLogo.png" style="width:50px; height:39px"></a>
 
       </div>
 
 
 
       <form class="navbar-form navbar-right">
-        <label class="username-title" style="color:white" for="usr">Enter username</label>
-
         <input type="text" class="form-control username" placeholder="Username" id="usr" ng-model="username">
         <button type=submit class="btn btn-primary" ng-click="login(username)">Login</button>
         <button type=submit class="btn btn-primary" ng-click="newUser(username)">Sign Up</button>
@@ -26,22 +24,8 @@
 
 <div class="below-nav">
 
-  <div class="jumbotron">
-
-    <div ng-controller="CarouselCtrl">
-        <div uib-carousel active="active">
-          <div uib-slide ng-repeat="pic in pics track by pic.id" index="pic.id">
-            <img ng-src="{{pic.image}}" style="margin:auto;">
-            <div class="carousel-caption">
-              <h4>{{pic.desc}}</h4>
-            </div>
-          </div>
-        </div>
-
-    </div>
-
-
-
+  <div class="jumbotron vertical-align">
+    <img ng-src="KanKan.png" class="img-responsive">
 
   </div>
 
