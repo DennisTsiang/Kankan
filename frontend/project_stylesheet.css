@@ -79,6 +79,8 @@ h2 {
   height: 111vh;
   background-color: white;
   background-image: url("background.jpg");
+  background-size: cover;
+
 }
 
 .jumbotron img{
