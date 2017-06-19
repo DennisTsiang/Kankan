@@ -123,7 +123,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
 
   $scope.handleTicketDragLeave = function(e) {
     e.toElement.style.border = "";
-    $(e.toElement).closest('.ticket-column')[0].style.border = ""
+    $(e.toElement).closest('.ticket-column')[0].style.border = "5px solid white"
   };
 
   $scope.handleTicketDragOver = function(e) {
@@ -142,7 +142,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
 
     sendTicketUpdateMoved(socket, scope.project.tickets[id], get_kanban_scope().pid, end_col_id, start_col_id);
 
-    $(e.toElement).closest('.ticket-column')[0].style.border = "";
+    $(e.toElement).closest('.ticket-column')[0].style.border = "5px solid white";
     e.srcElement.style.border = "";
     e.toElement.style.border = "";
   };

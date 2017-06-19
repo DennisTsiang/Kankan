@@ -63,6 +63,13 @@ h2 {
   clear: both;
 }
 
+.cog-dropdown {
+  font-size: 30px;
+  color: white;
+  margin-top: 10px;
+  margin-right: 13px;
+}
+
 .below-nav .jumbotron {
 
   margin-bottom:0px;
@@ -87,6 +94,12 @@ img {
   background-color: #e8eaeb;
   float: left;
 
+}
+
+body {
+  /*background-image: url("pattern2background.png");
+  background-color: #ff8080;*/
+  background-color: #aaeeeb;
 }
 
 .row button {
@@ -172,6 +185,10 @@ div {
   margin-bottom: 5px;
 }
 
+.kanbantable {
+  border: 5px solid white;
+}
+
 .ticket-column {
 
 }
@@ -243,6 +260,13 @@ div {
   flex-grow: 1;
   text-align: center;
 }
+
+.btn-primary {
+  color: #fff;
+  background-color: #7f5891;
+  border-color: #4d3b55;
+}
+
 
 .button-centered {
   text-align: center;

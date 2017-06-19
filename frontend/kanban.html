@@ -242,7 +242,7 @@
 </script>
 
 <div id="kanban_location" ng-controller="KanbanCtrl">
-  <nav id="optionsbar" class="nav navbar-default navbar-fixed-top">
+  <nav id="optionsbar" class="nav navbar-default navbar-fixed-top" style="background-color:#65aed6">
 
     <ul class="nav navbar-nav navbar-left vertical-align">
         <!-- Add buttons -->
@@ -250,22 +250,17 @@
 
       <!-- Button for user to return to home page - select other project from there. -->
       <li>
-        <div class="btn-group btn-lg" uib-dropdown=>
-          <button type="button" ng-click="goHome()" class="btn btn-link btn-md">Home</button>
-        </div>
+          <a href="" ng-click="goHome()"  style="color:white" ><strong>Home</strong></a>
       </li>
-      <li><a href="" ng-click="$ctrl.open_edit_column()" class="btn ">Edit Columns</a></li>
+      <li><a href="" ng-click="$ctrl.open_edit_column()"  style="color:white"><strong>Edit Columns</strong></a></li>
 
-      <li><a href="" ng-click="toggleOnlyUserTickets()">{{ticketsToggle}}</a></li>
+      <li><a href="" ng-click="toggleOnlyUserTickets()"  style="color:white"><strong>{{ticketsToggle}}</strong></a></li>
 
     </ul>
     <ul class="nav navbar-right"></ul>
     <ul class="nav navbar-right">
-      <div class="btn-group button-centered vertical-align" ng-controller="DropdownCtrl as $ctrl">
-        <button type="button" class="btn btn-default dropdown-toggle btn-lg" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <span class="caret"></span>
-          <span class="sr-only">Toggle Dropdown</span>
-        </button>
+      <div ng-controller="DropdownCtrl as $ctrl">
+          <span class="glyphicon glyphicon-cog cog-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></span>
         <ul class="dropdown-menu pull-right">
           <li><a ng-click="$ctrl.openAddUsers('sm', project)">Add Users</a></li>
           <li><a ng-click="$ctrl.openDeleteProject('sm', project)">Delete Project</a></li>
@@ -273,7 +268,7 @@
         </ul>
       </div>
     </ul>
-    <a class="navbar-brand navbar-right project-title" id="project_title">
+    <a class="navbar-brand navbar-right project-title" id="project_title" style="color:white">
       <!-- Project title -->
       {{project.title}}
     </a>
@@ -285,13 +280,13 @@
     <div class="row">
       <!-- Kanban table -->
       <div class="col-xs-12">
-        <table id="kanban" class="table table-bordered">
+        <table id="kanban" class="table table-bordered kanbantable">
           <tr>
-            <th class="column-title" ng-repeat="col in project.column_order">{{project.columns[col].title}}</th>
+            <th class="column-title" style="border: 5px solid white" ng-repeat="col in project.column_order">{{project.columns[col].title}}</th>
           </tr>
 
           <tr>
-            <td ng-repeat="col in project.column_order" class="ticket-column"
+            <td ng-repeat="col in project.column_order" class="ticket-column" style="border: 5px solid white"
                 ondragleave="angular.element(this).scope().handleTicketDragLeave(event)"
                 ondragover="angular.element(this).scope().handleTicketDragOver(event)"
                 ondrop="angular.element(this).scope().handleTicketDrop(event)"
