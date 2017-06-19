@@ -10,7 +10,6 @@ function Project(project_id){
   this.title = "";
   this.upcomingDeadlines = [];
   this.users = {};
-  this.definecheck = true;
 
   this.repositoryUrl = "";
   this.gh_url = "";

@@ -43,7 +43,6 @@ function generateTickets(ticket_info_list) {
     addTicket(ticket_info.column_id, ticket_info.id, ticket_info.desc, ticket_info.datetime, ticket_info.files);
   }
   updateTicketTimes();
-  updateTickets();
 }
 
 function generate_kanban(received_project) {
@@ -98,7 +97,10 @@ function generate_other_user_kanbans() {
 }
 
 function updateTickets() {
-  setInterval(updateTicketTimes, 10000);
+  setInterval(function () {
+    updateTicketTimes();
+    get_kanban_scope().$apply();
+  }, 10000);
   //updateProgressBars();
 }
 

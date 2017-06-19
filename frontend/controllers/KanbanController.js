@@ -6,64 +6,22 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
     //Enable popovers
     $('[data-toggle="popover"]').popover();
 
+    updateTickets();
 
     $scope.sendKanbanRequest = function(pid) {
       sendKanbanRequest(socket, pid);
     };
   }
 
-  $scope.goHome = function () {
+  $scope.goHome = function() {
     socket.emit('leaveroom', get_kanban_scope().pid);
     $location.path('/home');
   };
 
 
-  $scope.getBorderColour = function(timeLeft, deadlineActive) {
-    let css;
 
-    if (deadlineActive) {
-      if (timeLeft > 5) {
-        css = {
-          'border': '2px solid #26292e'
 
-        };
-      } else if(timeLeft > 2) {
-        css = {
-          'border': '2px solid #0000ff'
-        };
-
-      }else if(timeLeft > 1){
-        css = {
-          'border': '2px solid #ff9902'
-        };
-
-      }else if(timeLeft > 0.5){
-        css = {
-          'border': '2px solid #ff3300'
-        };
-
-      }else if(timeLeft > 0){
-        css = {
-          'border': '2px solid #ff0000'
-        };
-      }else{
-        css = {
-          'border': '2px solid #26292e'
-
-        };
-
-      }
-    } else {
-      css = {
-        'border': '2px solid #26292e'
-
-      };
-    }
-    return css;
-
-  };
-
-  $scope.toggleOnlyUserTickets = function () {
+  $scope.toggleOnlyUserTickets = function() {
     $scope.onlyUserTickets = !$scope.onlyUserTickets;
 
     if ($scope.onlyUserTickets) {
@@ -76,11 +34,14 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
   $scope.onlyUserTickets = true; //Default
   $scope.toggleOnlyUserTickets(); //Set default message
 
-  for (let ticket in $scope.project.tickets) {
-    getTicketUsers(socket, get_kanban_scope().pid, ticket);
+
+  if ($scope.project.tickets !== undefined) {
+    for (let ticket in $scope.project.tickets) {
+      getTicketUsers(socket, get_kanban_scope().pid, ticket);
+    }
   }
 
-  $scope.getColumnUserTickets = function (cid) {
+  $scope.getColumnUserTickets = function(cid) {
     let column = $scope.project.columns[cid];
 
     let userTickets = {};
@@ -96,7 +57,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
     return userTickets;
   };
 
-  $scope.getTicketMembers = function (pid, tid) {
+  $scope.getTicketMembers = function(pid, tid) {
     let projectMembers = $scope.projects[pid].users;
     let ticketMembers = $scope.project.tickets[tid].members;
 
@@ -111,24 +72,27 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
 
   let id = null;
   let dragSrcEl = null;
-  $scope.handleTicketDragStart = function (e) {
+  $scope.handleTicketDragStart = function(e) {
     dragSrcEl = e.srcElement;
     e.effectAllowed = 'move';
     id = e.srcElement.id;
     e.dataTransfer.setData('text/plain', e.target.innerHTML);
   };
 
-  $scope.handleTicketDragLeave = function (e) {
-    e.toElement.style.border = "";
-    $(e.toElement).closest('.ticket-column')[0].style.border = ""
+  $scope.handleTicketDragLeave = function(e) {
+    var isTicket = e.toElement.className.includes('ticket ');
+    if (!isTicket) {
+      e.toElement.style.border = "";
+      $(e.toElement).closest('.ticket-column')[0].style.border = "5px solid white";
+    }
   };
 
-  $scope.handleTicketDragOver = function (e) {
+  $scope.handleTicketDragOver = function(e) {
     e.preventDefault();
-    $(e.toElement).closest('.ticket-column')[0].style.border = "thick solid #0000FF"
+    $(e.toElement).closest('.ticket-column')[0].style.border = "6px solid #0000FF";
   };
 
-  $scope.handleTicketDrop = function (e) {
+  $scope.handleTicketDrop = function(e) {
     e.preventDefault();
 
     let scope = get_kanban_scope();
@@ -139,12 +103,15 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
 
     sendTicketUpdateMoved(socket, scope.project.tickets[id], get_kanban_scope().pid, end_col_id, start_col_id);
 
-    $(e.toElement).closest('.ticket-column')[0].style.border = "";
-    e.srcElement.style.border = "";
-    e.toElement.style.border = "";
+    var isTicket = e.toElement.className.includes('ticket ');
+    if (!isTicket) {
+      e.srcElement.style.border = "";
+      e.toElement.style.border = "";
+      $(e.toElement).closest('.ticket-column')[0].style.border = "5px solid white";
+    }
   };
 
-  $scope.addBTN = function () {
+  $scope.addBTN = function() {
     let k_scope = get_kanban_scope();
 
     //Get column in position 0
@@ -212,12 +179,12 @@ app.controller('TicketModalInstanceCtrl', function($scope, $uibModalInstance) {
     $uibModalInstance.dismiss('cancel');
   };
 
-  $scope.getTicket = function (id) {
+  $scope.getTicket = function(id) {
     let k_scope = get_kanban_scope();
     return k_scope.project.tickets[id];
   };
 
-  $scope.getTid = function () {
+  $scope.getTid = function() {
     let sel = 'div[ng-controller="ModalCtrl as $ctrl"]';
     return angular.element(sel).scope().tid;
   };
@@ -241,7 +208,7 @@ app.controller('editColumnCtrl', function($scope, socket) {
 
   let start_column_id;
   let drag_started = false;
-  $scope.handleColumnDragStart = function (event) {
+  $scope.handleColumnDragStart = function(event) {
     if (!drag_started) {
       let cell = $(event.toElement).closest('table');
       start_column_id = cell[0].getAttribute('column_id');
@@ -252,12 +219,12 @@ app.controller('editColumnCtrl', function($scope, socket) {
     }
   };
 
-  $scope.handleColumnDragOver = function (event) {
+  $scope.handleColumnDragOver = function(event) {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   };
 
-  $scope.handleColumnDrop = function (event) {
+  $scope.handleColumnDrop = function(event) {
     event.preventDefault();
     if (drag_started) {
       let cell = $(event.toElement).closest('table');
@@ -269,11 +236,11 @@ app.controller('editColumnCtrl', function($scope, socket) {
     }
   };
 
-  $scope.updateColLimitEvent = function (colId, newLimit) {
+  $scope.updateColLimitEvent = function(colId, newLimit) {
     if (isNaN(newLimit)) {
       alert("Ticket limit must be a number");
 
-    } else if(newLimit < 1) {
+    } else if (newLimit < 1) {
       alert("Column must be able to contain at least one ticket");
 
     } else if (newLimit > 100) {
@@ -285,7 +252,7 @@ app.controller('editColumnCtrl', function($scope, socket) {
   };
 });
 
-app.controller('DeadlineCtrl', function ($scope) {
+app.controller('DeadlineCtrl', function($scope) {
 
 });
 
@@ -301,11 +268,11 @@ app.controller('editTicketCtrl', function($scope, socket) {
     return get_kanban_scope().project.members;
   };
 
-  $scope.isMemberAddedToTicket = function (member) {
+  $scope.isMemberAddedToTicket = function(member) {
     return $scope.getTicket($scope.getTid()).members.includes(member);
   };
 
-  $scope.toggleMemberToTicket = function (member) {
+  $scope.toggleMemberToTicket = function(member) {
     if ($scope.isMemberAddedToTicket(member)) {
       //remove member
       removeUserFromTicket(socket, get_kanban_scope().pid, member, $scope.getTid());
@@ -315,7 +282,7 @@ app.controller('editTicketCtrl', function($scope, socket) {
     }
   };
 
-  $scope.addUser = function (username) {
+  $scope.addUser = function(username) {
     addUserToTicket(socket, username, get_kanban_scope().pid, $scope.tid);
   };
 
@@ -323,7 +290,7 @@ app.controller('editTicketCtrl', function($scope, socket) {
     let ticket = $scope.getTicket($scope.tid);
     ticket.deadline = deadline;
     sendTicketUpdateDeadline(socket, ticket, get_kanban_scope().pid, deadline);
-    updateTicketTimes()
+    updateTicketTimes();
 
 
   };
@@ -382,12 +349,12 @@ app.controller('editTicketCtrl', function($scope, socket) {
 
   function getDayClass(data) {
     var date = data.date,
-        mode = data.mode;
+      mode = data.mode;
     if (mode === 'day') {
-      var dayToCheck = new Date(date).setHours(0,0,0,0);
+      var dayToCheck = new Date(date).setHours(0, 0, 0, 0);
 
       for (var i = 0; i < $scope.events.length; i++) {
-        var currentDay = new Date($scope.events[i].date).setHours(0,0,0,0);
+        var currentDay = new Date($scope.events[i].date).setHours(0, 0, 0, 0);
 
         if (dayToCheck === currentDay) {
           return $scope.events[i].status;
@@ -398,7 +365,7 @@ app.controller('editTicketCtrl', function($scope, socket) {
     return '';
   }
 
-  $scope.toggleMode = function () {
+  $scope.toggleMode = function() {
     $scope.ismeridian = !$scope.ismeridian;
   };
 
@@ -441,15 +408,18 @@ app.controller('deleteTicketCtrl', function($scope, $sce, socket) {
   }
 });
 
-app.controller('DeadlineCollapseCtrl', function ($scope) {
+app.controller('DeadlineCollapseCtrl', function($scope) {
   $scope.isCollapsed = true;
 });
 
-app.controller('CodeCtrl', function ($scope, $http, socket) {
+app.controller('CodeCtrl', function($scope, $http, socket) {
   $scope.wholeFile = false; //Default
   editcodescope = $scope;
 
-  $scope.server_response = {'filenames':[], 'methodnames': []};
+  $scope.server_response = {
+    'filenames': [],
+    'methodnames': []
+  };
 
 
 
@@ -460,7 +430,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     return $scope.server_response['filenames'];
   };
 
-  $scope.selectFile = function (file, $model, $label, $event) {
+  $scope.selectFile = function(file, $model, $label, $event) {
     //TODO: Select file
 
     $scope.selectedFile = true;
@@ -478,13 +448,13 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
 
 
-  $scope.selectMethod = function (method, $model, $label, $event, file) {
+  $scope.selectMethod = function(method, $model, $label, $event, file) {
     addMethodToTicket(socket, get_kanban_scope().pid, file, method, $scope.getTid());
 
     $scope.selectedMethod = true;
   };
 
-  $scope.getTicketCodeData = function () {
+  $scope.getTicketCodeData = function() {
     let ticket = $scope.getTicket($scope.getTid());
 
     //Remove null data
@@ -510,33 +480,33 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
     }
   };
 
-  $scope.removeMethod = function (filename, method) {
+  $scope.removeMethod = function(filename, method) {
     removeMethodFromTicket(socket, get_kanban_scope().pid, filename, method, $scope.getTid());
   };
 
   let code = [];
 
   function trimToLines(lines, startLine1Inx, endLine1Inx) {
-    let startLine = startLine1Inx -1;
-    let endLine = endLine1Inx -1;
+    let startLine = startLine1Inx - 1;
+    let endLine = endLine1Inx - 1;
 
-    let trimmed = lines.slice(startLine, endLine+1);
+    let trimmed = lines.slice(startLine, endLine + 1);
     let numbers = [];
-    for (let i = startLine; i < endLine+1; i++) {
-      numbers.push([i, trimmed[i-startLine]]);
+    for (let i = startLine; i < endLine + 1; i++) {
+      numbers.push([i, trimmed[i - startLine]]);
     }
     return numbers;
   }
 
   function getMethodObject(methods, methodname) {
-    for(let i = 0; i < methods.length; i++) {
+    for (let i = 0; i < methods.length; i++) {
       if (methods[i]['methodname'] === methodname) {
         return methods[i];
       }
     }
   }
 
-  $scope.updateCode = function (filename, method) {
+  $scope.updateCode = function(filename, method) {
     $scope.filename = filename;
     $scope.methodname = method;
     let ticket = $scope.getTicket($scope.getTid());
@@ -548,7 +518,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
 
     let url = ticket.codeData[filename]['download_url'];
 
-    $http.get(url).then(function (response) {
+    $http.get(url).then(function(response) {
       let data = response.data;
       data = data.split('\n');
       code = trimToLines(data, startLine, endLine);
@@ -558,7 +528,7 @@ app.controller('CodeCtrl', function ($scope, $http, socket) {
   };
 
   $scope.showCode = false; //Default
-  $scope.getCodeData = function () {
+  $scope.getCodeData = function() {
     if ($scope.showCode) {
       return code;
     }

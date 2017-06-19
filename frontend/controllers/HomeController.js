@@ -1,7 +1,7 @@
 var users = {};
 var userpics = {
   "yianni": "yianni.jpg",
-  "thomas": "tom_derp.jpg",
+  "thomas": "tom.jpg",
   "Dennis": "Dennis.jpg",
   "harry": "harry.jpg"
 };
@@ -11,23 +11,20 @@ app.controller('HomeController', function($scope, $location, socket) {
     let reply = JSON.parse(reply_string);
     if (reply.type === "user_tickets") {
 
-      let title = $scope.projects[reply.object.pid].title;
-      let gh_url = $scope.projects[reply.object.pid].gh_url;
-      let project = new Project(reply.object.pid);
+      $scope.projects[reply.object.pid].tickets = {};
       let replyTickets = reply.object.tickets;
 
       for (let i = 0; i < replyTickets.length; i++) {
-        project.tickets[replyTickets[i].id] = replyTickets[i];
+        $scope.projects[reply.object.pid].tickets[replyTickets[i].id] = replyTickets[i];
       }
 
-      project.title = title;
-      project.gh_url = gh_url;
-      $scope.projects[reply.object.pid] = project;
-      $scope.showDeadlines(project);
+
+      $scope.showDeadlines($scope.projects[reply.object.pid]);
 
     } else if (reply.type === "project_users") {
 
       let project = $scope.projects[reply.object.pid];
+      console.log("doing reply for " + JSON.stringify(project));
 
       project.members = reply.object.users;
       if (!('users' in project)) {
@@ -49,8 +46,9 @@ app.controller('HomeController', function($scope, $location, socket) {
           //add project to that of the users?
         }
 
-        if(project.users[member] === undefined){
-          project.addUser(users[member]);
+        if (project.users[member] === undefined) {
+          //project.addUser(users[member]);
+          project.users[member] = users[member];
         }
       }
     }
@@ -102,9 +100,30 @@ app.controller('HomeController', function($scope, $location, socket) {
 
 });
 
+app.controller('CarouselCtrl', function($scope){
+
+  $scope.pics = [];
+
+  $scope.urls = ["kankan-example-1.png", "KanKan.png"];
+  $scope.descs = ["kankan", "tom"];
+
+  $scope.addPic = function(index){
+
+    $scope.pics.push({image:$scope.urls[index],desc:$scope.descs[index], id:index});
+
+  }
+
+  for(var i = 0; i < $scope.urls.length; i++){
+    $scope.addPic(i);
+
+  }
+
+
+});
+
 app.controller('NewProjectPopoverCtrl', function($scope, $sce, socket) {
   $scope.dynamicPopover = {
-    templateUrl: 'NewProjectPopover.html'
+    templateUrl: 'NewProjectPopover.html',
   };
   $scope.newProject = function(project_name, url) {
     $scope.isOpen = false;
@@ -217,4 +236,3 @@ app.controller('EditURLInstanceCtrl', function($uibModalInstance, items, socket)
     $uibModalInstance.close();
   };
 });
-

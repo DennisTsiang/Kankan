@@ -15,7 +15,7 @@
   }
 
   .top-login-nav {
-    margin-bottom: 30px;
+    margin-bottom: 50px;
   }
 }
 
@@ -49,15 +49,36 @@
   padding-right: 17px;
 }
 
+h2 ~ p {
+  font-style: normal;
+  font-size: 22px;
+}
+
+h2 {
+  font-weight: bold;
+}
+
 .top-login-nav {
   overflow: auto;
   clear: both;
+}
+
+#create-project .popover {
+  width:700px;
+}
+
+.cog-dropdown {
+  font-size: 30px;
+  color: white;
+  margin-top: 10px;
+  margin-right: 13px;
 }
 
 .below-nav .jumbotron {
 
   margin-bottom:0px;
   padding-bottom: 0px;
+  background-color: white;
 }
 
 img {
@@ -65,7 +86,7 @@ img {
 }
 
 .ticket-upcoming {
-  width: 125px;
+  width: 120px;
   display: flex;
   flex-direction: column;
   min-height:75px;
@@ -77,6 +98,12 @@ img {
   background-color: #e8eaeb;
   float: left;
 
+}
+
+body {
+  /*background-image: url("pattern2background.png");
+  background-color: #ff8080;*/
+  background-color: #C5E6F7;
 }
 
 .row button {
@@ -162,6 +189,10 @@ div {
   margin-bottom: 5px;
 }
 
+.kanbantable {
+  border: 5px solid white;
+}
+
 .ticket-column {
 
 }
@@ -233,6 +264,13 @@ div {
   flex-grow: 1;
   text-align: center;
 }
+
+.btn-primary {
+  color: #fff;
+  background-color: #515CC9;
+  border-color: #3440B3;
+}
+
 
 .button-centered {
   text-align: center;
