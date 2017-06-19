@@ -5,8 +5,8 @@
     <ul class="nav navbar-nav navbar-left vertical-align">
       <!-- Button for user to return to home page - select other project from there. -->
       <li>
-        <div ng-controller="NewProjectPopoverCtrl" id="create-project">
-          <button popover-placement="right-top" popover-trigger="'outsideClick'" uib-popover-template="dynamicPopover.templateUrl" popover-is-open="isOpen"
+        <div ng-controller="NewProjectPopoverCtrl" id="create-project]">
+          <button style="margin-left: 5px" popover-placement="right-top" popover-trigger="'outsideClick'" uib-popover-template="dynamicPopover.templateUrl" popover-is-open="isOpen"
                   ng-click="isOpen = true" type="button" class="btn btn-primary btn-lg">Create New Project</button>
         </div>
         <script type="text/ng-template" id="NewProjectPopover.html">
@@ -24,7 +24,10 @@
       </li>
     </ul>
     <ul class="nav navbar-right">
-      <li><button type="button" class="btn btn-lg btn-primary" ng-click="logOut()" style="margin-right: 20px;">Log Out</button></li>
+      <li><button type="button" class="btn btn-md btn-primary" ng-click="logOut()" style="margin-right: 20px; margin-top: 5px">Log Out</button></li>
+    </ul>
+    <ul class="nav navbar-right">
+      <li><span class="h2"><strong style="color: white; vertical-align: sub; margin-right: 5px">{{username}}</strong></span></li>
     </ul>
   </nav>
 
@@ -42,19 +45,15 @@
         <div class="col-sm-3">
           <h2>Members</h2></div>
         <div class="col-sm-6">
-          <h2>Upcoming Deadlines</h2></div>
-        <!--<div class="col-sm-2">
-          <h2>Summary</h2></div>-->
-
+          <h2>Your Upcoming Deadlines</h2></div>
       </div>
     </div>
 
-    <div class="row" ng-repeat="project in projects">
+    <div class="row" ng-repeat="project in projects" style="margin-bottom: 10px">
 
       <div class="col-sm-3">
         <div class="btn-group btn-flex button-centered" ng-controller="DropdownCtrl as $ctrl">
           <button type="button" class="btn btn-default" ng-click="chooseProject(project.project_id)">
-
                                 <b>{{project.title}}</b>
                               </button>
           <button type="button" class="btn btn-default dropdown-toggle btn-lg" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -80,7 +79,8 @@
           <h4>{{ticket.isTimeLeft}} {{ticket.timeLeftFormatted}} {{ticket.timeFormatter}}</h4></div>
       </div>
     <!--<div class="col-sm-2">Do we even need this? Not sure, will get back to you.</div>-->
-  </div>
+    </div>
+
 
   </div>
 

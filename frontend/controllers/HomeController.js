@@ -1,7 +1,7 @@
 var users = {};
 var userpics = {
   "yianni": "yianni.jpg",
-  "thomas": "tom_derp.jpg",
+  "thomas": "tom.jpg",
   "Dennis": "Dennis.jpg",
   "harry": "harry.jpg"
 };
@@ -104,7 +104,7 @@ app.controller('CarouselCtrl', function($scope){
 
   $scope.pics = [];
 
-  $scope.urls = ["kankan-example-1.png", "tom_derp.jpg"];
+  $scope.urls = ["kankan-example-1.png", "KanKan.png"];
   $scope.descs = ["kankan", "tom"];
 
   $scope.addPic = function(index){
