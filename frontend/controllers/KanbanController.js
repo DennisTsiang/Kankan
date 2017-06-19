@@ -6,6 +6,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
     //Enable popovers
     $('[data-toggle="popover"]').popover();
 
+    updateTickets();
 
     $scope.sendKanbanRequest = function(pid) {
       sendKanbanRequest(socket, pid);
@@ -18,50 +19,7 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
   };
 
 
-  $scope.getBorderColour = function(timeLeft, deadlineActive) {
-    let css;
 
-    if (deadlineActive) {
-      if (timeLeft > 5) {
-        css = {
-          'border': '2px solid #26292e'
-
-        };
-      } else if (timeLeft > 2) {
-        css = {
-          'border': '2px solid #0000ff'
-        };
-
-      } else if (timeLeft > 1) {
-        css = {
-          'border': '2px solid #ff9902'
-        };
-
-      } else if (timeLeft > 0.5) {
-        css = {
-          'border': '2px solid #ff3300'
-        };
-
-      } else if (timeLeft > 0) {
-        css = {
-          'border': '2px solid #ff0000'
-        };
-      } else {
-        css = {
-          'border': '2px solid #26292e'
-
-        };
-
-      }
-    } else {
-      css = {
-        'border': '2px solid #26292e'
-
-      };
-    }
-    return css;
-
-  };
 
   $scope.toggleOnlyUserTickets = function() {
     $scope.onlyUserTickets = !$scope.onlyUserTickets;
@@ -122,13 +80,16 @@ app.controller('KanbanCtrl', function($scope, $location, socket) {
   };
 
   $scope.handleTicketDragLeave = function(e) {
-    e.toElement.style.border = "";
-    $(e.toElement).closest('.ticket-column')[0].style.border = "5px solid white"
+    var isTicket = e.toElement.className.includes('ticket ');
+    if (!isTicket) {
+      e.toElement.style.border = "";
+      $(e.toElement).closest('.ticket-column')[0].style.border = "5px solid white";
+    }
   };
 
   $scope.handleTicketDragOver = function(e) {
     e.preventDefault();
-    $(e.toElement).closest('.ticket-column')[0].style.border = "thick solid #0000FF"
+    $(e.toElement).closest('.ticket-column')[0].style.border = "thick solid #0000FF";
   };
 
   $scope.handleTicketDrop = function(e) {
@@ -326,7 +287,7 @@ app.controller('editTicketCtrl', function($scope, socket) {
     let ticket = $scope.getTicket($scope.tid);
     ticket.deadline = deadline;
     sendTicketUpdateDeadline(socket, ticket, get_kanban_scope().pid, deadline);
-    updateTicketTimes()
+    updateTicketTimes();
 
 
   };

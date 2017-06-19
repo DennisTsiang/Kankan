@@ -13,6 +13,7 @@ function Ticket(ticket_id) {
   this.timeLeftFormatted = "";
   this.timeFormatter = "";
   this.isTimeLeft = "";
+  this.borderColour="2px solid #26292e";
 
   this.addMembersToTicket = function(array) {
     for (let i = 0; i < array.length; i++) {
@@ -101,10 +102,12 @@ function Ticket(ticket_id) {
       this.timeLeft = 0;
 
     } else {
+      console.log("doing stuff");
 
       if (this.timeLeft < 1) {
         this.timeFormatter = "minutes";
         this.timeLeftFormatted = (Math.floor(this.timeLeft * 60)).toString();
+        console.log("new minutes is " + this.timeLeftFormatted);
 
       } else if (this.timeLeft < (24)) {
         this.timeFormatter = "hours";
@@ -118,34 +121,63 @@ function Ticket(ticket_id) {
       }
     }
 
+    this.borderColour = this.getBorderColour();
 
 
+  };
 
-    /*
+  this.getBorderColour = function() {
+    let desc = this.desc;
+    let deadlineActive = this.deadlineActive;
+    let timeLeft = this.timeLeft;
+    console.log("calledesc, timeLeft, deadlineActived getColour for " + desc);
+    let css;
 
-    if (timeWidth > 0) {
+    if (deadlineActive) {
+      if (timeLeft > 5) {
+        //black
+        console.log("for " + desc + " we return black");
+        css =
+          '2px solid #26292e';
+      } else if (timeLeft > 2) {
+        //blue
+        console.log("for " + desc + " we return blue");
 
+        css =
+          '2px solid #0000ff';
 
-      let milliProgress = (currentDate.getTime() - starttime) / timeWidth
-      this.progress = (milliProgress * 100);
+      } else if (timeLeft > 1) {
+        //yellow
+        console.log("for " + desc + " we return yellow");
 
+        css =
 
-      if (this.progress >= 100) {
-        this.progress = 100;
-        this.deadlineActive = false;
+          '2px solid #ff9902';
+
+      } else if (timeLeft > 0.5) {
+        //orange
+        console.log("for " + desc + " we return orange");
+
+        css =
+          '2px solid #ff3300';
+
+      } else if (timeLeft > 0) {
+
+        //red
+        console.log("for " + desc + " we return red");
+
+        css =
+          '2px solid #ff0000';
+      } else {
+        css =
+          '2px solid #26292e';
+
       }
-
     } else {
-      this.progress = 0;
-      this.deadlineActive = 0;
+      css =
+        '2px solid #26292e';
     }
-
-    */
-
-    //  console.log("starttime " + starttime);
-    //  console.log("endtime is " + endtime);
-
-    //console.log("startdate is " + this.startdate);
+    return css;
 
   };
 }
