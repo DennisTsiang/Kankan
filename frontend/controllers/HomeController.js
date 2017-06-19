@@ -123,7 +123,7 @@ app.controller('CarouselCtrl', function($scope){
 
 app.controller('NewProjectPopoverCtrl', function($scope, $sce, socket) {
   $scope.dynamicPopover = {
-    templateUrl: 'NewProjectPopover.html'
+    templateUrl: 'NewProjectPopover.html',
   };
   $scope.newProject = function(project_name, url) {
     $scope.isOpen = false;

@@ -63,6 +63,10 @@ h2 {
   clear: both;
 }
 
+#create-project .popover {
+  width:700px;
+}
+
 .cog-dropdown {
   font-size: 30px;
   color: white;
