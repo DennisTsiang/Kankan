@@ -118,7 +118,7 @@ function addUserToProject(socket, username, pid) {
 
 function addUserToTicket(socket, username, pid, tid) {
   var jsonString = {type:'add_user_to_ticket', username : username, pid : pid, tid : tid};
-  socket.emit("request", JSON.stringify(jsonString));
+  socket.emit("store", JSON.stringify(jsonString));
 }
 
 function getTicketUsers(socket, pid, tid) {

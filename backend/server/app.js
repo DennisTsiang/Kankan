@@ -107,13 +107,6 @@ function App (db) {
           callback({type:'user_projects', object:projects});
         });
         break;
-      case 'add_user_to_ticket':
-        db.addUserToTicket(request["username"], request["tid"], request["pid"], function(success) {
-          db.getTicketUsers(request['pid'], request['tid'], function(tid, users) {
-            callback({type:'ticket_users', object:{tid: tid, users: users}});
-          })
-        });
-        break;
       case 'user_tickets':
         db.getUserTickets(request["username"], request["pid"], function (tickets) {
           callback({type:'user_tickets', object:{pid:request.pid, tickets:tickets}});
@@ -187,6 +180,12 @@ function App (db) {
               });
             });
           });
+        });
+        break;
+      case 'add_user_to_ticket':
+        db.addUserToTicket(store["username"], store["tid"], store["pid"], function(success) {
+          io_client.sockets.in(store.pid).emit('storereply', JSON.stringify({type:'add_user_to_ticket', tid: store.tid, user: store.username, pid:store.pid}));
+          io_client.sockets.in('home_' + store.pid).emit('storereply', JSON.stringify({type:'add_user_to_ticket', tid: store.tid, user: store.username, pid:store.pid}));
         });
         break;
       case 'column_new':
@@ -338,8 +337,8 @@ function App (db) {
       case "userOfTicket_remove" :
         db.removeUserFromTicket(remove.username, remove.pid, remove.tid, function(success) {
           db.getKanban(remove['pid'], function (kanban) {
-            io_client.sockets.in(remove.pid).emit('removereply', JSON.stringify({type: 'userOfTicket_remove', object: kanban}));
-            io_client.sockets.in('home_' + remove.pid).emit('removereply', JSON.stringify({type: 'userOfTicket_remove', object: kanban}));
+            io_client.sockets.in(remove.pid).emit('removereply', JSON.stringify({type: 'userOfTicket_remove', pid:remove.pid, username:remove.username, ticket_id:remove.tid}));
+            io_client.sockets.in('home_' + remove.pid).emit('removereply', JSON.stringify({type: 'userOfTicket_remove', pid:remove.pid, username:remove.username, ticket_id:remove.tid}));
           });
         });
         break;

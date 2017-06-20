@@ -138,10 +138,6 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
           get_kanban_scope().project.tickets[tid].members = users;
           break;
         }
-        case "add_user_to_ticket": {
-
-          break;
-        }
         case "user_new" : {
           if (reply.success) {
             get_kanban_scope().l.path('/home');
@@ -203,11 +199,20 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
           break;
         }
         case "userOfTicket_remove" : {
-          //remove a user from a ticket
-          generate_kanban(reply.object);
-
-          //Send for tickets, once received kanban.
-          sendTicketsRequest(socket, get_kanban_scope().pid);
+          var username = reply.username;
+          var pid = reply.pid;
+          var tid = reply.ticket_id;
+          console.log(reply);
+          if (pid === get_kanban_scope().pid) {
+            var members = get_kanban_scope().project.tickets[tid].members;
+            var new_members = []
+            for (var i = 0; i < members.length; i++) {
+              if (members[i] !== username) {
+                new_members.push(members[i]);
+              }
+            }
+            get_kanban_scope().project.tickets[tid].members = new_members;
+          }
           break;
         }
         case "userOfProject_remove" : {
@@ -283,7 +288,16 @@ app.controller('ApplicationCtrl', function($scope, $location, socket) {
           }
           break;
         }
-
+        case "add_user_to_ticket": {
+          var pid = reply.pid;
+          var ticket_id = reply.tid;
+          var username = reply.user;
+          console.log(reply);
+          if (get_kanban_scope().pid === pid) {
+            get_kanban_scope().project.tickets[ticket_id].members.push(username);
+          }
+          break;
+        }
         case "column_new": {
           let col_info = reply.object;
           addColumn(col_info.column_name, col_info.position, col_info.cid);
