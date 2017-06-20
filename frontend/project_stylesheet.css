@@ -66,6 +66,10 @@ h2 {
   width:700px;
 }
 
+.modal-body {
+  max-height: 800px;
+}
+
 .cog-dropdown {
   font-size: 30px;
   color: white;
