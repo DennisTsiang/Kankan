@@ -24,7 +24,6 @@ app.controller('HomeController', function($scope, $location, socket) {
     } else if (reply.type === "project_users") {
 
       let project = $scope.projects[reply.object.pid];
-      console.log("doing reply for " + JSON.stringify(project));
 
       project.members = reply.object.users;
       if (!('users' in project)) {

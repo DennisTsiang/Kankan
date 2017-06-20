@@ -87,12 +87,14 @@ function Database(pool) {
         pool.query('DELETE FROM project_table WHERE project_id = $1::int', [pid], function (err, res2) {
           pool.query('DROP TABLE tickets_' + pid, [], function (err, res3) {
             pool.query('DELETE FROM user_projects WHERE project_id = $1::int', [pid], function(res4) {
-              pool.query('DROP TABLE github_table_' + pid, [], function(err, res5) {
-                pool.query('DROP TABLE ticket_files_' + pid, [], function (err, res) {
-                  console.log('Deleted project ' + pid);
-                  rwlock.unlock();
-                  callback(true);
-                })
+              pool.query('DELETE FROM user_tickets WHERE project_id = $1::int', [pid], function() {
+                pool.query('DROP TABLE github_table_' + pid, [], function(err, res5) {
+                  pool.query('DROP TABLE ticket_files_' + pid, [], function (err, res) {
+                    console.log('Deleted project ' + pid);
+                    rwlock.unlock();
+                    callback(true);
+                  })
+                });
               });
             });
           });
